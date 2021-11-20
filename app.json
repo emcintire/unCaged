@@ -1,0 +1,40 @@
+{
+    "expo": {
+        "name": "unCaged",
+        "slug": "unCaged",
+        "icon": "./app/assets/imgs/appleIcon.png",
+        "version": "6.0.0",
+        "orientation": "portrait",
+        "packagerOpts": {
+            "config": "metro.config.js",
+            "sourceExts": [
+                "expo.ts",
+                "expo.tsx",
+                "expo.js",
+                "expo.jsx",
+                "ts",
+                "tsx",
+                "js",
+                "jsx",
+                "json",
+                "wasm",
+                "svg"
+            ]
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "uncaged.app"
+        },
+        "android": {
+            "package": "uncaged.app",
+            "versionCode": 6
+        },
+        "web": {
+            "favicon": "./app/assets/imgs/icon.png"
+        }
+    }
+}
