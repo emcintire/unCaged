@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "413485957006",
+    "project_id": "uncaged-487315",
+    "storage_bucket": "uncaged-487315.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413485957006:android:eba6024df1ab877655eedf",
+        "android_client_info": {
+          "package_name": "uncaged.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD67ZS3NIC3V3e3Ndl18ZcD_B39hGqaZgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

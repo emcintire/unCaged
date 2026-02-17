@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+
+# Test coverage
+coverage/
+
+# Environment variables
+.env
+
+# Scripts
+run.sh
+
+# Logs
+*.log
+uncaughtExceptions.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

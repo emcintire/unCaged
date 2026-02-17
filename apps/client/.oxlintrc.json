@@ -1,0 +1,78 @@
+{
+  "rules": {
+    "typescript": "error",
+    "react": "warn",
+    "jsx-a11y": "warn",
+    "eslint": "error",
+    "unicorn": "warn",
+    "import": "warn",
+
+    "eslint/default-case": "off",
+    "eslint/eqeqeq": ["error", "smart"],
+    "eslint/max-depth": ["error", { "max": 4 }],
+    "eslint/max-lines": ["warn", { "max": 500 }],
+    "eslint/max-lines-per-function": ["error", { "max": 500 }],
+    "eslint/max-nested-callbacks": ["error", { "max": 3 }],
+    "eslint/max-params": ["error", { "max": 15 }],
+    "eslint/max-len": ["error", { "code": 116, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true }],
+    "eslint/no-trailing-spaces": "error",
+    "eslint/no-multi-spaces": "error",
+    "eslint/comma-dangle": ["error", "always-multiline"],
+    "eslint/semi": ["error", "always"],
+    "eslint/yoda": ["error", "never", { "onlyEquality": true }],
+    "eslint/func-style": "off",
+    "eslint/no-nested-ternary": "off",
+    "eslint/no-ternary": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/prefer-destructuring": ["error", { "array": false, "object": true }],
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+    "eslint/vars-on-top": "off",
+    "import/exports-last": "off",
+    "import/extensions": ["off", "ignorePackages"],
+    "import/group-exports": "off",
+    "import/max-dependencies": "off",
+    "import/consistent-type-specifier-style": "off",
+    "import/no-anonymous-default-export": "off",
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    "jsx_a11y/no-autofocus": "off",
+    "oxc/no-async-await": "off",
+    "oxc/no-barrel-file": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "promise/catch-or-return": "warn",
+    "react/exhaustive-deps": "warn",
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "allow": "as-needed",
+        "extensions": [".jsx", ".tsx"]
+      }
+    ],
+    "react/jsx-handler-names": "off",
+    "react/no-set-state": "off",
+    "react/react-in-jsx-scope": "off",
+    "typescript/array-type": ["error", { "default": "generic", "readonly": "generic" }],
+    "typescript/ban-ts-comment": "warn",
+    "typescript/consistent-indexed-object-style": ["error", "record"],
+    "typescript/consistent-type-definitions": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-unused-vars": "error",
+    "unicorn/no-nested-ternary": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-unreadable-array-destructuring": "off",
+    "unicorn/switch-case-braces": ["error", "always"]
+  },
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}
