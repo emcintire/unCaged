@@ -3,7 +3,8 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import type { SetState } from '@/types';
 import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useCurrentUser } from '@/services';
 import { borderRadius, colors, showErrorToast, spacing } from '@/config';
-import Icon from '../Icon'
+import { getStarIcon } from '../StarRating';
+import Icon from '../Icon';
 
 const styles = StyleSheet.create({
   stars: {
@@ -18,7 +19,10 @@ const styles = StyleSheet.create({
   },
 });
 
-const stars = [1, 2, 3, 4, 5];
+function getStarColor(star: number, rating: number): string {
+  if (rating >= star - 0.5) return colors.orange;
+  return colors.medium;
+}
 
 type Props = {
   movie: Movie;
@@ -26,17 +30,6 @@ type Props = {
   rating: number;
   setRating: SetState<number>;
 };
-
-function getStarIcon(star: number, rating: number): 'star' | 'star-half-full' | 'star-outline' {
-  if (rating >= star) return 'star';
-  if (rating >= star - 0.5) return 'star-half-full';
-  return 'star-outline';
-}
-
-function getStarColor(star: number, rating: number): string {
-  if (rating >= star - 0.5) return colors.orange;
-  return colors.medium;
-}
 
 export default function MovieModalRating({ movie, onSeenAdded, rating, setRating }: Props) {
   const rateMovieMutation = useRateMovie();
@@ -62,23 +55,25 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
 
   const handleRating = (star: number) => async () => {
     if (rating === star) {
-      // Full star tapped again → half star
       await submitRating(star - 0.5);
     } else if (rating === star - 0.5) {
-      // Half star tapped again → remove rating
       deleteRatingMutation.mutate({ id: movie._id }, {
         onSuccess: () => setRating(0),
       });
     } else {
-      // New selection → full star
       await submitRating(star);
     }
   };
 
   return (
     <View style={styles.stars}>
-      {stars.map((star) => (
-        <TouchableOpacity key={star} onPress={handleRating(star)} accessibilityRole="button" accessibilityLabel={`Rate ${star} star${star > 1 ? 's' : ''}`}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <TouchableOpacity
+          key={star}
+          onPress={handleRating(star)}
+          accessibilityRole="button"
+          accessibilityLabel={`Rate ${star} star${star > 1 ? 's' : ''}`}
+        >
           <Icon
             name={getStarIcon(star, rating)}
             size={60}

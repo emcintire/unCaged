@@ -13,8 +13,8 @@ const styles = StyleSheet.create({
     minHeight: 60,
     height: 'auto',
     width: '90%',
-    backgroundColor: colors.white,
-    borderWidth: 2,
+    backgroundColor: colors.black,
+    borderWidth: 1,
     borderColor: colors.green,
     borderRadius: borderRadius.md,
     display: 'flex',
@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
     minHeight: 60,
     height: 'auto',
     width: '90%',
-    backgroundColor: colors.white,
-    borderWidth: 2,
+    backgroundColor: colors.black,
+    borderWidth: 1,
     borderColor: colors.red,
     borderRadius: borderRadius.md,
     display: 'flex',
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   notificationText: {
     fontSize: fontSize.sm,
     fontFamily: fontFamily.medium,
-    color: colors.bg,
+    color: colors.light,
     paddingLeft: spacing.sm,
     width: '88%',
   },
@@ -57,7 +57,7 @@ export const toastConfig = {
       <View style={[styles.iconContainer, { backgroundColor: colors.green }]}>
         <MaterialCommunityIcons name="check-bold" color={colors.white} size={17} />
       </View>
-      <Text style={[styles.notificationText, { color: colors.green }]}>{text1}</Text>
+      <Text style={styles.notificationText}>{text1}</Text>
     </View>
   ),
   error: ({ text1 }: ToastConfigProps) => (
@@ -65,7 +65,7 @@ export const toastConfig = {
       <View style={[styles.iconContainer, { backgroundColor: colors.red }]}>
         <MaterialCommunityIcons name="exclamation-thick" color={colors.white} size={17} />
       </View>
-      <Text style={[styles.notificationText, { color: colors.red }]}>{text1}</Text>
+      <Text style={styles.notificationText}>{text1}</Text>
     </View>
   ),
 };

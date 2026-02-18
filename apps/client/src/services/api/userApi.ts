@@ -11,6 +11,7 @@ import {
   MoviesArraySchema,
   RateMovieDataSchema,
   RegisterDataSchema,
+  UserReviewsArraySchema,
   TokenResponseSchema,
   UpdateUserDataSchema,
   UserSchema,
@@ -222,5 +223,10 @@ export const userApi = makeApi([
       },
     ],
     response: z.void(),
+  }, {
+    method: 'get',
+    path: '/reviews',
+    alias: 'getMyReviews',
+    response: UserReviewsArraySchema,
   },
 ]);

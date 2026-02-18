@@ -12,6 +12,7 @@ import MovieModalDetails from './MovieModalDetails';
 import MovieModalActions from './MovieModalActions';
 import MovieModalSignIn from './MovieModalSignIn';
 import MovieModalSkeleton from '@/components/movieModal/MovieModalSkeleton';
+import MovieReviews from './MovieReviews';
 
 type Props = {
   isOpen: boolean;
@@ -89,6 +90,7 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
               </View>
               {isAuthenticated ? <MovieModalActions movie={movie} /> : <MovieModalSignIn onClose={onClose} />}
               <MovieModalDetails movie={movie} />
+              <MovieReviews movieId={movie._id} />
             </ScrollView>
             {!imageLoaded && (
               <View style={styles.skeletonOverlay}>

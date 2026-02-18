@@ -26,9 +26,11 @@ export type SettingsTabParamList = {
   Settings: undefined;
   'My Account': undefined;
   'My Collection': undefined;
+  'My Reviews': undefined;
   Security: undefined;
   About: undefined;
   Admin: undefined;
+  'Admin Reviews': undefined;
   'Privacy Policy': undefined;
 };
 

@@ -1,7 +1,3 @@
-export { MovieSchema, type Movie } from './movie';
-export { UserSchema, type User } from './user';
-export { UserRatingSchema, type UserRating } from './userRating';
-export { QuoteSchema, type Quote } from './quote';
 export {
   ReviewSchema,
   ReviewsArraySchema,
@@ -15,4 +11,4 @@ export {
   type UserReview,
   type AdminReview,
   type AdminReviewsPage,
-} from './review';
+} from '@uncaged/shared';

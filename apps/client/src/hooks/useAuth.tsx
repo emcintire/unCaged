@@ -20,9 +20,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
 
   const signOut = useCallback(async () => {
-    await SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
-    queryClient.clear();
+    // Update state synchronously first so navigation switches immediately
     setIsAuthenticated(false);
+    queryClient.clear();
+    // Delete token in background — no need to block UI on this
+    void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
   }, [queryClient]);
 
   const signIn = useCallback(async (token: string) => {

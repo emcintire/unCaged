@@ -5,10 +5,12 @@ import type { Screen, SettingsTabParamList } from '@/types';
 import { screenOptions } from '@/navigation/stacks/screenOptions';
 import AboutScreen from '@/screens/Home/AboutScreen';
 import AdminScreen from '@/screens/Home/AdminScreen';
+import AdminReviewsScreen from '@/screens/Home/AdminReviewsScreen';
 import AccountButton from '@/components/AccountButton';
 import AppLogo from '@/components/AppLogo';
 import AccountDetailsScreen from '@/screens/Home/AccountDetailsScreen';
 import CollectionScreen from '@/screens/Home/CollectionScreen';
+import MyReviewsScreen from '@/screens/Home/MyReviewsScreen';
 import PrivacyPolicyScreen from '@/screens/Home/PrivacyPolicy';
 import SecurityScreen from '@/screens/Home/SecurityScreen';
 import SettingsScreen from '@/screens/Home/SettingsScreen';
@@ -29,6 +31,10 @@ const screens: Array<Screen<SettingsTabParamList>> = [{
   name: 'My Collection',
   component: CollectionScreen,
 }, {
+  name: 'My Reviews',
+  component: MyReviewsScreen,
+  options: ({ title: 'My Reviews' }),
+}, {
   name: 'Security',
   component: SecurityScreen,
   options: ({ title: 'Change Password' }),
@@ -38,6 +44,10 @@ const screens: Array<Screen<SettingsTabParamList>> = [{
 }, {
   name: 'Admin',
   component: AdminScreen,
+}, {
+  name: 'Admin Reviews',
+  component: AdminReviewsScreen,
+  options: ({ title: 'Manage Reviews' }),
 }, {
   name: 'Privacy Policy',
   component: PrivacyPolicyScreen,

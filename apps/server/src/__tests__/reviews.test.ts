@@ -159,7 +159,7 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body).toHaveLength(2);
+      expect(response.body.reviews).toHaveLength(2);
     });
 
     it('should return reviews sorted by newest first', async () => {
@@ -180,8 +180,8 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body[0].text).toBe('Newer review');
-      expect(response.body[1].text).toBe('Older review');
+      expect(response.body.reviews[0].text).toBe('Newer review');
+      expect(response.body.reviews[1].text).toBe('Older review');
     });
 
     it('should include user name and avatar in reviews', async () => {
@@ -191,8 +191,8 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body[0]).toHaveProperty('userName', 'Review User');
-      expect(response.body[0]).toHaveProperty('userImg', 'https://i.imgur.com/user.png');
+      expect(response.body.reviews[0]).toHaveProperty('userName', 'Review User');
+      expect(response.body.reviews[0]).toHaveProperty('userImg', 'https://i.imgur.com/user.png');
     });
 
     it('should include spoiler flag in response', async () => {
@@ -202,7 +202,7 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body[0].isSpoiler).toBe(true);
+      expect(response.body.reviews[0].isSpoiler).toBe(true);
     });
 
     it('should include snapshot rating in response', async () => {
@@ -212,7 +212,7 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body[0].rating).toBe(3);
+      expect(response.body.reviews[0].rating).toBe(3);
     });
 
     it('should return empty array when no reviews exist', async () => {
@@ -220,7 +220,7 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body).toEqual([]);
+      expect(response.body.reviews).toEqual([]);
     });
 
     it('should not require authentication', async () => {
@@ -230,7 +230,7 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body).toHaveLength(1);
+      expect(response.body.reviews).toHaveLength(1);
     });
 
     it('should only return reviews for the specified movie', async () => {
@@ -251,8 +251,8 @@ describe('Review API Endpoints', () => {
         .get(`/api/movies/${movieId}/reviews`)
         .expect(200);
 
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].text).toBe('Review for movie 1');
+      expect(response.body.reviews).toHaveLength(1);
+      expect(response.body.reviews[0].text).toBe('Review for movie 1');
     });
   });
 

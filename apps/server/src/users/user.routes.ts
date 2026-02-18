@@ -42,3 +42,4 @@ userRouter.put('/rate', auth, controller.rateMovie.bind(controller));
 userRouter.delete('/rate', auth, controller.deleteRating.bind(controller));
 
 userRouter.post('/filteredMovies', auth, controller.getFilteredMovies.bind(controller));
+userRouter.get('/reviews', auth, controller.getUserReviews.bind(controller));

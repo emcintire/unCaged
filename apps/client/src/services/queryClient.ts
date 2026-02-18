@@ -1,9 +1,16 @@
 import { QueryClient } from '@tanstack/react-query';
 
+function shouldRetry(failureCount: number, error: unknown): boolean {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  // Never retry auth or permission failures — the 401 interceptor handles signOut
+  if (status === 401 || status === 403) return false;
+  return failureCount < 2;
+}
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 2,
+      retry: shouldRetry,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
@@ -11,7 +18,7 @@ export const queryClient = new QueryClient({
       refetchOnReconnect: true,
     },
     mutations: {
-      retry: 1,
+      retry: (failureCount, error) => shouldRetry(failureCount, error),
     },
   },
 });

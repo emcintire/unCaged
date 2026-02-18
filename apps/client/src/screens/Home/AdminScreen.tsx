@@ -1,7 +1,11 @@
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { z } from 'zod';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { SettingsTabParamList } from '@/types';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAddQuote, useCreateMovie } from '@/services';
-import { colors, spacing, fontSize, fontFamily, showSuccessToast } from '@/config';
+import { borderRadius, colors, spacing, fontSize, fontFamily, showSuccessToast } from '@/config';
 import Screen from '@/components/Screen';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import { toFormikValidator } from '@/utils/toFormikValidator';
@@ -59,6 +63,7 @@ const initialQuoteValues: QuoteFormValues = {
 };
 
 export default function AdminScreen() {
+  const { navigate } = useNavigation<NativeStackNavigationProp<SettingsTabParamList>>();
   const addQuoteMutation = useAddQuote();
   const createMovieMutation = useCreateMovie();
 
@@ -97,6 +102,13 @@ export default function AdminScreen() {
   return (
     <Screen style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} decelerationRate="fast">
+        {/* Manage Reviews */}
+        <TouchableOpacity style={styles.manageBtn} onPress={() => navigate('Admin Reviews')}>
+          <MaterialCommunityIcons name="flag-outline" size={20} color={colors.orange} />
+          <Text style={styles.manageBtnText}>Manage Reviews</Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color={colors.medium} />
+        </TouchableOpacity>
+
         <Text style={styles.sectionHeader}>Submit Quote</Text>
         <AppForm<QuoteFormValues>
           initialValues={initialQuoteValues}
@@ -133,6 +145,21 @@ export default function AdminScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: spacing.md,
+  },
+  manageBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.black,
+    borderRadius: borderRadius.sm,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  manageBtnText: {
+    flex: 1,
+    color: colors.white,
+    fontFamily: fontFamily.medium,
+    fontSize: fontSize.base,
   },
   sectionHeader: {
     fontFamily: fontFamily.bold,

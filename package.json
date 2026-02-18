@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev:client & npm run dev:server",
+    "dev": "start cmd /k npm run dev:server && npm run dev:client",
     "dev:server": "npm run dev -w uncaged-server",
     "dev:client": "npm run dev -w uncaged-client",
     "test:server": "npm test -w uncaged-server",
@@ -19,6 +19,5 @@
   },
   "devDependencies": {
     "nx": "22.5.0"
-  },
-  "dependencies": {}
+  }
 }

@@ -3,6 +3,9 @@ import type { ReviewData } from './review.schema';
 
 export type ReviewDocument = ReviewData & Document & {
   _id: Types.ObjectId;
+  likes: string[];
+  isFlagged: boolean;
+  flaggedBy: string[];
 };
 
 const reviewMongooseSchema = new Schema<ReviewDocument>({
@@ -28,6 +31,18 @@ const reviewMongooseSchema = new Schema<ReviewDocument>({
   isSpoiler: {
     type: Boolean,
     default: false,
+  },
+  likes: {
+    type: [String],
+    default: [],
+  },
+  isFlagged: {
+    type: Boolean,
+    default: false,
+  },
+  flaggedBy: {
+    type: [String],
+    default: [],
   },
   createdOn: {
     type: Date,

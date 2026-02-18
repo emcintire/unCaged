@@ -13,6 +13,9 @@ import type {
   FilteredMoviesDto,
 } from './types';
 import { UserService } from './user.service';
+import { User } from './user.model';
+import { Review } from '../reviews/review.model';
+import { Movie } from '@/movies';
 
 const userService = new UserService();
 
@@ -266,6 +269,46 @@ export class UserController {
       res.status(200).send(movies);
     } catch (error) {
       res.status(404).send(error instanceof Error ? error.message : 'An error occurred');
+    }
+  }
+
+  async getUserReviews(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = getUserIdFromRequest(req, res);
+      if (!userId) return;
+
+      const [reviews, user] = await Promise.all([
+        Review.find({ userId }).sort({ createdOn: -1 }),
+        User.findById(userId).select('name img'),
+      ]);
+
+      const movieIds = [...new Set(reviews.map((r) => r.movieId))];
+      const movies = await Movie.find({ _id: { $in: movieIds } }).select('title img');
+      const movieMap = new Map(movies.map((m) => [m._id.toString(), m]));
+
+      const result = reviews.map((review) => {
+        const movie = movieMap.get(review.movieId);
+        return {
+          _id: review._id.toString(),
+          userId: review.userId,
+          movieId: review.movieId,
+          text: review.text,
+          rating: review.rating,
+          isSpoiler: review.isSpoiler,
+          likes: review.likes ?? [],
+          likeCount: review.likes?.length ?? 0,
+          isFlagged: review.isFlagged,
+          createdOn: review.createdOn,
+          userName: user?.name ?? '',
+          userImg: user?.img ?? '',
+          movieTitle: movie?.title ?? '',
+          movieImg: movie?.img ?? '',
+        };
+      });
+
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(500).send(error instanceof Error ? error.message : 'An error occurred');
     }
   }
 }

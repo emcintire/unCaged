@@ -1,7 +1,8 @@
 import { useCallback, useState, type ReactElement } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, Text } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Movie } from '@/services';
-import { movieCard, spacing } from '@/config';
+import { colors, fontFamily, fontSize, movieCard, spacing } from '@/config';
 import MovieCard from './MovieCard';
 import MovieModal from './movieModal/MovieModal';
 import BuyMeCoffeeButton from './BuyMeCoffeeButton';
@@ -14,9 +15,10 @@ type Props = {
   seenIds?: Set<string>;
   ListHeaderComponent?: ReactElement;
   ListHeaderComponentStyle?: object;
+  emptyMessage?: string;
 };
 
-export default function MovieGrid({ movies, favoriteIds, seenIds, ListHeaderComponent, ListHeaderComponentStyle }: Props) {
+export default function MovieGrid({ movies, favoriteIds, seenIds, ListHeaderComponent, ListHeaderComponentStyle, emptyMessage = 'No movies found.' }: Props) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const renderMovie = useCallback(({ item }: { item: Movie }) => (
@@ -50,6 +52,12 @@ export default function MovieGrid({ movies, favoriteIds, seenIds, ListHeaderComp
         ListHeaderComponent={ListHeaderComponent}
         ListHeaderComponentStyle={ListHeaderComponentStyle}
         ListFooterComponent={<BuyMeCoffeeButton />}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <MaterialCommunityIcons name="movie-open-off-outline" size={48} color={colors.medium} />
+            <Text style={styles.emptyText}>{emptyMessage}</Text>
+          </View>
+        }
       />
     </>
   );
@@ -61,5 +69,17 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: 'space-evenly' as const,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+    gap: spacing.md,
+  },
+  emptyText: {
+    color: colors.medium,
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize.base,
+    textAlign: 'center',
   },
 });

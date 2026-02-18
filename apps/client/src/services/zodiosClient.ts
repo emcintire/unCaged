@@ -2,7 +2,7 @@ import { mergeApis, Zodios } from '@zodios/core';
 import * as SecureStore from 'expo-secure-store';
 import { env } from '@/config';
 import { STORAGE_KEYS } from '@/constants';
-import { movieApi, userApi } from './api';
+import { adminApi, movieApi, userApi } from './api';
 
 let onUnauthorizedCallback: (() => void) | null = null;
 
@@ -13,6 +13,7 @@ export function setOnUnauthorized(callback: (() => void) | null) {
 const apiContract = mergeApis({
   'users': userApi,
   'movies': movieApi,
+  'admin': adminApi,
 });
 
 const baseClient = new Zodios(env.apiBaseUrl, apiContract);
