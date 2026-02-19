@@ -8,8 +8,9 @@ import { getIdFromToken } from '@/util';
 const reviewService = new ReviewService();
 
 export class ReviewController {
-  async getReviewsByMovie(req: Request<{ movieId: string }>, res: Response) {
+  async getReviewsByMovie(req: Request, res: Response) {
     try {
+      const movieId = req.query.movieId as string;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const sort = (req.query.sort as SortOption) || 'recent';
@@ -25,7 +26,7 @@ export class ReviewController {
         }
       }
 
-      const result = await reviewService.getReviewsByMovie(req.params.movieId, {
+      const result = await reviewService.getReviewsByMovie(movieId, {
         page,
         limit,
         sort,
@@ -37,20 +38,21 @@ export class ReviewController {
     }
   }
 
-  async createReview(req: AuthenticatedRequest<CreateReviewDto, { movieId: string }>, res: Response) {
+  async createReview(req: AuthenticatedRequest<CreateReviewDto & { movieId: string }>, res: Response) {
     try {
       if (!req.user) {
         res.status(401).send('Not authenticated');
         return;
       }
-      const review = await reviewService.createReview(req.user._id, req.params.movieId, req.body);
+      const { movieId, ...reviewBody } = req.body;
+      const review = await reviewService.createReview(req.user._id, movieId, reviewBody as CreateReviewDto);
       res.status(200).send(review);
     } catch (error) {
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
     }
   }
 
-  async deleteReview(req: AuthenticatedRequest<unknown, { movieId: string; reviewId: string }>, res: Response) {
+  async deleteReview(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
     try {
       if (!req.user) {
         res.status(401).send('Not authenticated');
@@ -107,10 +109,10 @@ export class ReviewController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const flaggedOnly = req.query.flaggedOnly === 'true';
-      const userId = req.query.userId as string | undefined;
-      const movieId = req.query.movieId as string | undefined;
+      const userEmail = req.query.userEmail as string | undefined;
+      const movieTitle = req.query.movieTitle as string | undefined;
 
-      const result = await reviewService.getAllReviewsAdmin({ page, limit, flaggedOnly, userId, movieId });
+      const result = await reviewService.getAllReviewsAdmin({ page, limit, flaggedOnly, userEmail, movieTitle });
       res.status(200).send(result);
     } catch (error) {
       res.status(500).send(error instanceof Error ? error.message : 'An error occurred');

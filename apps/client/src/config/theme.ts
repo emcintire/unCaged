@@ -41,25 +41,13 @@ export const fontFamily = {
 
 export const shadow = {
   sm: {
-    shadowColor: '#00000060',
-    shadowOffset: { width: 2, height: 2 },
-    shadowRadius: 3,
-    shadowOpacity: 1.0,
-    elevation: 2,
+    boxShadow: '0 2px 8px 0 rgba(0,0,0,0.35)',
   },
   md: {
-    shadowColor: '#00000070',
-    shadowOffset: { width: 3, height: 3 },
-    shadowRadius: 5,
-    shadowOpacity: 1.0,
-    elevation: 3,
+    boxShadow: '0 3px 14px 0 rgba(0,0,0,0.4)',
   },
   lg: {
-    shadowColor: '#00000080',
-    shadowOffset: { width: 4, height: 4 },
-    shadowRadius: 6,
-    shadowOpacity: 1.0,
-    elevation: 5,
+    boxShadow: '0 4px 20px 0 rgba(0,0,0,0.45)',
   },
 } as const;
 
@@ -167,7 +155,7 @@ export const movieCard = StyleSheet.create({
   button: {
     width: 150,
     height: 230,
-    ...shadow.md,
+    ...shadow.sm,
     borderRadius: borderRadius.sm,
   },
   image: {

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
 import { colors, fontFamily, fontSize } from '@/config';
@@ -67,11 +67,25 @@ export default function MovieModalActions({ movie }: Props) {
         onSuccess: () => setSeen(false),
       });
     } else {
+      const isFirstSeen = user?.seen.length === 0;
       addToSeenMutation.mutate(movie._id, {
         onSuccess: () => {
           setSeen(true);
           if (watchlist) {
             toggleWatchlist();
+          }
+          if (isFirstSeen) {
+            Alert.alert(
+              'Hello traveler',
+              'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. Nay, I do it for the people. Consider helping me in my holy mission.',
+              [
+                { text: 'Later', style: 'cancel' },
+                {
+                  text: 'Help the mission',
+                  onPress: () => Linking.openURL('https://www.buymeacoffee.com/greasyfingers'),
+                },
+              ],
+            );
           }
         },
       });

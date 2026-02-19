@@ -18,8 +18,8 @@ export interface AdminReviewsOptions {
   page?: number;
   limit?: number;
   flaggedOnly?: boolean;
-  userId?: string;
-  movieId?: string;
+  userEmail?: string;
+  movieTitle?: string;
 }
 
 export class ReviewService {
@@ -173,13 +173,21 @@ export class ReviewService {
   }
 
   async getAllReviewsAdmin(options: AdminReviewsOptions = {}) {
-    const { page = 1, limit = 20, flaggedOnly, userId, movieId } = options;
+    const { page = 1, limit = 20, flaggedOnly, userEmail, movieTitle } = options;
     const skip = (page - 1) * limit;
 
     const match: Record<string, unknown> = {};
     if (flaggedOnly) match.isFlagged = true;
-    if (userId) match.userId = userId;
-    if (movieId) match.movieId = movieId;
+
+    if (userEmail) {
+      const matchedUsers = await User.find({ email: new RegExp(userEmail, 'i') }).select('_id');
+      match.userId = { $in: matchedUsers.map((u) => u._id.toString()) };
+    }
+
+    if (movieTitle) {
+      const matchedMovies = await Movie.find({ title: new RegExp(movieTitle, 'i') }).select('_id');
+      match.movieId = { $in: matchedMovies.map((m) => m._id.toString()) };
+    }
 
     const total = await Review.countDocuments(match);
     const reviews = await Review.find(match).sort({ createdOn: -1 }).skip(skip).limit(limit);

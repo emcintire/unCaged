@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useQueryClient } from '@tanstack/react-query';
 import { STORAGE_KEYS } from '@/constants';
-import { setOnUnauthorized } from '@/services/zodiosClient';
+import { zodiosClient, setOnUnauthorized } from '@/services/zodiosClient';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -20,10 +20,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
 
   const signOut = useCallback(async () => {
-    // Update state synchronously first so navigation switches immediately
     setIsAuthenticated(false);
     queryClient.clear();
-    // Delete token in background — no need to block UI on this
     void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
   }, [queryClient]);
 
@@ -34,23 +32,25 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     async function checkAuth() {
+      setOnUnauthorized(null);
       try {
         const token = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKEN);
-        setIsAuthenticated(token != null);
+        if (!token) {
+          setIsAuthenticated(false);
+          return;
+        }
+        await zodiosClient.getCurrentUser();
+        setIsAuthenticated(true);
       } catch {
         setIsAuthenticated(false);
+        void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
       } finally {
         setIsLoading(false);
+        setOnUnauthorized(signOut);
       }
     }
 
     checkAuth();
-  }, []);
-
-  // Register the 401 handler so the interceptor can trigger sign out
-  useEffect(() => {
-    setOnUnauthorized(signOut);
-    return () => setOnUnauthorized(null);
   }, [signOut]);
 
   const value = useMemo(

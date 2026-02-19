@@ -6,7 +6,7 @@ import type { Review } from '@/services';
 import { useCurrentUser, useDeleteReview, useFlagReview, useToggleLike } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
-import StarRating from '../StarRating';
+import StarRating from '../../StarRating';
 
 type Props = {
   review: Review;

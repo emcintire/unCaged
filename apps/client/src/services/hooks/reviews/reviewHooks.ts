@@ -16,8 +16,7 @@ export const useReviewsByMovie = (
     queryKey: [...reviewKeys.byMovie(movieId), page, sort],
     queryFn: () =>
       zodiosClient.getReviewsByMovie({
-        params: { movieId },
-        queries: { page, limit: 10, sort },
+        queries: { movieId, page, limit: 10, sort },
       }),
     enabled: !!movieId,
     staleTime: 2 * 60 * 1000,
@@ -35,8 +34,8 @@ export const useMyReviews = () => {
 export type AdminReviewFilters = {
   page: number;
   flaggedOnly?: boolean;
-  userId?: string | undefined;
-  movieId?: string | undefined;
+  userEmail?: string | undefined;
+  movieTitle?: string | undefined;
 };
 
 export const useAdminReviews = (filters: AdminReviewFilters) => {
@@ -48,8 +47,8 @@ export const useAdminReviews = (filters: AdminReviewFilters) => {
           page: filters.page,
           limit: 20,
           flaggedOnly: filters.flaggedOnly,
-          userId: filters.userId,
-          movieId: filters.movieId,
+          userEmail: filters.userEmail,
+          movieTitle: filters.movieTitle,
         },
       }),
     staleTime: 0,
@@ -65,7 +64,7 @@ export const useCreateReview = (movieId: string) => {
 
   return useMutation({
     mutationFn: (data: { text: string; rating?: number; isSpoiler?: boolean }) =>
-      zodiosClient.createReview(data, { params: { movieId } }),
+      zodiosClient.createReview({ movieId, ...data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.byMovie(movieId) });
       queryClient.invalidateQueries({ queryKey: reviewKeys.myReviews() });
@@ -80,7 +79,7 @@ export const useDeleteReview = (movieId: string) => {
 
   return useMutation({
     mutationFn: (reviewId: string) =>
-      zodiosClient.deleteReview(undefined, { params: { movieId, reviewId } }),
+      zodiosClient.deleteReview(undefined, { params: { reviewId } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.byMovie(movieId) });
       queryClient.invalidateQueries({ queryKey: reviewKeys.myReviews() });
@@ -95,7 +94,7 @@ export const useToggleLike = (movieId: string) => {
 
   return useMutation({
     mutationFn: (reviewId: string) =>
-      zodiosClient.toggleReviewLike(undefined, { params: { movieId, reviewId } }),
+      zodiosClient.toggleReviewLike(undefined, { params: { reviewId } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.byMovie(movieId) });
     },
@@ -106,7 +105,7 @@ export const useToggleLike = (movieId: string) => {
 export const useFlagReview = (movieId: string) => {
   return useMutation({
     mutationFn: (reviewId: string) =>
-      zodiosClient.flagReview(undefined, { params: { movieId, reviewId } }),
+      zodiosClient.flagReview(undefined, { params: { reviewId } }),
     onSuccess: () => {
       showSuccessToast('Review reported. Thank you!');
     },
@@ -133,7 +132,7 @@ export const useAdminDeleteReview = () => {
 
   return useMutation({
     mutationFn: (reviewId: string) =>
-      zodiosClient.adminDeleteReview(undefined, { params: { reviewId } }),
+      zodiosClient.deleteReview(undefined, { params: { reviewId } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.admin() });
       showSuccessToast('Review deleted');

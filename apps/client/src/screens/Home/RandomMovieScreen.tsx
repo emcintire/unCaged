@@ -16,9 +16,10 @@ export default function RandomMovieScreen() {
   const [mandyFilter, setMandyFilter] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [movie, setMovie] = useState<Movie | null>(null);
-  const [pool, setPool] = useState<Movie[]>([]);
+  const [movieKey, setMovieKey] = useState(0);
   const [watchlistFilter, setWatchlistFilter] = useState(false);
   const [unseenFilter, setUnseenFilter] = useState(false);
+  const poolRef = useRef<Movie[]>([]);
 
   const { data: user, isLoading: isUserLoading } = useCurrentUser();
   const { data: allMovies = [], isLoading: isMoviesLoading } = useMovies();
@@ -40,25 +41,27 @@ export default function RandomMovieScreen() {
     const idx = Math.floor(Math.random() * from.length);
     const picked = from[idx];
     if (!picked) return from;
+    setMovieKey(k => k + 1);
     if (!picked.img) {
       setMovie(picked);
     } else {
       setMovie(picked.img.length === 32 ? changeResolution('', picked) : picked);
     }
     return from.filter((_, i) => i !== idx);
-  }, []);
+  }, [setMovieKey]);
 
-  // Reset pool and pick a new movie whenever filters or data change
   useEffect(() => {
     if (isLoading || !allMovies.length) return;
     const filtered = getFilteredMovies();
-    setPool(pickRandom(filtered));
+    poolRef.current = pickRandom(filtered);
   }, [isLoading, allMovies.length, getFilteredMovies, pickRandom]);
 
   const getRandomMovie = useCallback(() => {
-    const currentPool = pool.length > 0 ? pool : getFilteredMovies();
-    setPool(pickRandom(currentPool));
-  }, [pool, getFilteredMovies, pickRandom]);
+    if (!poolRef.current.length) {
+      poolRef.current = getFilteredMovies();
+    }
+    poolRef.current = pickRandom(poolRef.current);
+  }, [getFilteredMovies, pickRandom]);
 
   const fade = useAnimatedValue(1);
   const waitingForImage = useRef(false);
@@ -77,13 +80,12 @@ export default function RandomMovieScreen() {
     });
   }, [fade, getRandomMovie]);
 
-  // Fade in immediately if new movie has no image or is null (no image to wait for)
   useEffect(() => {
     if (waitingForImage.current && (movie === null || !movie.img)) {
       waitingForImage.current = false;
       fadeIn();
     }
-  }, [movie, fadeIn]);
+  }, [movie, movieKey, fadeIn]);
 
   return (
     <Screen isLoading={isLoading}>
@@ -114,13 +116,14 @@ export default function RandomMovieScreen() {
       <View style={styles.content}>
         <Animated.View style={[styles.movieArea, { opacity: fade.value }]}>
           {movie == null ? (
-            <Text style={styles.noResults}>No results :(</Text>
+            <Text style={styles.emptyText}>No results :(</Text>
           ) : (
             <TouchableOpacity
               style={styles.movieButton}
               onPress={() => setModalVisible(true)}
             >
               <Image
+                key={movieKey}
                 source={movie.img}
                 style={styles.movieImage}
                 contentFit="cover"
@@ -167,10 +170,10 @@ const styles = StyleSheet.create({
   movieArea: {
     alignItems: 'center',
   },
-  noResults: {
-    color: 'white',
-    fontFamily: fontFamily.bold,
-    fontSize: fontSize.xxxl,
+  emptyText: {
+    color: colors.medium,
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize.base,
     textAlign: 'center',
   },
   movieButton: {

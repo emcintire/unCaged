@@ -600,7 +600,7 @@ describe('Movie API Endpoints', () => {
     });
   });
 
-  describe('GET /api/movies/quote - Get Quote', () => {
+  describe('GET /api/movies/quote - Get Quote (iOS compat route)', () => {
     it('should return a recent quote if one exists', async () => {
       await Quote.create({
         quote: 'Test quote',
@@ -647,7 +647,7 @@ describe('Movie API Endpoints', () => {
     });
   });
 
-  describe('POST /api/movies/quote - Create Quote (Admin)', () => {
+  describe('POST /api/movies/quote - Create Quote Admin (iOS compat route)', () => {
     it('should create a new quote with admin token', async () => {
       const response = await request(app)
         .post('/api/movies/quote')

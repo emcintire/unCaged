@@ -31,7 +31,7 @@ describe('Quote API Endpoints', () => {
     userToken = user.generateAuthToken();
   });
 
-  describe('GET /api/movies/quote - Get Quote', () => {
+  describe('GET /api/quotes - Get Quote', () => {
     it('should return a recent quote if one exists', async () => {
       await Quote.create({
         quote: 'Test quote',
@@ -40,7 +40,7 @@ describe('Quote API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/movies/quote')
+        .get('/api/quotes')
         .expect(200);
 
       expect(response.body).toHaveLength(1);
@@ -50,7 +50,7 @@ describe('Quote API Endpoints', () => {
 
     it('should fall back to hardcoded quote when no recent quote exists', async () => {
       const response = await request(app)
-        .get('/api/movies/quote')
+        .get('/api/quotes')
         .expect(200);
 
       expect(response.body).toHaveProperty('quote');
@@ -65,7 +65,7 @@ describe('Quote API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/movies/quote')
+        .get('/api/quotes')
         .expect(200);
 
       if (Array.isArray(response.body)) {
@@ -88,7 +88,7 @@ describe('Quote API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/movies/quote')
+        .get('/api/quotes')
         .expect(200);
 
       expect(response.body).toHaveLength(1);
@@ -103,17 +103,17 @@ describe('Quote API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/movies/quote')
+        .get('/api/quotes')
         .expect(200);
 
       expect(response.body).toHaveLength(1);
     });
   });
 
-  describe('POST /api/movies/quote - Create Quote', () => {
+  describe('POST /api/quotes - Create Quote', () => {
     it('should create a new quote with admin token', async () => {
       const response = await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .set('x-auth-token', adminToken)
         .send({ quote: 'New quote', subquote: 'New subquote' })
         .expect(200);
@@ -128,7 +128,7 @@ describe('Quote API Endpoints', () => {
 
     it('should reject quote creation without admin privileges', async () => {
       await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .set('x-auth-token', userToken)
         .send({ quote: 'User quote', subquote: 'Sub' })
         .expect(401);
@@ -136,14 +136,14 @@ describe('Quote API Endpoints', () => {
 
     it('should reject quote creation without authentication', async () => {
       await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .send({ quote: 'No auth quote', subquote: 'Sub' })
         .expect(401);
     });
 
     it('should reject empty quote text', async () => {
       await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .set('x-auth-token', adminToken)
         .send({ quote: '', subquote: 'Sub' })
         .expect(400);
@@ -151,7 +151,7 @@ describe('Quote API Endpoints', () => {
 
     it('should reject missing subquote', async () => {
       await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .set('x-auth-token', adminToken)
         .send({ quote: 'Quote only' })
         .expect(400);
@@ -159,7 +159,7 @@ describe('Quote API Endpoints', () => {
 
     it('should reject quote exceeding max length', async () => {
       await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .set('x-auth-token', adminToken)
         .send({ quote: 'a'.repeat(256), subquote: 'Sub' })
         .expect(400);
@@ -167,7 +167,7 @@ describe('Quote API Endpoints', () => {
 
     it('should reject subquote exceeding max length', async () => {
       await request(app)
-        .post('/api/movies/quote')
+        .post('/api/quotes')
         .set('x-auth-token', adminToken)
         .send({ quote: 'Valid quote', subquote: 'a'.repeat(129) })
         .expect(400);

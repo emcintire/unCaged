@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.md,
+    padding: spacing.sm,
     width: '100%',
     marginVertical: spacing.sm,
   },

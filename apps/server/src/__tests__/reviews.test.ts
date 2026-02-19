@@ -59,12 +59,12 @@ describe('Review API Endpoints', () => {
     movieId = movie._id.toString();
   });
 
-  describe('POST /api/movies/:movieId/reviews - Create Review', () => {
+  describe('POST /api/reviews - Create Review', () => {
     it('should create a review with text only', async () => {
       const response = await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: 'Great movie, loved every minute!' })
+        .send({ movieId, text: 'Great movie, loved every minute!' })
         .expect(200);
 
       expect(response.body).toHaveProperty('text', 'Great movie, loved every minute!');
@@ -76,9 +76,9 @@ describe('Review API Endpoints', () => {
 
     it('should create a review with a snapshot rating', async () => {
       const response = await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: 'Solid film.', rating: 4 })
+        .send({ movieId, text: 'Solid film.', rating: 4 })
         .expect(200);
 
       expect(response.body).toHaveProperty('rating', 4);
@@ -87,9 +87,9 @@ describe('Review API Endpoints', () => {
 
     it('should create a review marked as spoiler', async () => {
       const response = await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: 'The ending was wild!', isSpoiler: true })
+        .send({ movieId, text: 'The ending was wild!', isSpoiler: true })
         .expect(200);
 
       expect(response.body).toHaveProperty('isSpoiler', true);
@@ -97,9 +97,9 @@ describe('Review API Endpoints', () => {
 
     it('should create a review with all fields', async () => {
       const response = await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: 'Amazing!', rating: 5, isSpoiler: false })
+        .send({ movieId, text: 'Amazing!', rating: 5, isSpoiler: false })
         .expect(200);
 
       expect(response.body.text).toBe('Amazing!');
@@ -109,15 +109,15 @@ describe('Review API Endpoints', () => {
 
     it('should allow multiple reviews from the same user on the same movie', async () => {
       await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: 'First viewing thoughts' })
+        .send({ movieId, text: 'First viewing thoughts' })
         .expect(200);
 
       await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: 'Second viewing - even better!' })
+        .send({ movieId, text: 'Second viewing - even better!' })
         .expect(200);
 
       const reviews = await Review.find({ movieId, userId });
@@ -126,29 +126,29 @@ describe('Review API Endpoints', () => {
 
     it('should reject review without authentication', async () => {
       await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
-        .send({ text: 'No auth review' })
+        .post('/api/reviews')
+        .send({ movieId, text: 'No auth review' })
         .expect(401);
     });
 
     it('should reject review with empty text', async () => {
       await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ text: '' })
+        .send({ movieId, text: '' })
         .expect(400);
     });
 
     it('should reject review with missing text', async () => {
       await request(app)
-        .post(`/api/movies/${movieId}/reviews`)
+        .post('/api/reviews')
         .set('x-auth-token', userToken)
-        .send({ rating: 3 })
+        .send({ movieId, rating: 3 })
         .expect(400);
     });
   });
 
-  describe('GET /api/movies/:movieId/reviews - Get Reviews', () => {
+  describe('GET /api/reviews - Get Reviews', () => {
     it('should return all reviews for a movie', async () => {
       await Review.create([
         { userId, movieId, text: 'Review 1' },
@@ -156,7 +156,7 @@ describe('Review API Endpoints', () => {
       ]);
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews).toHaveLength(2);
@@ -177,7 +177,7 @@ describe('Review API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews[0].text).toBe('Newer review');
@@ -188,7 +188,7 @@ describe('Review API Endpoints', () => {
       await Review.create({ userId, movieId, text: 'My review' });
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews[0]).toHaveProperty('userName', 'Review User');
@@ -199,7 +199,7 @@ describe('Review API Endpoints', () => {
       await Review.create({ userId, movieId, text: 'Spoiler!', isSpoiler: true });
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews[0].isSpoiler).toBe(true);
@@ -209,7 +209,7 @@ describe('Review API Endpoints', () => {
       await Review.create({ userId, movieId, text: 'Rated review', rating: 3 });
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews[0].rating).toBe(3);
@@ -217,7 +217,7 @@ describe('Review API Endpoints', () => {
 
     it('should return empty array when no reviews exist', async () => {
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews).toEqual([]);
@@ -227,7 +227,7 @@ describe('Review API Endpoints', () => {
       await Review.create({ userId, movieId, text: 'Public review' });
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews).toHaveLength(1);
@@ -248,7 +248,7 @@ describe('Review API Endpoints', () => {
       ]);
 
       const response = await request(app)
-        .get(`/api/movies/${movieId}/reviews`)
+        .get(`/api/reviews?movieId=${movieId}`)
         .expect(200);
 
       expect(response.body.reviews).toHaveLength(1);
@@ -256,7 +256,7 @@ describe('Review API Endpoints', () => {
     });
   });
 
-  describe('DELETE /api/movies/:movieId/reviews/:reviewId - Delete Review', () => {
+  describe('DELETE /api/reviews/:reviewId - Delete Review', () => {
     let reviewId: string;
 
     beforeEach(async () => {
@@ -270,7 +270,7 @@ describe('Review API Endpoints', () => {
 
     it('should allow author to delete their own review', async () => {
       await request(app)
-        .delete(`/api/movies/${movieId}/reviews/${reviewId}`)
+        .delete(`/api/reviews/${reviewId}`)
         .set('x-auth-token', userToken)
         .expect(200);
 
@@ -280,7 +280,7 @@ describe('Review API Endpoints', () => {
 
     it('should allow admin to delete any review', async () => {
       await request(app)
-        .delete(`/api/movies/${movieId}/reviews/${reviewId}`)
+        .delete(`/api/reviews/${reviewId}`)
         .set('x-auth-token', adminToken)
         .expect(200);
 
@@ -290,7 +290,7 @@ describe('Review API Endpoints', () => {
 
     it('should reject deletion by non-author non-admin', async () => {
       const response = await request(app)
-        .delete(`/api/movies/${movieId}/reviews/${reviewId}`)
+        .delete(`/api/reviews/${reviewId}`)
         .set('x-auth-token', secondUserToken)
         .expect(401);
 
@@ -302,14 +302,14 @@ describe('Review API Endpoints', () => {
 
     it('should reject deletion without authentication', async () => {
       await request(app)
-        .delete(`/api/movies/${movieId}/reviews/${reviewId}`)
+        .delete(`/api/reviews/${reviewId}`)
         .expect(401);
     });
 
     it('should return 400 for non-existent review ID', async () => {
       const fakeId = '507f1f77bcf86cd799439011';
       await request(app)
-        .delete(`/api/movies/${movieId}/reviews/${fakeId}`)
+        .delete(`/api/reviews/${fakeId}`)
         .set('x-auth-token', userToken)
         .expect(400);
     });

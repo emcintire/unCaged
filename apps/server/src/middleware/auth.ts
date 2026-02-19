@@ -25,6 +25,6 @@ export function auth(
     req.user = decoded;
     next();
   } catch {
-    res.status(400).send('Invalid token...');
+    res.status(401).send('Invalid token...');
   }
 }

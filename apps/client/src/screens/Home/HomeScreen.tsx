@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     marginLeft: 15,
+    paddingVertical: spacing.sm,
   },
   listSpacer: {
     width: 20,

@@ -75,7 +75,7 @@ export default function PrivacyPolicyScreen() {
         <strong>
           <span style="font-size: 15px;">
             <span data-custom-class="subtitle">Last updated 
-              <bdt class="question">November 04, 2021
+              <bdt class="question">February 18, 2026
               </bdt>
             </span>
           </span>

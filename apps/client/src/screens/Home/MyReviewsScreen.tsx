@@ -115,7 +115,7 @@ export default function MyReviewsScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
   },
   item: {

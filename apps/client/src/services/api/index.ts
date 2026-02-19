@@ -1,3 +1,4 @@
 export { movieApi } from './movieApi';
 export { userApi } from './userApi';
-export { adminApi } from './adminApi';
+export { reviewApi } from './reviewApi';
+export { quoteApi } from './quoteApi';

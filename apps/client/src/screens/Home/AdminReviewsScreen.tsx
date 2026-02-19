@@ -3,6 +3,7 @@ import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { AdminReview, AdminReviewFilters } from '@/services';
 import { useAdminDeleteReview, useAdminReviews, useAdminUnflagReview } from '@/services';
+import { useDebounce } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import Screen from '@/components/Screen';
 
@@ -109,15 +110,18 @@ function AdminReviewItem({ item }: { item: AdminReview }) {
 
 export default function AdminReviewsScreen() {
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
-  const [searchUserId, setSearchUserId] = useState('');
-  const [searchMovieId, setSearchMovieId] = useState('');
+  const [searchUserEmail, setSearchUserEmail] = useState('');
+  const [searchMovieTitle, setSearchMovieTitle] = useState('');
   const [page, setPage] = useState(1);
+
+  const debouncedUserEmail = useDebounce(searchUserEmail);
+  const debouncedMovieTitle = useDebounce(searchMovieTitle);
 
   const filters: AdminReviewFilters = {
     page,
     flaggedOnly: filterMode === 'flagged',
-    userId: searchUserId.trim() || undefined,
-    movieId: searchMovieId.trim() || undefined,
+    userEmail: debouncedUserEmail.trim() || undefined,
+    movieTitle: debouncedMovieTitle.trim() || undefined,
   };
 
   const { data, isLoading, isFetching } = useAdminReviews(filters);
@@ -128,10 +132,6 @@ export default function AdminReviewsScreen() {
 
   const handleFilterChange = (mode: FilterMode) => {
     setFilterMode(mode);
-    setPage(1);
-  };
-
-  const handleSearch = () => {
     setPage(1);
   };
 
@@ -155,20 +155,20 @@ export default function AdminReviewsScreen() {
       {/* Search Inputs */}
       <TextInput
         style={styles.searchInput}
-        value={searchUserId}
-        onChangeText={setSearchUserId}
-        placeholder="Search by User ID..."
+        value={searchUserEmail}
+        onChangeText={setSearchUserEmail}
+        placeholder="Search by user email..."
         placeholderTextColor={colors.medium}
-        onSubmitEditing={handleSearch}
+        autoCapitalize="none"
+        keyboardType="email-address"
         returnKeyType="search"
       />
       <TextInput
         style={styles.searchInput}
-        value={searchMovieId}
-        onChangeText={setSearchMovieId}
-        placeholder="Search by Movie ID..."
+        value={searchMovieTitle}
+        onChangeText={setSearchMovieTitle}
+        placeholder="Search by movie title..."
         placeholderTextColor={colors.medium}
-        onSubmitEditing={handleSearch}
         returnKeyType="search"
       />
 

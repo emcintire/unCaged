@@ -2,7 +2,7 @@ import type { Express } from 'express';
 import path from 'path';
 import { movieRouter } from '@/movies';
 import { quoteRouter } from '@/quotes';
-import { reviewRouter, adminReviewRouter } from '@/reviews';
+import { reviewRouter } from '@/reviews';
 import { userRouter } from '@/users';
 
 export function setupRoutes(app: Express) {
@@ -11,10 +11,10 @@ export function setupRoutes(app: Express) {
   });
 
   app.use('/api/users', userRouter);
-  app.use('/api/movies/:movieId/reviews', reviewRouter);
-  app.use('/api/movies/quote', quoteRouter);
+  app.use('/api/reviews', reviewRouter);
+  app.use('/api/quotes', quoteRouter);
+  app.use('/api/movies/quote', quoteRouter); // kept for iOS backwards compatibility
   app.use('/api/movies', movieRouter);
-  app.use('/api/admin/reviews', adminReviewRouter);
 
   app.get('/privacy', (_request, response) => {
     response.sendFile(path.join(__dirname, '../public/privacy.html'));

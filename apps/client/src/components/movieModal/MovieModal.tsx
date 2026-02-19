@@ -12,7 +12,7 @@ import MovieModalDetails from './MovieModalDetails';
 import MovieModalActions from './MovieModalActions';
 import MovieModalSignIn from './MovieModalSignIn';
 import MovieModalSkeleton from '@/components/movieModal/MovieModalSkeleton';
-import MovieReviews from './MovieReviews';
+import MovieReviews from './reviews/MovieReviews';
 
 type Props = {
   isOpen: boolean;

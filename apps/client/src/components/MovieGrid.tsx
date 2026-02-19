@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactElement } from 'react';
+import { ReactNode, useCallback, useState, type ReactElement } from 'react';
 import { View, FlatList, StyleSheet, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Movie } from '@/services';
@@ -13,9 +13,9 @@ type Props = {
   movies: Movie[];
   favoriteIds?: Set<string>;
   seenIds?: Set<string>;
-  ListHeaderComponent?: ReactElement;
+  ListHeaderComponent?: ReactElement | null;
   ListHeaderComponentStyle?: object;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
 };
 
 export default function MovieGrid({ movies, favoriteIds, seenIds, ListHeaderComponent, ListHeaderComponentStyle, emptyMessage = 'No movies found.' }: Props) {
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 80,
+    paddingHorizontal: spacing.md,
     gap: spacing.md,
   },
   emptyText: {

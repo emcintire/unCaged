@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
   },
   icon: {
     marginRight: spacing.sm,

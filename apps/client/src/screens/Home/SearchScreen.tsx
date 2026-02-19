@@ -1,9 +1,10 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   StyleSheet, View, Text, TouchableOpacity, TextInput,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { type Movie, useCurrentUser, useMovies } from '@/services';
+import { useDebounce } from '@/hooks';
 import { colors, spacing, borderRadius, fontSize, fontFamily, movieCard } from '@/config';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
@@ -55,10 +56,11 @@ const styles = StyleSheet.create({
 export default function SearchScreen() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
-  const [debouncedTitle, setDebouncedTitle] = useState('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selected, setSelected] = useState('az');
   const [genre, setGenre] = useState('Genre');
+
+  const debouncedTitle = useDebounce(title);
 
   const { data: user } = useCurrentUser();
   const { data: movies = [], isLoading: loading } = useMovies();
@@ -66,30 +68,13 @@ export default function SearchScreen() {
   const favoriteIds = useMemo(() => new Set(user?.favorites ?? []), [user?.favorites]);
   const seenIds = useMemo(() => new Set(user?.seen ?? []), [user?.seen]);
 
-  // Debounce search input using setTimeout
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-    };
-  }, []);
-
-  const handleTitleChange = (value: string) => {
-    setTitle(value);
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-    debounceTimer.current = setTimeout(() => {
-      setDebouncedTitle(value);
-    }, 300);
-  };
-
   const displayMovies = useMemo(() => {
     const predicates = [
-      (movie: Movie) => !debouncedTitle || movie.title.toLowerCase().includes(debouncedTitle.toLowerCase()),
+      (movie: Movie) => !debouncedTitle || (
+        movie.title.toLowerCase().includes(debouncedTitle.toLowerCase()) ||
+        movie.director.toLowerCase().includes(debouncedTitle.toLowerCase()) ||
+        movie.date.includes(debouncedTitle)
+      ),
       (movie: Movie) => genre === 'Genre' || movie.genres.some((g: string) => g.toLowerCase() === genre.toLowerCase()),
     ];
 
@@ -112,12 +97,12 @@ export default function SearchScreen() {
   }, [genre, movies, selected, sortDirection, debouncedTitle]);
 
   return (
-    <Screen>
+    <Screen isLoading={loading} skeleton={<MovieGridSkeleton />}>
       <View style={[styles.inputContainer, open && styles.inputContainerOpen]}>
         <TextInput
-          onChangeText={handleTitleChange}
+          onChangeText={setTitle}
           value={title}
-          placeholder="Enter title"
+          placeholder="Title, director, or year"
           placeholderTextColor={colors.medium}
           style={styles.text}
         />
@@ -140,18 +125,12 @@ export default function SearchScreen() {
           sortDirection={sortDirection}
         />
       )}
-      {loading ? <MovieGridSkeleton /> : (displayMovies.length > 0 ? (
-        <MovieGrid
-          movies={displayMovies}
-          favoriteIds={favoriteIds}
-          seenIds={seenIds}
-        />
-      ) : (
-        <View style={styles.noResultsContainer}>
-          <Text style={styles.noResults}>No results :(</Text>
-          <BuyMeCoffeeButton />
-        </View>
-      ))}
+      <MovieGrid
+        emptyMessage="No results :("
+        movies={displayMovies}
+        favoriteIds={favoriteIds}
+        seenIds={seenIds}
+      />
     </Screen>
   );
 }

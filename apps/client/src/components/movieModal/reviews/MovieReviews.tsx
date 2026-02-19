@@ -5,8 +5,8 @@ import type { Review } from '@/services';
 import { useCurrentUser, useReviewsByMovie } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
-import ReviewCard from './ReviewCard';
 import WriteReviewForm from './WriteReviewForm';
+import ReviewCard from './ReviewCard';
 
 type Props = {
   movieId: string;
@@ -157,8 +157,8 @@ export default function MovieReviews({ movieId }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: spacing.lg,
-    paddingBottom: spacing.xxl * 2,
+    marginTop: spacing.md,
+    paddingBottom: 60,
     width: '100%',
   },
   headerRow: {

@@ -8,6 +8,7 @@ type Props = {
   seenMovies: Movie[];
   totalMovies: number;
   userRatings: User['ratings'];
+  reviewCount: number;
 };
 
 function parseRuntime(runtime: string): number {
@@ -59,7 +60,7 @@ function StatItem({ icon, label, value }: StatItemProps) {
   );
 }
 
-export default function CollectionStats({ seenMovies, totalMovies, userRatings }: Props) {
+export default function CollectionStats({ seenMovies, totalMovies, userRatings, reviewCount }: Props) {
   const stats = useMemo(() => {
     const seenCount = seenMovies.length;
     const percentage = totalMovies > 0 ? Math.round((seenCount / totalMovies) * 100) : 0;
@@ -70,9 +71,7 @@ export default function CollectionStats({ seenMovies, totalMovies, userRatings }
       : '-';
     const topGenre = getTopGenre(seenMovies);
 
-    const ratedCount = userRatings.length;
-
-    return { seenCount, percentage, watchTime, avgRating, topGenre, ratedCount };
+    return { seenCount, percentage, watchTime, avgRating, topGenre };
   }, [seenMovies, totalMovies, userRatings]);
 
   return (
@@ -83,7 +82,7 @@ export default function CollectionStats({ seenMovies, totalMovies, userRatings }
         <StatItem icon="clock-outline" label="Watch Time" value={stats.watchTime} />
       </View>
       <View style={styles.row}>
-        <StatItem icon="counter" label="Rated" value={`${stats.ratedCount}`} />
+        <StatItem icon="pencil-outline" label="Reviews" value={`${reviewCount}`} />
         <StatItem icon="star" label="Avg Rating" value={stats.avgRating} />
         <StatItem icon="filmstrip" label="Top Genre" value={stats.topGenre} />
       </View>

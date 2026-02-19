@@ -1,4 +1,4 @@
-import { Fragment, ReactNode } from 'react';
+import { Fragment, ReactNode, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
@@ -31,37 +31,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
 });
-
-const accountItems: Array<{
-  children?: ReactNode;
-  title: keyof SettingsTabParamList;
-  iconName: keyof typeof MaterialCommunityIconsType.glyphMap;
-  iconColor: string;
-}> = [{
-  children: <Separator />,
-  title: 'My Collection',
-  iconName: 'movie-open',
-  iconColor: colors.orange,
-}, {
-  children: <View style={styles.spacer} />,
-  title: 'My Reviews',
-  iconName: 'star-outline',
-  iconColor: colors.orange,
-}, {
-  children: <Separator />,
-  title: 'Security',
-  iconName: 'lock',
-  iconColor: colors.white,
-}, {
-  children: <Separator />,
-  title: 'Privacy Policy',
-  iconName: 'shield-alert',
-  iconColor: colors.white,
-}, {
-  title: 'About',
-  iconName: 'help',
-  iconColor: colors.white,
-}];
 
 export default function SettingsScreen() {
   const { data: user, isLoading } = useCurrentUser();
@@ -98,6 +67,62 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const accountItems: Array<{
+    children?: ReactNode;
+    disabled?: boolean;
+    iconColor: string;
+    iconName: keyof typeof MaterialCommunityIconsType.glyphMap;
+    onPress: () => void;
+    title: string;
+  }> = useMemo(() => [{
+    children: <Separator />,
+    iconColor: colors.orange,
+    iconName: 'movie-open',
+    onPress: () => navigate('My Collection'),
+    title: 'My Collection',
+  }, {
+    children: <View style={styles.spacer} />,
+    iconColor: colors.orange,
+    iconName: 'star-outline',
+    onPress: () => navigate('My Reviews'),
+    title: 'My Reviews',
+  }, {
+    children: <Separator />,
+    iconColor: colors.white,
+    iconName: 'lock',
+    onPress: () => navigate('Security'),
+    title: 'Security',
+  }, {
+    children: <Separator />,
+    iconColor: colors.white,
+    iconName: 'shield-alert',
+    onPress: () => navigate('Privacy Policy'),
+    title: 'Privacy Policy',
+  }, {
+    iconColor: colors.white,
+    iconName: 'help',
+    onPress: () => navigate('About'),
+    title: 'About',
+  }, {
+    children: <View style={styles.spacer} />,
+    disabled: !user?.isAdmin,
+    iconColor: colors.orange,
+    iconName: 'shield-crown',
+    onPress: () => navigate('Admin'),
+    title: 'Admin',
+  }, {
+    children: <Separator />,
+    iconColor: colors.red,
+    iconName: 'logout',
+    onPress: logOut,
+    title: 'Log Out',
+  }, {
+    iconColor: colors.red,
+    iconName: 'delete',
+    onPress: deleteAccount,
+    title: 'Delete Account',
+  }], [navigate, user, deleteAccount, logOut]);
+
   return (
     <Screen isLoading={isLoading}>
       <ScrollView showsVerticalScrollIndicator={false} decelerationRate="fast">
@@ -112,10 +137,10 @@ export default function SettingsScreen() {
         </View>
         <Separator modal={false} />
         <View>
-          {accountItems.map((item) => (
+          {accountItems.filter((item) => !item.disabled).map((item) => (
             <Fragment key={item.title}>
               <ListItem
-                onPress={() => navigate(item.title)}
+                onPress={item.onPress}
                 title={item.title}
                 IconComponent={(
                   <Icon name={item.iconName} iconColor={item.iconColor} backgroundColor={colors.bg} />
@@ -124,29 +149,7 @@ export default function SettingsScreen() {
               {item.children}
             </Fragment>
           ))}
-          {user?.isAdmin && (
-            <>
-              <Separator />
-              <ListItem
-                onPress={() => navigate('Admin')}
-                title="Admin"
-                IconComponent={<Icon name="shield-crown" iconColor={colors.orange} backgroundColor={colors.bg} />}
-              />
-            </>
-          )}
         </View>
-        <View style={styles.spacer} />
-        <ListItem
-          onPress={logOut}
-          title="Log Out"
-          IconComponent={<Icon name="logout" backgroundColor={colors.bg} iconColor={colors.red} />}
-        />
-        <Separator />
-        <ListItem
-          onPress={deleteAccount}
-          title="Delete Account"
-          IconComponent={<Icon name="delete" backgroundColor={colors.bg} iconColor={colors.red} />}
-        />
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </Screen>
