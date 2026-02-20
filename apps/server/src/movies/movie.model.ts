@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { MovieData } from './movie.schema';
+import type { MovieData } from './schemas/movie.schema';
 
 export type MovieDocument = MovieData & Document & {
   _id: Types.ObjectId;

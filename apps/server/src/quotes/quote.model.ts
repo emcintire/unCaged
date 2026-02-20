@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { QuoteData } from './quote.schema';
+import type { QuoteData } from './schemas/quote.schema';
 
 export type QuoteDocument = QuoteData & Document & {
   _id: Types.ObjectId;

@@ -1,5 +1,5 @@
 import { Movie } from './movie.model';
-import { movieSchema } from './movie.schema';
+import { movieSchema } from './schemas/movie.schema';
 import { User } from '@/users';
 import type {
   CreateMovieDto,

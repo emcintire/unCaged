@@ -13,9 +13,9 @@ import type {
   RateMovieDto,
   FilteredMoviesDto
 } from './types';
-import { newUserSchema } from './newUser.schema';
-import { loginSchema } from './login.schema';
-import { updateUserSchema } from './updateUser.schema';
+import { newUserSchema } from './schemas/newUser.schema';
+import { loginSchema } from './schemas/login.schema';
+import { updateUserSchema } from './schemas/updateUser.schema';
 import { movieRatingSchema } from '@/movies';
 
 export class UserService {

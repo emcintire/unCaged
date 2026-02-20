@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { ReviewData } from './review.schema';
+import type { ReviewData } from './schemas/review.schema';
 
 export type ReviewDocument = ReviewData & Document & {
   _id: Types.ObjectId;

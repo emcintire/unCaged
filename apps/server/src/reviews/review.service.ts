@@ -1,6 +1,6 @@
 import type { PipelineStage } from 'mongoose';
 import { Review } from './review.model';
-import { reviewSchema } from './review.schema';
+import { reviewSchema } from './schemas/review.schema';
 import { User } from '@/users';
 import { Movie } from '@/movies';
 import type { CreateReviewDto } from './types';
