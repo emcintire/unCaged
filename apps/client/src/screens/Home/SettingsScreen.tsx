@@ -5,7 +5,7 @@ import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { SettingsTabParamList } from '@/types';
 import { colors, showErrorToast, showSuccessToast, spacing } from '@/config';
-import { useCurrentUser, useDeleteUser } from '@/services';
+import { useGetCurrentUser, useDeleteUser } from '@/services';
 import { useAuth } from '@/hooks';
 import Screen from '@/components/Screen';
 import ListItem from '@/components/ListItem';
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
 });
 
 export default function SettingsScreen() {
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user, isLoading } = useGetCurrentUser();
   const deleteUserMutation = useDeleteUser();
   const { signOut } = useAuth();
   const { navigate } = useNavigation<NativeStackNavigationProp<SettingsTabParamList>>();
@@ -45,7 +45,11 @@ export default function SettingsScreen() {
         text: 'Ok',
         onPress: async () => {
           try {
-            await deleteUserMutation.mutateAsync({ id: user!._id });
+            if (!user?._id) {
+              showErrorToast('Failed to delete account');
+              return;
+            }
+            await deleteUserMutation.mutateAsync({ data: { id: user._id } });
             showSuccessToast('Account deleted :(');
             await signOut();
           } catch (error) {
@@ -130,9 +134,9 @@ export default function SettingsScreen() {
         <View style={styles.container}>
           <ListItem
             onPress={() => navigate('My Account')}
-            title={user!.name ?? user!.email}
-            subTitle={user!.email}
-            image={{ uri: user!.img }}
+            title={user?.name ?? user?.email ?? ''}
+            subTitle={user?.email ?? ''}
+            image={{ uri: user?.img ?? '' }}
           />
         </View>
         <Separator modal={false} />

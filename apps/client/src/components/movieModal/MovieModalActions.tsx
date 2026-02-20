@@ -4,7 +4,8 @@ import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo
 import { colors, fontFamily, fontSize } from '@/config';
 import {
   useAddToSeen, useRemoveFromSeen, useAddToFavorites, useRemoveFromFavorites, useAddToWatchlist,
-  useRemoveFromWatchlist, useCurrentUser, type Movie,
+  useRemoveFromWatchlist, type Movie,
+  useGetCurrentUser,
 } from '@/services';
 import MovieModalRating from './MovieModalRating';
 import Icon from '../Icon';
@@ -27,7 +28,7 @@ export default function MovieModalActions({ movie }: Props) {
   const addToWatchlistMutation = useAddToWatchlist();
   const removeFromWatchlistMutation = useRemoveFromWatchlist();
 
-  const { data: user } = useCurrentUser();
+  const { data: user } = useGetCurrentUser();
 
   useEffect(() => {
     if (!user) { return; }
@@ -39,11 +40,11 @@ export default function MovieModalActions({ movie }: Props) {
 
   const toggleFavorite = () => {
     if (favorite) {
-      removeFromFavoritesMutation.mutate(movie._id, {
+      removeFromFavoritesMutation.mutate({ data: { id: movie._id }}, {
         onSuccess: () => setFavorite(false),
       });
     } else {
-      addToFavoritesMutation.mutate(movie._id, {
+      addToFavoritesMutation.mutate({ data: { id: movie._id }}, {
         onSuccess: () => setFavorite(true),
       });
     }
@@ -51,11 +52,11 @@ export default function MovieModalActions({ movie }: Props) {
 
   const toggleWatchlist = () => {
     if (watchlist) {
-      removeFromWatchlistMutation.mutate(movie._id, {
+      removeFromWatchlistMutation.mutate({ data: { id: movie._id }}, {
         onSuccess: () => setWatchlist(false),
       });
     } else {
-      addToWatchlistMutation.mutate(movie._id, {
+      addToWatchlistMutation.mutate({ data: { id: movie._id }}, {
         onSuccess: () => setWatchlist(true),
       });
     }
@@ -63,12 +64,12 @@ export default function MovieModalActions({ movie }: Props) {
 
   const toggleSeen = () => {
     if (seen) {
-      removeFromSeenMutation.mutate(movie._id, {
+      removeFromSeenMutation.mutate({ data: { id: movie._id }}, {
         onSuccess: () => setSeen(false),
       });
     } else {
       const isFirstSeen = user?.seen.length === 0;
-      addToSeenMutation.mutate(movie._id, {
+      addToSeenMutation.mutate({ data: { id: movie._id }}, {
         onSuccess: () => {
           setSeen(true);
           if (watchlist) {

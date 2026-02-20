@@ -69,8 +69,10 @@ export default function AdminScreen() {
 
   const submitQuote = (values: QuoteFormValues, { resetForm }: { resetForm: () => void }) => {
     addQuoteMutation.mutate({
-      quote: values.quote.trim(),
-      subquote: values.subquote.trim(),
+      data: {
+        quote: values.quote.trim(),
+        subquote: values.subquote.trim(),
+      },
     }, {
       onSuccess: () => {
         resetForm();
@@ -86,14 +88,16 @@ export default function AdminScreen() {
       .filter(Boolean);
 
     createMovieMutation.mutate({
-      title: values.title.trim(),
-      director: values.director.trim(),
-      description: values.description.trim() || undefined,
-      genres: genres.length > 0 ? genres : undefined,
-      runtime: values.runtime.trim(),
-      rating: values.rating.trim(),
-      date: values.date.trim(),
-      img: values.img.trim() || undefined,
+      data: {
+        title: values.title.trim(),
+        director: values.director.trim(),
+        description: values.description.trim(),
+        genres,
+        runtime: values.runtime.trim(),
+        rating: values.rating.trim(),
+        date: values.date.trim(),
+        img: values.img.trim(),
+      },
     }, {
       onSuccess: () => resetForm(),
     });

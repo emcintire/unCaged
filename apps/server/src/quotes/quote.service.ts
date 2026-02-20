@@ -5,15 +5,14 @@ import type { CreateQuoteDto } from './types';
 
 export class QuoteService {
   async getQuote() {
-    const quote = await Quote.find({
+    const quote = await Quote.findOne({
       createdOn: {
         $gte: new Date(new Date().getTime() - 7 * 60 * 60 * 24 * 1000),
       },
     })
-      .sort({ createdOn: -1 })
-      .limit(1);
+      .sort({ createdOn: -1 });
 
-    if (quote && quote.length > 0) return quote;
+    if (quote) return quote;
 
     const oneWeek = 24 * 60 * 60 * 1000 * 7;
     const firstDate = new Date(2021, 10, 14);

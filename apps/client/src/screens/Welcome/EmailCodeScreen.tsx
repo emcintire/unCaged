@@ -4,7 +4,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { z } from 'zod';
 import type { WelcomeAuthTabParamList } from '@/types';
 import { useCheckCode } from '@/services';
-import { form, typography, utils, showErrorToast, spacing } from '@/config';
+import { form, typography, utils, showErrorToast, screen } from '@/config';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 import { toFormikValidator } from '@/utils/toFormikValidator';
@@ -25,7 +25,7 @@ export default function EmailCodeScreen() {
 
   const handleSubmit = async (values: EmailCodeFormValues) => {
     try {
-      await checkCodeMutation.mutateAsync({ code: values.code });
+      await checkCodeMutation.mutateAsync({ data: { code: values.code } });
       navigate('Password Reset');
     } catch {
       showErrorToast('Invalid code');
@@ -33,7 +33,7 @@ export default function EmailCodeScreen() {
   };
 
   return (
-    <Screen style={{ padding: spacing.md }}>
+    <Screen style={screen.withPadding}>
       <Text style={[typography.h1, utils.selfCenter, utils.mt10]}>Check Email</Text>
       <Text style={[typography.caption, utils.selfCenter]}>(Check spam folder)</Text>
       <View style={form.container}>

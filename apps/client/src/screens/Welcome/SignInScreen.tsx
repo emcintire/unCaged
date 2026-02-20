@@ -25,18 +25,15 @@ export default function SignInScreen() {
 
   const handleSubmit = async (values: LoginFormValues): Promise<void> => {
     const email = values.email.toLowerCase().trim();
-    loginMutation.mutate({
-      email,
-      password: values.password,
-    }, {
-      onSuccess: async (token: string) => {
-        await signIn(token);
-        showSuccessToast('Sign in successful!');
-      },
-      onError: () => {
-        showErrorToast('Sign in failed');
-      },
-    });
+    try {
+      const token = await loginMutation.mutateAsync({ data: { email, password: values.password }});
+      console.log(token);
+      await signIn(token);
+      showSuccessToast('Sign in successful!');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Sign in failed';
+      showErrorToast(message);
+    }
   };
 
   return (

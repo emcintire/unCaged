@@ -31,9 +31,7 @@ export default function SecurityScreen() {
     }
 
     try {
-      await changePasswordMutation.mutateAsync({
-        password: values.newPassword,
-      });
+      await changePasswordMutation.mutateAsync({ data: { password: values.newPassword }});
       showSuccessToast('Password updated!');
       navigate('SettingsTab');
     } catch (error: unknown) {

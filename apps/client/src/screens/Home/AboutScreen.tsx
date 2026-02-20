@@ -1,10 +1,10 @@
 import { StyleSheet, Text, ScrollView } from 'react-native';
 import Screen from '@/components/Screen';
-import { colors, spacing, fontSize, fontFamily } from '@/config';
+import { colors, spacing, fontSize, fontFamily, screen } from '@/config';
 
 export default function AboutScreen() {
   return (
-    <Screen style={styles.container}>
+    <Screen style={screen.withPadding}>
       <ScrollView showsVerticalScrollIndicator={false} decelerationRate="fast">
         <Text style={styles.header}>Disclaimer</Text>
         <Text style={styles.body}>
@@ -44,9 +44,6 @@ export default function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: spacing.md,
-  },
   header: {
     marginTop: spacing.sm,
     fontFamily: fontFamily.bold,

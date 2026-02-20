@@ -3,29 +3,29 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Review } from '@/services';
-import { useCurrentUser, useDeleteReview, useFlagReview, useToggleLike } from '@/services';
+import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
 
 type Props = {
-  review: Review;
-  movieId: string;
   isOwnReview?: boolean;
+  onSuccess: () => void;
+  review: Review;
 };
 
-export default function ReviewCard({ review, movieId, isOwnReview }: Props) {
+export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   const [spoilerRevealed, setSpoilerRevealed] = useState(false);
   const [flagged, setFlagged] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { data: currentUser } = useCurrentUser();
+  const { data: user } = useGetCurrentUser();
 
-  const deleteMutation = useDeleteReview(movieId);
-  const toggleLikeMutation = useToggleLike(movieId);
-  const flagMutation = useFlagReview(movieId);
+  const deleteMutation = useDeleteReview();
+  const toggleLikeMutation = useToggleReviewLike();
+  const flagMutation = useFlagReview();
 
-  const canDelete = isAuthenticated && (isOwnReview || currentUser?.isAdmin);
+  const canDelete = isAuthenticated && (isOwnReview || user?.isAdmin);
   const canReport = isAuthenticated && !isOwnReview && !flagged;
 
   const handleDelete = () => {
@@ -34,14 +34,14 @@ export default function ReviewCard({ review, movieId, isOwnReview }: Props) {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteMutation.mutate(review._id),
+        onPress: () => deleteMutation.mutate({ reviewId: review._id }, { onSuccess }),
       },
     ]);
   };
 
   const handleLike = () => {
     if (!isAuthenticated) return;
-    toggleLikeMutation.mutate(review._id);
+    toggleLikeMutation.mutate({ reviewId: review._id });
   };
 
   const handleFlag = () => {
@@ -50,7 +50,7 @@ export default function ReviewCard({ review, movieId, isOwnReview }: Props) {
       {
         text: 'Report',
         onPress: () => {
-          flagMutation.mutate(review._id);
+          flagMutation.mutate({ reviewId: review._id });
           setFlagged(true);
         },
       },

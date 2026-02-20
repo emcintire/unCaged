@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { AdminReview, AdminReviewFilters } from '@/services';
-import { useAdminDeleteReview, useAdminReviews, useAdminUnflagReview } from '@/services';
+import type { AdminReview, GetAdminReviewsParams } from '@/services';
+import { useDeleteReview, useGetAdminReviews, useUnflagReview } from '@/services';
 import { useDebounce } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import Screen from '@/components/Screen';
@@ -10,8 +10,8 @@ import Screen from '@/components/Screen';
 type FilterMode = 'all' | 'flagged';
 
 function AdminReviewItem({ item }: { item: AdminReview }) {
-  const unflagMutation = useAdminUnflagReview();
-  const deleteMutation = useAdminDeleteReview();
+  const unflagMutation = useUnflagReview();
+  const deleteMutation = useDeleteReview();
 
   const handleDelete = () => {
     Alert.alert('Delete Review', `Delete this review by ${item.userName}?`, [
@@ -19,13 +19,13 @@ function AdminReviewItem({ item }: { item: AdminReview }) {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteMutation.mutate(item._id),
+        onPress: () => deleteMutation.mutate({ reviewId: item._id }),
       },
     ]);
   };
 
   const handleUnflag = () => {
-    unflagMutation.mutate(item._id);
+    unflagMutation.mutate({ reviewId: item._id });
   };
 
   const formattedDate = new Date(item.createdOn).toLocaleDateString('en-US', {
@@ -117,14 +117,14 @@ export default function AdminReviewsScreen() {
   const debouncedUserEmail = useDebounce(searchUserEmail);
   const debouncedMovieTitle = useDebounce(searchMovieTitle);
 
-  const filters: AdminReviewFilters = {
+  const filters: GetAdminReviewsParams = {
     page,
     flaggedOnly: filterMode === 'flagged',
-    userEmail: debouncedUserEmail.trim() || undefined,
-    movieTitle: debouncedMovieTitle.trim() || undefined,
+    userEmail: debouncedUserEmail.trim(),
+    movieTitle: debouncedMovieTitle.trim(),
   };
 
-  const { data, isLoading, isFetching } = useAdminReviews(filters);
+  const { data, isLoading, isFetching } = useGetAdminReviews(filters);
 
   const reviews = data?.reviews ?? [];
   const hasMore = data?.hasMore ?? false;

@@ -39,9 +39,11 @@ export default function SignUpScreen() {
       const email = values.email.toLowerCase().trim();
       const name = values.name?.trim();
       const token = await registerMutation.mutateAsync({
-        ...(name ? { name } : {}),
-        email,
-        password: values.password,
+        data: {
+          ...(name ? { name } : {}),
+          email,
+          password: values.password,
+        },
       });
       await signIn(token);
     } catch (error: unknown) {

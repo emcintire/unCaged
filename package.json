@@ -15,9 +15,17 @@
     "dev:client": "npm run dev -w uncaged-client",
     "test:server": "npm test -w uncaged-server",
     "build": "npm run build -w uncaged-server",
-    "start": "npm start -w uncaged-server"
+    "start": "npm start -w uncaged-server",
+    "generate": "orval"
   },
   "devDependencies": {
     "nx": "22.5.0"
+  },
+  "dependencies": {
+    "orval": "^8.4.0",
+    "swagger-jsdoc": "^6.2.8"
+  },
+  "overrides": {
+    "minimatch": "^10.2.1"
   }
 }

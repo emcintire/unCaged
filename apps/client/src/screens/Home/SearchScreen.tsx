@@ -1,16 +1,13 @@
 import { useState, useMemo } from 'react';
-import {
-  StyleSheet, View, Text, TouchableOpacity, TextInput,
-} from 'react-native';
+import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Movie, useCurrentUser, useMovies } from '@/services';
+import { type Movie, useGetCurrentUser, useGetAllMovies } from '@/services';
 import { useDebounce } from '@/hooks';
 import { colors, spacing, borderRadius, fontSize, fontFamily, movieCard } from '@/config';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
 import Screen from '@/components/Screen';
 import SearchFilters from '@/components/SearchFilters';
-import BuyMeCoffeeButton from '@/components/BuyMeCoffeeButton';
 
 const styles = StyleSheet.create({
   inputContainer: {
@@ -62,8 +59,8 @@ export default function SearchScreen() {
 
   const debouncedTitle = useDebounce(title);
 
-  const { data: user } = useCurrentUser();
-  const { data: movies = [], isLoading: loading } = useMovies();
+  const { data: user } = useGetCurrentUser();
+  const { data: movies = [], isLoading: loading } = useGetAllMovies();
 
   const favoriteIds = useMemo(() => new Set(user?.favorites ?? []), [user?.favorites]);
   const seenIds = useMemo(() => new Set(user?.seen ?? []), [user?.seen]);
@@ -80,7 +77,6 @@ export default function SearchScreen() {
 
     const filtered = movies.filter((movie: Movie) => predicates.every(p => p(movie)));
 
-    // Sort based on selected criteria
     const sortKey: (movie: Movie) => string | number = selected === 'rating'
       ? (movie: Movie) => movie.avgRating || 0
         : selected === 'year'

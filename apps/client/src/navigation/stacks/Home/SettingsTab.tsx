@@ -11,7 +11,7 @@ import AppLogo from '@/components/AppLogo';
 import AccountDetailsScreen from '@/screens/Home/AccountDetailsScreen';
 import CollectionScreen from '@/screens/Home/CollectionScreen';
 import MyReviewsScreen from '@/screens/Home/MyReviewsScreen';
-import PrivacyPolicyScreen from '@/screens/Home/PrivacyPolicy';
+import PrivacyPolicyScreen from '@/screens/Home/PrivacyPolicyScreen';
 import SecurityScreen from '@/screens/Home/SecurityScreen';
 import SettingsScreen from '@/screens/Home/SettingsScreen';
 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useCreateReview, useRateMovie } from '@/services';
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { borderRadius, colors, fontFamily, fontSize, showErrorToast, spacing } from '@/config';
 import StarRating from '../../StarRating';
+import { logger } from '@/utils/logger';
 
 type Props = {
   movieId: string;
@@ -15,7 +16,7 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
   const [rating, setRating] = useState<number | null>(null);
   const [isSpoiler, setIsSpoiler] = useState(false);
 
-  const createMutation = useCreateReview(movieId);
+  const createReviewMutation = useCreateReview();
   const rateMovieMutation = useRateMovie();
 
   const handleStarPress = (star: number) => {
@@ -28,26 +29,30 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!text.trim()) return;
-    createMutation.mutate(
-      {
-        text: text.trim(),
-        ...(rating != null && { rating }),
-        isSpoiler,
-      },
-      {
-        onSuccess: () => {
-          if (rating != null) {
-            rateMovieMutation.mutate({ id: movieId, rating });
-          }
-          setText('');
-          setRating(null);
-          setIsSpoiler(false);
-          onSuccess();
+    try {
+      await createReviewMutation.mutateAsync({
+        data: {
+          movieId,
+          text: text.trim(),
+          ...(rating != null && { rating }),
+          isSpoiler,
         },
-      },
-    );
+      });
+    
+      if (rating != null) {
+        await rateMovieMutation.mutateAsync({ data: { id: movieId, rating } });
+      }
+
+      setText('');
+      setRating(null);
+      setIsSpoiler(false);
+      onSuccess();
+    } catch (error) {
+      logger.error('Failed to submit review:', error);
+      showErrorToast('Failed to submit review. Please try again.');
+    }
   };
 
   return (
@@ -95,12 +100,12 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.submitBtn, (!text.trim() || createMutation.isPending) && styles.submitBtnDisabled]}
+          style={[styles.submitBtn, (!text.trim() || createReviewMutation.isPending) && styles.submitBtnDisabled]}
           onPress={handleSubmit}
-          disabled={!text.trim() || createMutation.isPending}
+          disabled={!text.trim() || createReviewMutation.isPending}
         >
           <Text style={styles.submitText}>
-            {createMutation.isPending ? 'Submitting...' : 'Submit'}
+            {createReviewMutation.isPending ? 'Submitting...' : 'Submit'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -138,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     color: colors.white,
     fontFamily: fontFamily.light,
-    fontSize: fontSize.sm,
+    fontSize: fontSize.md,
     minHeight: 100,
     padding: spacing.sm,
     marginBottom: spacing.xs,

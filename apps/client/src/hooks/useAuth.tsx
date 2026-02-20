@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useQueryClient } from '@tanstack/react-query';
 import { STORAGE_KEYS } from '@/constants';
-import { zodiosClient, setOnUnauthorized } from '@/services/zodiosClient';
+import { setOnUnauthorized } from '@/services';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -39,7 +39,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
           setIsAuthenticated(false);
           return;
         }
-        await zodiosClient.getCurrentUser();
         setIsAuthenticated(true);
       } catch {
         setIsAuthenticated(false);

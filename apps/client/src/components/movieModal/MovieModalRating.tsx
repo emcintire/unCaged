@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import type { SetState } from '@/types';
-import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useCurrentUser } from '@/services';
+import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser } from '@/services';
 import { borderRadius, colors, showErrorToast, spacing } from '@/config';
 import { getStarIcon } from '../StarRating';
 import Icon from '../Icon';
@@ -35,16 +35,16 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
   const rateMovieMutation = useRateMovie();
   const deleteRatingMutation = useDeleteRating();
   const addToSeenMutation = useAddToSeen();
-  const { data: user } = useCurrentUser();
+  const { data: user } = useGetCurrentUser();
 
   const submitRating = async (newRating: number) => {
     try {
-      await rateMovieMutation.mutateAsync({ id: movie._id, rating: newRating });
+      await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
       setRating(newRating);
 
       const isMovieSeen = user && user.seen.includes(movie._id);
       if (!isMovieSeen) {
-        await addToSeenMutation.mutateAsync(movie._id);
+        await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
         onSeenAdded();
       }
     } catch (error: unknown) {
@@ -57,7 +57,7 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
     if (rating === star) {
       await submitRating(star - 0.5);
     } else if (rating === star - 0.5) {
-      deleteRatingMutation.mutate({ id: movie._id }, {
+      deleteRatingMutation.mutate({ data: { id: movie._id } }, {
         onSuccess: () => setRating(0),
       });
     } else {

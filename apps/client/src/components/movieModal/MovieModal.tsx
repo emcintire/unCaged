@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { Image } from 'expo-image';
 import { ScrollView } from 'react-native-gesture-handler';
-import { type Movie, useCurrentUser, useAverageRating } from '@/services';
+import { useGetAverageRating, type Movie } from '@/services';
 import { useAuth } from '@/hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { changeResolution, colors, fontFamily, fontSize, modal, movieCard, shadow, spacing } from '@/config';
-import AdBanner from '../AdBanner';
 import Icon from '../Icon';
 import MovieModalDetails from './MovieModalDetails';
 import MovieModalActions from './MovieModalActions';
@@ -25,10 +24,9 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { data: user } = useCurrentUser();
-  const { data: ratingData, isLoading } = useAverageRating(propsMovie?._id || '');
+  const { data: rating, isLoading } = useGetAverageRating(propsMovie?._id || '');
 
-  const movieRating = ratingData ? Number(ratingData) : 0;
+  const movieRating = rating ? Number(rating) : 0;
 
   useEffect(() => {
     if (!isOpen || propsMovie == null) { return; }
@@ -51,11 +49,6 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
       onRequestClose={onClose}
     >
       <View style={styles.background}>
-        {!user?.isAdmin && (
-          <View style={styles.adContainerTop}>
-            <AdBanner />
-          </View>
-        )}
         {(isLoading || movie == null) ? (
           <MovieModalSkeleton />
         ) : (

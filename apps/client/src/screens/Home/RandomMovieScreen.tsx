@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, Text, Animated } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Movie, useCurrentUser, useMovies } from '@/services';
+import { type Movie, useGetCurrentUser, useGetAllMovies } from '@/services';
 import { borderRadius, changeResolution, colors, fontFamily, fontSize, shadow, spacing } from '@/config';
 import AdBanner from '@/components/AdBanner';
 import MovieModal from '@/components/movieModal/MovieModal';
@@ -21,8 +21,8 @@ export default function RandomMovieScreen() {
   const [unseenFilter, setUnseenFilter] = useState(false);
   const poolRef = useRef<Movie[]>([]);
 
-  const { data: user, isLoading: isUserLoading } = useCurrentUser();
-  const { data: allMovies = [], isLoading: isMoviesLoading } = useMovies();
+  const { data: user, isLoading: isUserLoading } = useGetCurrentUser();
+  const { data: allMovies = [], isLoading: isMoviesLoading } = useGetAllMovies();
   const isAdmin = user?.isAdmin ?? false;
   const isLoading = isUserLoading || isMoviesLoading;
 
@@ -54,7 +54,7 @@ export default function RandomMovieScreen() {
     if (isLoading || !allMovies.length) return;
     const filtered = getFilteredMovies();
     poolRef.current = pickRandom(filtered);
-  }, [isLoading, allMovies.length, getFilteredMovies, pickRandom]);
+  }, [isLoading, allMovies, getFilteredMovies, pickRandom]);
 
   const getRandomMovie = useCallback(() => {
     if (!poolRef.current.length) {
@@ -134,13 +134,13 @@ export default function RandomMovieScreen() {
                   }
                 }}
               />
-              {user?.favorites.includes(movie._id) && (
+              {user?.favorites?.includes(movie._id) && (
                 <View style={styles.badge}>
                   <MaterialCommunityIcons name="heart" size={18} color={colors.orange} />
                 </View>
               )}
-              {user?.seen.includes(movie._id) && (
-                <View style={[styles.badge, user?.favorites.includes(movie._id) ? styles.secondBadge : undefined]}>
+              {user?.seen?.includes(movie._id) && (
+                <View style={[styles.badge, user?.favorites?.includes(movie._id) ? styles.secondBadge : undefined]}>
                   <MaterialCommunityIcons name="eye" size={18} color={colors.orange} />
                 </View>
               )}

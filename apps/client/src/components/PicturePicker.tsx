@@ -3,10 +3,9 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { borderRadius, colors, showErrorToast, spacing } from '@/config';
-import Screen from './Screen';
 import AppButton from './AppButton';
 import Icon from './Icon';
-import { useCurrentUser, useUpdateUserImage } from '@/services';
+import { useGetCurrentUser, useUpdateUser } from '@/services';
 
 type Props = {
   modalVisible: boolean;
@@ -25,22 +24,22 @@ const imgs = [
 export default function PicturePicker({ modalVisible, setModalVisible }: Props) {
   const [selected, setSelected] = useState(0);
 
-  const { data: user, refetch } = useCurrentUser();
-  const updateUserImageMutation = useUpdateUserImage();
+  const { data: user, refetch } = useGetCurrentUser();
+  const updateUserMutation = useUpdateUser();
 
   useEffect(() => {
     const index = imgs.findIndex((link) => link === user?.img);
     if (index !== -1) {
       setSelected(index);
     }
-  }, [user?.img]);
+  }, [user]);
 
   const handleSubmit = async () => {
     const selectedImg = imgs[selected];
     if (!selectedImg) return;
 
     try {
-      await updateUserImageMutation.mutateAsync({ img: selectedImg });
+      await updateUserMutation.mutateAsync({ data: { img: selectedImg } });
       setModalVisible(false);
       refetch();
     } catch (error: unknown) {

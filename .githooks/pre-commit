@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if git diff --cached --name-only | grep -q "^apps/server/"; then
+  echo "Server changes detected — running tests..."
+  cd apps/server && npm test
+  exit $?
+fi

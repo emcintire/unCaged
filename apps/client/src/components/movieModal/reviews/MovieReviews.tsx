@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Review } from '@/services';
-import { useCurrentUser, useReviewsByMovie } from '@/services';
+import { useGetCurrentUser, useGetReviewsByMovie } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import WriteReviewForm from './WriteReviewForm';
@@ -19,29 +19,28 @@ export default function MovieReviews({ movieId }: Props) {
   const [showWriteForm, setShowWriteForm] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { data: currentUser } = useCurrentUser();
-
-  const { data, isLoading, isFetching } = useReviewsByMovie(movieId, page, sort);
+  const { data: user } = useGetCurrentUser();
+  const { data: reviews, isLoading, isFetching, refetch } = useGetReviewsByMovie({ movieId, page, sort });
 
   const prevSortRef = useRef(sort);
 
   // Accumulate reviews as pages load; reset on sort change
   useEffect(() => {
-    if (!data) return;
+    if (!reviews) return;
 
     if (prevSortRef.current !== sort) {
       // Sort changed — replace all
-      setAccumulatedReviews(data.reviews);
+      setAccumulatedReviews(reviews.reviews);
       prevSortRef.current = sort;
     } else {
       // Same sort, new page — append unique reviews
       setAccumulatedReviews((prev) => {
         const existingIds = new Set(prev.map((r) => r._id));
-        const newOnes = data.reviews.filter((r) => !existingIds.has(r._id));
-        return page === 1 ? data.reviews : [...prev, ...newOnes];
+        const newOnes = reviews.reviews.filter((r) => !existingIds.has(r._id));
+        return page === 1 ? reviews.reviews : [...prev, ...newOnes];
       });
     }
-  }, [data, sort, page]);
+  }, [reviews, sort, page]);
 
   const handleSortChange = (newSort: 'recent' | 'popular') => {
     if (newSort === sort) return;
@@ -54,12 +53,12 @@ export default function MovieReviews({ movieId }: Props) {
   };
 
   const ownReviews = isAuthenticated
-    ? accumulatedReviews.filter((r) => r.userId === currentUser?._id)
+    ? accumulatedReviews.filter((r) => r.userId === user?._id)
     : [];
 
-  const otherReviews = accumulatedReviews.filter((r) => r.userId !== currentUser?._id);
-  const hasMore = data?.hasMore ?? false;
-  const total = data?.total ?? 0;
+  const otherReviews = accumulatedReviews.filter((r) => r.userId !== user?._id);
+  const hasMore = reviews?.hasMore ?? false;
+  const total = reviews?.total ?? 0;
 
   return (
     <View style={styles.container}>
@@ -89,7 +88,7 @@ export default function MovieReviews({ movieId }: Props) {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Your Reviews</Text>
           {ownReviews.map((review) => (
-            <ReviewCard key={review._id} review={review} movieId={movieId} isOwnReview />
+            <ReviewCard key={review._id} onSuccess={refetch} review={review} isOwnReview />
           ))}
         </View>
       )}
@@ -104,7 +103,10 @@ export default function MovieReviews({ movieId }: Props) {
       {isAuthenticated && showWriteForm && (
         <WriteReviewForm
           movieId={movieId}
-          onSuccess={() => setShowWriteForm(false)}
+          onSuccess={() => {
+            setShowWriteForm(false);
+            refetch();
+          }}
           onCancel={() => setShowWriteForm(false)}
         />
       )}
@@ -123,8 +125,8 @@ export default function MovieReviews({ movieId }: Props) {
           {otherReviews.map((review) => (
             <ReviewCard
               key={review._id}
+              onSuccess={refetch}
               review={review}
-              movieId={movieId}
               isOwnReview={false}
             />
           ))}

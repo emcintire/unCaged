@@ -1,25 +1,25 @@
 import { useState, useCallback, useMemo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { type Movie, useCurrentUser, useMovies, usePopularMovies, useStaffPicks, useQuote } from '@/services';
-import { colors, spacing, fontSize, fontFamily } from '@/config';
+import { type Movie, useGetCurrentUser, useGetAllMovies, useGetPopularMovies, useGetStaffPicks, useGetQuote } from '@/services';
+import { colors, spacing, fontSize, fontFamily, borderRadius } from '@/config';
 import Screen from '@/components/Screen';
 import MovieCard from '@/components/MovieCard';
 import MovieModal from '@/components/movieModal/MovieModal';
 import BuyMeCoffeeButton from '@/components/BuyMeCoffeeButton';
-import HomeScreenSkeleton from './HomeScreenSkeleton';
+import Skeleton from '@/components/Skeleton';
 
 const styles = StyleSheet.create({
   quote: {
     fontFamily: fontFamily.extraLight,
-    fontSize: fontSize.xxxl - 2,
+    fontSize: fontSize.xxl,
     color: 'white',
     textAlign: 'center',
     marginTop: spacing.xxl,
     paddingHorizontal: spacing.sm,
   },
   subquote: {
-    marginTop: spacing.xs + 3,
+    marginTop: spacing.sm,
     fontFamily: fontFamily.regular,
     fontSize: fontSize.base,
     color: 'white',
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   subTagline: {
     fontFamily: fontFamily.light,
-    fontSize: fontSize.sm - 1,
+    fontSize: fontSize.sm,
     color: colors.white,
     alignSelf: 'flex-start',
   },
@@ -65,6 +65,23 @@ const styles = StyleSheet.create({
   },
   listSpacer: {
     width: 20,
+  },
+    container: {
+    flex: 1,
+  },
+  quoteBlock: {
+    alignItems: 'center',
+    marginTop: spacing.xxl,
+    paddingHorizontal: spacing.sm,
+  },
+  quoteLine: {
+    marginTop: spacing.xs,
+  },
+  row: {
+    marginTop: spacing.lg,
+  },
+  card: {
+    marginRight: spacing.sm,
   },
 });
 
@@ -83,14 +100,55 @@ const genres = [
   'Fantasy',
 ];
 
+const ROWS = Array.from({ length: 4 }, (_, i) => i);
+const CARDS_PER_ROW = Array.from({ length: 4 }, (_, i) => i);
+
+const CARD_WIDTH = 135;
+const CARD_HEIGHT = 200;
+
+function HomeScreenSkeleton() {
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+      <View style={styles.quoteBlock}>
+        <Skeleton width="80%" height={22} />
+        <Skeleton width="60%" height={22} style={styles.quoteLine} />
+        <Skeleton width="40%" height={14} style={styles.subquote} />
+        <Skeleton width="30%" height={10} style={styles.subsubquote} />
+      </View>
+      {ROWS.map((row) => (
+        <View key={row} style={styles.row}>
+          <Skeleton width="30%" height={22} style={styles.header} />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {CARDS_PER_ROW.map((card) => (
+              <Skeleton
+                key={card}
+                width={CARD_WIDTH}
+                height={CARD_HEIGHT}
+                borderRadiusValue={borderRadius.sm}
+                style={styles.card}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
 export default function HomeScreen() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data: user } = useCurrentUser();
-  const { data: movies = [], isLoading: moviesLoading } = useMovies();
-  const { data: popularMovies = [], isLoading: popularLoading } = usePopularMovies();
-  const { data: staffPicks = [], isLoading: staffPicksLoading } = useStaffPicks();
-  const { data: quote, isLoading: quoteLoading } = useQuote();
+  const { data: user } = useGetCurrentUser();
+  const { data: movies = [], isLoading: moviesLoading } = useGetAllMovies();
+  const { data: popularMovies = [], isLoading: popularLoading } = useGetPopularMovies();
+  const { data: staffPicks = [], isLoading: staffPicksLoading } = useGetStaffPicks();
+  const { data: quote, isLoading: quoteLoading } = useGetQuote();
+
+  console.log(quote);
 
   const isLoading = moviesLoading || popularLoading || staffPicksLoading || quoteLoading;
 
@@ -108,7 +166,10 @@ export default function HomeScreen() {
   );
 
   const customRows = useMemo(
-    () => [{ label: 'Popular', data: seededShuffle(popularMovies, 'Popular') }, { label: 'Staff Picks', data: seededShuffle(staffPicks, 'Staff Picks') }],
+    () => [
+      { label: 'Popular', data: seededShuffle(popularMovies, 'Popular') },
+      { label: 'Staff Picks', data: seededShuffle(staffPicks, 'Staff Picks') },
+    ],
     [popularMovies, staffPicks, seededShuffle],
   );
 

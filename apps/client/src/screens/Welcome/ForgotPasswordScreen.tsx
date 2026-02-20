@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen() {
   const handleSubmit = async (values: ForgotPasswordFormValues) => {
     try {
       const email = values.email.trim().toLowerCase();
-      await forgotPasswordMutation.mutateAsync({ email });
+      await forgotPasswordMutation.mutateAsync({ data: { email } });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to send reset email';
       showErrorToast(message);

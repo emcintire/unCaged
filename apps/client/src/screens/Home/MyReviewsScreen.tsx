@@ -3,12 +3,12 @@ import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { UserReview } from '@/services';
-import { useDeleteReview, useMyReviews } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import Screen from '@/components/Screen';
+import { useDeleteReview, useGetMyReviews } from '@/services';
 
 function ReviewListItem({ item }: { item: UserReview }) {
-  const deleteMutation = useDeleteReview(item.movieId);
+  const deleteMutation = useDeleteReview();
 
   const handleDelete = () => {
     Alert.alert('Delete Review', 'Delete this review?', [
@@ -16,7 +16,7 @@ function ReviewListItem({ item }: { item: UserReview }) {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteMutation.mutate(item._id),
+        onPress: () => deleteMutation.mutate({ reviewId: item._id }),
       },
     ]);
   };
@@ -71,8 +71,8 @@ type SortMode = 'recent' | 'popular';
 
 export default function MyReviewsScreen() {
   const [sort, setSort] = useState<SortMode>('recent');
-  const { data: reviews = [], isLoading } = useMyReviews();
-
+  const { data: reviews = [], isLoading } = useGetMyReviews();
+  
   const sorted = [...reviews].sort((a, b) =>
     sort === 'popular'
       ? b.likeCount - a.likeCount

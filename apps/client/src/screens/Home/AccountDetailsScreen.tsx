@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { z } from 'zod';
 
 import type { HomeStackParamList } from '@/types';
-import { useCurrentUser, useUpdateUser } from '@/services';
+import { useGetCurrentUser, useUpdateUser } from '@/services';
 import { showErrorToast, showSuccessToast, spacing } from '@/config';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
@@ -30,7 +30,7 @@ export default function AccountDetailsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const { navigate } = useNavigation<NativeStackNavigationProp<HomeStackParamList, 'SettingsTab'>>();
 
-  const { data: user, isLoading, refetch } = useCurrentUser();
+  const { data: user, isLoading, refetch } = useGetCurrentUser();
   const updateUserMutation = useUpdateUser();
 
   const handleSubmit = async (values: FormValues) => {
@@ -39,7 +39,7 @@ export default function AccountDetailsScreen() {
     try {
       const email = values.email.toLowerCase().trim();
       const name = (values.name ?? '').trim();
-      await updateUserMutation.mutateAsync({ email, name });
+      await updateUserMutation.mutateAsync({ data: { email, name }});
       navigate('SettingsTab');
       refetch();
       showSuccessToast();

@@ -25,7 +25,7 @@ export default function PasswordResetScreen() {
 
   const handleSubmit = async (values: PasswordResetFormValues) => {
     try {
-      const token = await changePasswordMutation.mutateAsync({ password: values.password });
+      const token = await changePasswordMutation.mutateAsync({ data: { password: values.password } });
       if (typeof token === 'string') {
         await signIn(token);
       }
