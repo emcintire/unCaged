@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'row',
-    paddingLeft: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
   errorContainer: {
     minHeight: 60,
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'row',
-    paddingLeft: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
   notificationText: {
     fontSize: fontSize.sm,

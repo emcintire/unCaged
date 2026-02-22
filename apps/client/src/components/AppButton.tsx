@@ -9,8 +9,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import type { ColorKey } from '@/types';
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { borderRadius, type ColorKey, colors, fontFamily, fontSize, spacing } from '@/config';
 import { useAnimatedValue } from '@/hooks';
 
 type Props = {

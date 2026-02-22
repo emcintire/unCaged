@@ -11,9 +11,11 @@ const controller = new MovieController();
  *   schemas:
  *     Movie:
  *       type: object
- *       required: [_id, title, director, genres, img, rating, runtime, date, favoriteCount, ratingCount, ratingSum, seenCount]
+ *       required: [_id, date, director, genres, img, rating, runtime, title]
  *       properties:
  *         _id:
+ *           type: string
+ *         title:
  *           type: string
  *         avgRating:
  *           type: number
@@ -23,8 +25,6 @@ const controller = new MovieController();
  *           type: string
  *         director:
  *           type: string
- *         favoriteCount:
- *           type: integer
  *         genres:
  *           type: array
  *           items:
@@ -33,15 +33,7 @@ const controller = new MovieController();
  *           type: string
  *         rating:
  *           type: string
- *         ratingCount:
- *           type: integer
- *         ratingSum:
- *           type: integer
  *         runtime:
- *           type: string
- *         seenCount:
- *           type: integer
- *         title:
  *           type: string
  */
 
@@ -63,107 +55,6 @@ const controller = new MovieController();
  *                 $ref: '#/components/schemas/Movie'
  */
 movieRouter.get('/', controller.getAllMovies);
-
-/**
- * @swagger
- * /api/movies/getMovies:
- *   post:
- *     summary: Get movies with sort options
- *     operationId: getMovies
- *     tags: [Movies]
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       '200':
- *         description: List of movies
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Movie'
- */
-movieRouter.post('/getMovies', controller.getMoviesWithSort);
-
-/**
- * @swagger
- * /api/movies/findByID/{id}:
- *   get:
- *     summary: Find movie by ID
- *     operationId: findMovieById
- *     tags: [Movies]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Movie
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Movie'
- */
-movieRouter.get('/findByID/:id', controller.findMovieById);
-
-/**
- * @swagger
- * /api/movies/findByTitle/{title}:
- *   get:
- *     summary: Find movies by title path param
- *     operationId: findMoviesByTitleParam
- *     tags: [Movies]
- *     parameters:
- *       - in: path
- *         name: title
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Movies matching title
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Movie'
- */
-movieRouter.get('/findByTitle/:title', controller.findMoviesByTitleParam);
-
-/**
- * @swagger
- * /api/movies/findByTitle:
- *   post:
- *     summary: Search movies by title
- *     operationId: searchMovies
- *     tags: [Movies]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [search]
- *             properties:
- *               search:
- *                 type: string
- *     responses:
- *       '200':
- *         description: Movies matching search
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Movie'
- */
-movieRouter.post('/findByTitle', controller.findMoviesByTitle);
 
 /**
  * @swagger
@@ -270,55 +161,3 @@ movieRouter.get('/avgRating/:id', controller.getAverageRating);
  *               $ref: '#/components/schemas/Movie'
  */
 movieRouter.post('/', auth, admin, controller.createMovie);
-
-/**
- * @swagger
- * /api/movies/{id}:
- *   put:
- *     summary: Update a movie (admin only)
- *     operationId: updateMovie
- *     tags: [Movies]
- *     security:
- *       - xAuthToken: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               director:
- *                 type: string
- *               description:
- *                 type: string
- *               genres:
- *                 type: array
- *                 items:
- *                   type: string
- *               runtime:
- *                 type: string
- *               rating:
- *                 type: string
- *               date:
- *                 type: string
- *               img:
- *                 type: string
- *     responses:
- *       '200':
- *         description: Updated movie
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Movie'
- */
-movieRouter.put('/:id', auth, admin, controller.updateMovie);
-
-movieRouter.get('/updateRatings', auth, controller.updateAllRatings);

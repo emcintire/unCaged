@@ -1,26 +1,26 @@
 import type { PipelineStage } from 'mongoose';
+import { validateSchema } from '@/utils';
 import { Review } from './review.model';
-import { reviewSchema } from './schemas/review.schema';
 import { User } from '@/users';
 import { Movie } from '@/movies';
-import type { CreateReviewDto } from './types';
+import { createReviewDtoSchema, type CreateReviewDto } from './schemas';
 
 export type SortOption = 'recent' | 'popular';
 
-export interface GetReviewsOptions {
+export type GetReviewsOptions = {
   page?: number;
   limit?: number;
   sort?: SortOption;
   currentUserId?: string;
-}
+};
 
-export interface AdminReviewsOptions {
+export type AdminReviewsOptions = {
   page?: number;
   limit?: number;
   flaggedOnly?: boolean;
   userEmail?: string;
   movieTitle?: string;
-}
+};
 
 export class ReviewService {
   async getReviewsByMovie(movieId: string, options: GetReviewsOptions = {}) {
@@ -69,10 +69,7 @@ export class ReviewService {
   }
 
   async createReview(userId: string, dto: CreateReviewDto) {
-    const validation = reviewSchema.safeParse(dto);
-    if (!validation.success) {
-      throw new Error(validation.error.issues[0].message);
-    }
+    validateSchema(createReviewDtoSchema, dto);
 
     const review = new Review({
       userId,

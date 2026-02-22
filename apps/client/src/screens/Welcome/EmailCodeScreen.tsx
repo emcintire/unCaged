@@ -5,11 +5,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { z } from 'zod';
 import type { WelcomeAuthTabParamList } from '@/types';
 import { useCheckCode } from '@/services';
-import { form, typography, utils, showErrorToast, screen } from '@/config';
+import { STORAGE_KEYS } from '@/constants';
+import { form, typography, utils, screen } from '@/config';
+import { showErrorToast, toFormikValidator } from '@/utils';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
-import { toFormikValidator } from '@/utils/toFormikValidator';
-import { STORAGE_KEYS } from '@/constants';
 
 const schema = z.object({
   code: z.string().min(1, 'Code is required'),

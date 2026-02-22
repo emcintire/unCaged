@@ -1,7 +1,8 @@
+import { quotes } from '@/utils';
+import { validateSchema } from '@/utils';
 import { Quote } from './quote.model';
-import { quoteSchema } from './schemas/quote.schema';
-import { quotes } from '@/util';
-import type { CreateQuoteDto } from './types';
+import { quoteSchema } from './quote.schema';
+import type { CreateQuoteDto } from './schemas';
 
 export class QuoteService {
   async getQuote() {
@@ -26,10 +27,7 @@ export class QuoteService {
   }
 
   async createQuote(dto: CreateQuoteDto) {
-    const validation = quoteSchema.safeParse(dto);
-    if (!validation.success) {
-      throw new Error(validation.error.issues[0].message);
-    }
+    validateSchema(quoteSchema, dto);
 
     const quote = new Quote({
       quote: dto.quote,

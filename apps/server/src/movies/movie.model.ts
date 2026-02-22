@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { MovieData } from './schemas/movie.schema';
+import type { MovieData } from './movie.schema';
 
 export type MovieDocument = MovieData & Document & {
   _id: Types.ObjectId;
@@ -10,40 +10,40 @@ const movieMongooseSchema = new Schema<MovieDocument>({
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
     unique: true,
   },
   director: {
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
   },
   description: {
     type: String,
-    maxlength: 512,
+    maxLength: 512,
   },
   genres: {
     type: [String],
     minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
   },
   runtime: {
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
   },
   rating: {
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
   },
   date: {
     type: String,
     minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
     required: true
   },
   img: {

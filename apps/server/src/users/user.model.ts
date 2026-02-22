@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { UserData } from './schemas/user.schema';
+import { DEFAULT_USER_IMG } from '@/utils';
+import type { UserData } from './user.schema';
 
 export type UserDocument = Document & UserData & {
   _id: Types.ObjectId;
@@ -16,35 +17,34 @@ const userSchema = new Schema<UserDocument>({
   },
   name: {
     type: String,
-    default: '',
     required: false,
-    minlength: 1,
-    maxlength: 100,
+    maxLength: 100,
   },
   email: {
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 255,
+    maxLength: 255,
     unique: true,
   },
   password: {
     type: String,
     required: true,
     minlength: 5,
-    maxlength: 1024,
+    maxLength: 1024,
   },
   resetCode: {
     type: String,
-    default: '',
-    maxlength: 100,
+    maxLength: 100,
   },
   resetCodeExpiry: {
     type: Date,
+    maxLength: 100,
   },
   img: {
     type: String,
-    default: '',
+    default: DEFAULT_USER_IMG,
+    maxLength: 100,
   },
   ratings: [
     {

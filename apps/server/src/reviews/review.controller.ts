@@ -1,9 +1,8 @@
 import type { Response, Request } from 'express';
+import { getIdFromToken } from '@/utils';
 import type { AuthenticatedRequest } from '@/types';
-import { ReviewService } from './review.service';
-import type { CreateReviewDto } from './types';
-import type { SortOption } from './review.service';
-import { getIdFromToken } from '@/util';
+import { ReviewService, type SortOption } from './review.service';
+import type { CreateReviewDto } from './schemas';
 
 const reviewService = new ReviewService();
 
@@ -40,12 +39,8 @@ export class ReviewController {
 
   async createReview(req: AuthenticatedRequest<CreateReviewDto>, res: Response) {
     try {
-      if (!req.user) {
-        res.status(401).send('Not authenticated');
-        return;
-      }
-      const review = await reviewService.createReview(req.user._id, req.body);
-      res.status(200).send(review);
+      const review = await reviewService.createReview(req.user!.sub, req.body);
+      res.status(201).send(review);
     } catch (error) {
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
     }
@@ -53,15 +48,11 @@ export class ReviewController {
 
   async deleteReview(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
     try {
-      if (!req.user) {
-        res.status(401).send('Not authenticated');
-        return;
-      }
-      await reviewService.deleteReview(req.params.reviewId, req.user._id, req.user.isAdmin);
+      await reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
       res.sendStatus(200);
     } catch (error) {
       if (error instanceof Error && error.message === 'Not authorized to delete this review.') {
-        res.status(401).send(error.message);
+        res.status(403).send(error.message);
         return;
       }
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
@@ -70,11 +61,7 @@ export class ReviewController {
 
   async toggleLike(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
     try {
-      if (!req.user) {
-        res.status(401).send('Not authenticated');
-        return;
-      }
-      const result = await reviewService.toggleLike(req.params.reviewId, req.user._id);
+      const result = await reviewService.toggleLike(req.params.reviewId, req.user!.sub);
       res.status(200).send(result);
     } catch (error) {
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
@@ -83,11 +70,7 @@ export class ReviewController {
 
   async flagReview(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
     try {
-      if (!req.user) {
-        res.status(401).send('Not authenticated');
-        return;
-      }
-      await reviewService.flagReview(req.params.reviewId, req.user._id);
+      await reviewService.flagReview(req.params.reviewId, req.user!.sub);
       res.sendStatus(200);
     } catch (error) {
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
@@ -114,17 +97,13 @@ export class ReviewController {
       const result = await reviewService.getAllReviewsAdmin({ page, limit, flaggedOnly, userEmail, movieTitle });
       res.status(200).send(result);
     } catch (error) {
-      res.status(500).send(error instanceof Error ? error.message : 'An error occurred');
+      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
     }
   }
 
   async deleteReviewAdmin(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
     try {
-      if (!req.user) {
-        res.status(401).send('Not authenticated');
-        return;
-      }
-      await reviewService.deleteReview(req.params.reviewId, req.user._id, true);
+      await reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
       res.sendStatus(200);
     } catch (error) {
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');

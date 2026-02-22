@@ -3,7 +3,8 @@ import Separator from './Separator'
 import AppDropdown from './AppDropdown'
 
 import { SetState } from '@/types'
-import { colors, genres, spacing, borderRadius, fontSize, fontFamily } from '@/config'
+import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/config'
+import { genres } from '@/constants'
 
 type Props = {
   genreFilter: string;

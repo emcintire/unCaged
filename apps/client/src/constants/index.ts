@@ -1,12 +1,11 @@
-export { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from '@uncaged/shared';
-
 export const STORAGE_KEYS = {
   AUTH_CODE: 'code',
   AUTH_EMAIL: 'email',
   AUTH_TOKEN: 'token',
   AUTH_REFRESH_TOKEN: 'refreshToken',
-  USER_PREFERENCES: 'userPreferences',
 } as const;
+
+export type StorageKey = typeof STORAGE_KEYS[keyof typeof STORAGE_KEYS];
 
 export const TOAST_DURATION = {
   SHORT: 2000,
@@ -14,5 +13,20 @@ export const TOAST_DURATION = {
   LONG: 4000,
 } as const;
 
-export type StorageKey = typeof STORAGE_KEYS[keyof typeof STORAGE_KEYS];
-
+export const genres = [
+  'Action',
+  'Adventure',
+  'Animation',
+  'Comedy',
+  'Crime',
+  'Documentary',
+  'Drama',
+  'Family',
+  'Fantasy',
+  'Horror',
+  'Mystery',
+  'Romance',
+  'Sci-Fi',
+  'Thriller',
+  'War',
+] as const;

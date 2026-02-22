@@ -1,15 +1,14 @@
 import express from 'express';
-import rateLimit from 'express-rate-limit';
 import { auth } from '@/middleware';
 import { AuthController } from '@/auth';
+import { createAuthLimiter } from '@/utils';
 
-const fiveMinutesInMs = 5 * 60 * 1000;
-const authLimiter = rateLimit({
-  windowMs: fiveMinutesInMs,
-  max: 15,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+const fifteenMinutesInMs = 15 * 60 * 1000;
+const loginLimiter = createAuthLimiter({ max: 10 });
+const refreshLimiter = createAuthLimiter({ max: 60 });
+const forgotPasswordLimiter = createAuthLimiter({ windowMs: fifteenMinutesInMs, max: 5 });
+const checkCodeLimiter = createAuthLimiter({ windowMs: fifteenMinutesInMs, max: 8 });
+const resetPasswordLimiter = createAuthLimiter({ windowMs: fifteenMinutesInMs, max: 5 });
 
 export const authRouter = express.Router();
 const controller = new AuthController();
@@ -59,7 +58,7 @@ const controller = new AuthController();
  *       '400':
  *         description: Invalid request
  */
-authRouter.post('/login', authLimiter, controller.login);
+authRouter.post('/login', loginLimiter, controller.login);
 
 /**
  * @swagger
@@ -109,7 +108,7 @@ authRouter.post('/logout', auth, controller.logout);
  *             schema:
  *               $ref: '#/components/schemas/AuthTokenData'
  */
-authRouter.post('/refresh', authLimiter, controller.refresh);
+authRouter.post('/refresh', refreshLimiter, controller.refresh);
 
 /**
  * @swagger
@@ -133,7 +132,7 @@ authRouter.post('/refresh', authLimiter, controller.refresh);
  *       '200':
  *         description: Reset token
  */
-authRouter.post('/forgotPassword', authLimiter, controller.forgotPassword);
+authRouter.post('/forgotPassword', forgotPasswordLimiter, controller.forgotPassword);
 
 /**
  * @swagger
@@ -159,7 +158,7 @@ authRouter.post('/forgotPassword', authLimiter, controller.forgotPassword);
  *       '200':
  *         description: Result message
  */
-authRouter.post('/checkCode', authLimiter, controller.checkResetCode);
+authRouter.post('/checkCode', checkCodeLimiter, controller.checkResetCode);
 
 /**
  * @swagger
@@ -191,4 +190,4 @@ authRouter.post('/checkCode', authLimiter, controller.checkResetCode);
  *             schema:
  *               $ref: '#/components/schemas/AuthTokenData'
  */
-authRouter.post('/resetPassword', authLimiter, controller.resetPassword);
+authRouter.post('/resetPassword', resetPasswordLimiter, controller.resetPassword);

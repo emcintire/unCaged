@@ -2,9 +2,7 @@ import type { Request } from 'express';
 
 export type AuthenticatedRequest<TBody = unknown, TParams = unknown, TQuery = unknown> = Request<TParams, unknown, TBody, TQuery> & {
   user?: {
-    _id: string;
+    sub: string;
     isAdmin: boolean;
   };
 };
-
-export type AuthRequest = AuthenticatedRequest;

@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { QuoteData } from './schemas/quote.schema';
+import type { QuoteData } from './quote.schema';
 
 export type QuoteDocument = QuoteData & Document & {
   _id: Types.ObjectId;
@@ -10,13 +10,13 @@ const quoteMongooseSchema = new Schema<QuoteDocument>({
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 255,
+    maxLength: 255,
   },
   subquote: {
     type: String,
     required: false,
     minlength: 1,
-    maxlength: 128,
+    maxLength: 128,
   },
   createdOn: {
     type: Date,

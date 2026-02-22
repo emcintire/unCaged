@@ -8,11 +8,11 @@ import { z } from 'zod';
 
 import type { HomeStackParamList } from '@/types';
 import { useGetCurrentUser, useUpdateUser } from '@/services';
-import { showErrorToast, showSuccessToast, spacing } from '@/config';
+import { spacing } from '@/config';
+import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 import PicturePicker from '@/components/PicturePicker';
-import { toFormikValidator } from '@/utils/toFormikValidator';
 
 type FormValues = {
   name: string;

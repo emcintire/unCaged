@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useCreateReview, useRateMovie } from '@/services';
-import { borderRadius, colors, fontFamily, fontSize, showErrorToast, spacing } from '@/config';
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
-import { logger } from '@/utils/logger';
+import { logger, showErrorToast } from '@/utils';
 
 type Props = {
   movieId: string;

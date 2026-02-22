@@ -2,19 +2,19 @@ import { StyleSheet, View } from 'react-native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { z } from 'zod';
+import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
 import type { HomeStackParamList } from '@/types';
-import { form, spacing, showErrorToast, showSuccessToast } from '@/config';
+import { form, spacing } from '@/config';
+import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
 import { useChangePassword } from '@/services';
 import { AppForm, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 import PasswordInput from '@/components/forms/PasswordInput';
-import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@/constants';
-import { toFormikValidator } from '@/utils/toFormikValidator';
 
 type SecurityFormValues = {
+  confirmPassword: string;
   currentPassword: string;
   newPassword: string;
-  confirmPassword: string;
 };
 
 export default function SecurityScreen() {
@@ -31,7 +31,9 @@ export default function SecurityScreen() {
     }
 
     try {
-      await changePasswordMutation.mutateAsync({ data: { password: values.newPassword }});
+      await changePasswordMutation.mutateAsync({
+        data: { currentPassword: values.currentPassword, password: values.newPassword,
+      }});
       showSuccessToast('Password updated!');
       navigate('SettingsTab');
     } catch (error: unknown) {

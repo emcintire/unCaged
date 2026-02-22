@@ -1,13 +1,13 @@
 import { View } from 'react-native';
 import { z } from 'zod';
-import { useRegister } from '@/services';
+import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
 import { useAuth } from '@/hooks';
-import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@/constants';
-import { form, screen, showErrorToast } from '@/config';
+import { form, screen } from '@/config';
+import { showErrorToast, toFormikValidator } from '@/utils';
 import Screen from '@/components/Screen';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import PasswordInput from '@/components/forms/PasswordInput';
-import { toFormikValidator } from '@/utils/toFormikValidator';
+import { useCreateUser } from '@/services';
 
 const schema = z.object({
   name: z.string().optional(),
@@ -27,7 +27,7 @@ type RegisterFormValues = {
 
 export default function SignUpScreen() {
   const { signIn } = useAuth();
-  const registerMutation = useRegister();
+  const createUserMutation = useCreateUser();
 
   const handleSubmit = async (values: RegisterFormValues) => {
     if (values.password !== values.confirmPassword) {
@@ -38,7 +38,7 @@ export default function SignUpScreen() {
     try {
       const email = values.email.toLowerCase().trim();
       const name = values.name?.trim();
-      const { accessToken, refreshToken } = await registerMutation.mutateAsync({
+      const { accessToken, refreshToken } = await createUserMutation.mutateAsync({
         data: {
           ...(name ? { name } : {}),
           email,

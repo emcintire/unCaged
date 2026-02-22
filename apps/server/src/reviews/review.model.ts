@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import type { ReviewData } from './schemas/review.schema';
+import type { ReviewData } from './review.schema';
 
 export type ReviewDocument = ReviewData & Document & {
   _id: Types.ObjectId;
@@ -21,7 +21,7 @@ const reviewMongooseSchema = new Schema<ReviewDocument>({
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 2048,
+    maxLength: 2048,
   },
   rating: {
     type: Number,

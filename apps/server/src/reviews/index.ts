@@ -1,6 +1,6 @@
-export * from './types/index';
+export * from './schemas';
 export { ReviewController } from './review.controller';
 export { ReviewService } from './review.service';
 export { reviewRouter } from './review.routes';
 export { Review, type ReviewDocument } from './review.model';
-export { reviewSchema, type ReviewData } from './schemas/review.schema';
+export { reviewSchema, type ReviewData } from './review.schema';

@@ -2,22 +2,17 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-nati
 import { z } from 'zod';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { SettingsTabParamList } from '@/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAddQuote, useCreateMovie } from '@/services';
-import { borderRadius, colors, spacing, fontSize, fontFamily, showSuccessToast } from '@/config';
+import type { SettingsTabParamList } from '@/types';
+import { type AddQuoteBody, type CreateMovieBody, useAddQuote, useCreateMovie } from '@/services';
+import { showSuccessToast, toFormikValidator } from '@/utils';
+import { borderRadius, colors, spacing, fontSize, fontFamily } from '@/config';
 import Screen from '@/components/Screen';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
-import { toFormikValidator } from '@/utils/toFormikValidator';
 
-type MovieFormValues = {
-  title: string;
-  director: string;
-  description: string;
+type MovieFormValues = Omit<CreateMovieBody, 'genres' | 'description' | 'img'> & {
   genres: string;
-  runtime: string;
-  rating: string;
-  date: string;
+  description: string;
   img: string;
 };
 
@@ -45,10 +40,7 @@ const initialMovieValues: MovieFormValues = {
   img: '',
 };
 
-type QuoteFormValues = {
-  quote: string;
-  subquote: string;
-};
+type QuoteFormValues = AddQuoteBody;
 
 const quoteSchema = z.object({
   quote: z.string().min(1, 'Quote is required'),

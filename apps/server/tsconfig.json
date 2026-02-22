@@ -29,7 +29,7 @@
       "@/reviews": ["reviews"],
       "@/types": ["types"],
       "@/users": ["users"],
-      "@/util": ["util"],
+      "@/utils": ["utils"],
     }
   },
   "include": ["src/**/*", "app.ts"],

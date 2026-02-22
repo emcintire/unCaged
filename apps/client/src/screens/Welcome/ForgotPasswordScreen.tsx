@@ -6,10 +6,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import type { WelcomeAuthTabParamList } from '@/types';
 import { useForgotPassword } from '@/services';
-import { showErrorToast, showSuccessToast, form, screen } from '@/config';
+import { form, screen } from '@/config';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
-import { toFormikValidator } from '@/utils/toFormikValidator';
+import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
 import { STORAGE_KEYS } from '@/constants';
 
 const schema = z.object({

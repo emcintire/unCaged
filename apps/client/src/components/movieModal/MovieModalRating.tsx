@@ -2,10 +2,11 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import type { SetState } from '@/types';
 import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey } from '@/services';
-import { borderRadius, colors, showErrorToast, spacing } from '@/config';
+import { borderRadius, colors, spacing } from '@/config';
+import { useAuth } from '@/hooks';
+import { showErrorToast } from '@/utils';
 import { getStarIcon } from '../StarRating';
 import Icon from '../Icon';
-import { useAuth } from '@/hooks';
 
 const styles = StyleSheet.create({
   stars: {

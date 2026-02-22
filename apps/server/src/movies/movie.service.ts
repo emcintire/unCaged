@@ -1,22 +1,11 @@
-import { Movie } from './movie.model';
-import { movieSchema } from './schemas/movie.schema';
 import { User } from '@/users';
-import type {
-  CreateMovieDto,
-  UpdateMovieDto,
-  GetMoviesDto,
-  FindByTitleDto,
-} from './types';
-import { escapeRegex } from '@/util';
+import { validateSchema } from '@/utils';
+import { Movie } from './movie.model';
+import { movieSchema } from './movie.schema';
+import type { CreateMovieDto } from './schemas';
 
 export class MovieService {
-  async getAllMovies(dto?: GetMoviesDto) {
-    if (dto?.category && dto?.direction) {
-      return await Movie.find().sort({
-        [dto.category]: dto.direction,
-      });
-    }
-
+  async getAllMovies() {
     return await Movie.find().sort({ title: 1 });
   }
 
@@ -28,44 +17,10 @@ export class MovieService {
     return movie;
   }
 
-  async findMoviesByTitleParam(title: string) {
-    return await Movie.find({
-      title: { $regex: escapeRegex(title), $options: 'i' },
-    });
-  }
-
-  async findMoviesByTitle(dto: FindByTitleDto) {
-    if (dto.category && dto.direction) {
-      if (dto.title) {
-        return await Movie.find({
-          title: { $regex: escapeRegex(dto.title), $options: 'i' },
-        }).sort({
-          [dto.category]: dto.direction,
-        });
-      } else {
-        return await Movie.find().sort({
-          [dto.category]: dto.direction,
-        });
-      }
-    }
-
-    // Default sort when category/direction not provided
-    if (dto.title) {
-      return await Movie.find({
-        title: { $regex: escapeRegex(dto.title), $options: 'i' },
-      }).sort('director');
-    } else {
-      return await Movie.find().sort('director');
-    }
-  }
-
   async createMovie(dto: CreateMovieDto) {
-    const validation = movieSchema.safeParse(dto);
-    if (!validation.success) {
-      throw new Error(validation.error.issues[0].message);
-    }
+    validateSchema(movieSchema, dto);
 
-    const movieAlreadyExists = await Movie.findOne({ title: dto.title }) != null;
+    const movieAlreadyExists = await Movie.exists({ title: dto.title });
     if (movieAlreadyExists) {
       throw new Error('Movie already registered');
     }
@@ -82,18 +37,6 @@ export class MovieService {
     });
 
     await movie.save();
-  }
-
-  async updateMovie(id: string, dto: UpdateMovieDto) {
-    const validation = movieSchema.safeParse(dto);
-    if (!validation.success) {
-      throw new Error(validation.error.issues[0].message);
-    }
-
-    const movie = await Movie.findByIdAndUpdate(id, { $set: dto });
-    if (!movie) {
-      throw new Error('The movie with the given ID was not found.');
-    }
   }
 
   async getPopularMovies() {
@@ -119,11 +62,7 @@ export class MovieService {
   }
 
   async getAverageRating(id: string) {
-    const movie = await Movie.findById(id);
-    if (!movie) {
-      throw new Error('The movie with the given ID was not found.');
-    }
-
+    const movie = await this.findMovieById(id);
     return JSON.stringify(movie.avgRating || 0);
   }
 }

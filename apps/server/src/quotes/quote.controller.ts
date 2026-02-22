@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { QuoteService } from './quote.service';
-import type { CreateQuoteDto } from './types';
+import type { CreateQuoteDto } from './schemas';
 
 const quoteService = new QuoteService();
 

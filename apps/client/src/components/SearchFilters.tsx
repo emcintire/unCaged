@@ -1,7 +1,8 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import { colors, genres, borderRadius, fontSize, fontFamily } from '@/config'
+import { colors, borderRadius, fontSize, fontFamily } from '@/config'
+import { genres } from '@/constants'
 import type { SetState } from '@/types'
 import AppDropdown from './AppDropdown'
 

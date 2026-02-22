@@ -2,14 +2,8 @@ import type { Express } from 'express';
 import mongoose from 'mongoose';
 import winston from 'winston';
 import type { Server } from 'http';
+import { getRequiredEnv } from '@/utils';
 
-const getRequiredEnv = (name: string): string => {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} environment variable is not defined`);
-  }
-  return value;
-}
 
 const createLogger = () => {
   const logger = winston.createLogger({

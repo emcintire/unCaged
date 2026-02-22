@@ -1,11 +1,12 @@
 import { View } from 'react-native';
 import { z } from 'zod';
-import { form, screen, showErrorToast, showSuccessToast } from '@/config';
+import { form, screen } from '@/config';
 import { useLogin } from '@/services';
+import type { LoginBody } from '@/services';
 import { useAuth } from '@/hooks';
 import { AppForm, AppFormField, PasswordInput, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
-import { toFormikValidator } from '@/utils/toFormikValidator';
+import { showErrorToast, toFormikValidator } from '@/utils';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Email must be a valid email'),
@@ -14,21 +15,15 @@ const schema = z.object({
 
 const validate = toFormikValidator(schema);
 
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
-
 export default function SignInScreen() {
   const { signIn } = useAuth();
   const loginMutation = useLogin();
 
-  const handleSubmit = async (values: LoginFormValues): Promise<void> => {
+  const handleSubmit = async (values: LoginBody): Promise<void> => {
     const email = values.email.toLowerCase().trim();
     try {
       const { accessToken, refreshToken } = await loginMutation.mutateAsync({ data: { email, password: values.password }});
       await signIn(accessToken, refreshToken);
-      showSuccessToast('Sign in successful!');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Sign in failed';
       showErrorToast(message);
@@ -38,12 +33,12 @@ export default function SignInScreen() {
   return (
     <Screen style={screen.withPadding}>
       <View style={form.container}>
-        <AppForm<LoginFormValues>
+        <AppForm<LoginBody>
           initialValues={{ email: '', password: '' }}
           onSubmit={handleSubmit}
           validate={validate}
         >
-          <AppFormField<LoginFormValues>
+          <AppFormField<LoginBody>
             autoComplete="email"
             icon="email"
             keyboardType="email-address"
@@ -51,8 +46,8 @@ export default function SignInScreen() {
             placeholder="Email"
             textContentType="emailAddress"
           />
-          <PasswordInput<LoginFormValues> autoComplete="password" name="password" placeholder="Password" />
-          <SubmitButton<LoginFormValues> title="Sign In" style={form.submitButton} />
+          <PasswordInput<LoginBody> autoComplete="password" name="password" placeholder="Password" />
+          <SubmitButton<LoginBody> title="Sign In" style={form.submitButton} />
         </AppForm>
       </View>
     </Screen>

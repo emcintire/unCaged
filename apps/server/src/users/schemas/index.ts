@@ -1,4 +1,4 @@
-export { newUserSchema } from './newUser.schema';
-export { updateUserSchema } from './updateUser.schema';
-export { userRatingSchema } from './userRating.schema';
-export { userSchema, type UserData } from './user.schema';
+export { createUserDtoSchema, type CreateUserDto } from './createUserDto.schema';
+export { rateMovieDtoSchema, type RateMovieDto } from './rateMovieDto.schema';
+export { updateUserDtoSchema, type UpdateUserDto } from './updateUserDto.schema';
+export { userSchema, type UserData } from '../user.schema';

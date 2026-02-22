@@ -1,26 +1,26 @@
 import { View, Text } from 'react-native';
 import { z } from 'zod';
 import * as SecureStore from 'expo-secure-store';
-import { useChangePassword, useResetPassword } from '@/services';
-import { useAuth } from '@/hooks';
-import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@/constants';
-import { form, screen, typography, utils, showErrorToast, showSuccessToast } from '@/config';
-import { AppForm, SubmitButton } from '@/components/forms';
-import PasswordInput from '@/components/forms/PasswordInput';
-import Screen from '@/components/Screen';
-import { toFormikValidator } from '@/utils/toFormikValidator';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { WelcomeAuthTabParamList } from '@/types';
+import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
+import { useResetPassword } from '@/services';
+import { useAuth } from '@/hooks';
+import { form, screen, typography, utils } from '@/config';
+import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
+import PasswordInput from '@/components/forms/PasswordInput';
+import Screen from '@/components/Screen';
+import { AppForm, SubmitButton } from '@/components/forms';
+import type { WelcomeAuthTabParamList } from '@/types';
 
 const schema = z.object({
-  password: z.string().min(1, 'Password is required').regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
+  newPassword: z.string().min(1, 'Password is required').regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
 });
 
 const validate = toFormikValidator(schema);
 
 type PasswordResetFormValues = {
-  password: string;
+  newPassword: string;
 };
 
 export default function PasswordResetScreen() {
@@ -37,7 +37,7 @@ export default function PasswordResetScreen() {
         return;
       }
 
-      const { accessToken, refreshToken } = await resetPasswordMutation.mutateAsync({ data: { code, email, newPassword: values.password } });
+      const { accessToken, refreshToken } = await resetPasswordMutation.mutateAsync({ data: { code, email, newPassword: values.newPassword } });
       await signIn(accessToken, refreshToken);
       showSuccessToast('Password reset successful!');
     } catch (error: unknown) {
@@ -51,11 +51,11 @@ export default function PasswordResetScreen() {
       <Text style={[typography.h1, utils.selfCenter]}>New password</Text>
       <View style={form.container}>
         <AppForm<PasswordResetFormValues>
-          initialValues={{ password: '' }}
+          initialValues={{ newPassword: '' }}
           onSubmit={handleSubmit}
           validate={validate}
         >
-          <PasswordInput<PasswordResetFormValues> autoComplete="new-password" name="password" placeholder="Password" />
+          <PasswordInput<PasswordResetFormValues> autoComplete="new-password" name="newPassword" placeholder="Password" />
           <SubmitButton<PasswordResetFormValues> title="Submit" style={form.submitButton} />
         </AppForm>
       </View>

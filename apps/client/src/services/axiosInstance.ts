@@ -1,4 +1,3 @@
-// apps/client/src/services/axiosInstance.ts
 import Axios, {
   type AxiosRequestConfig,
   type AxiosRequestHeaders,
@@ -8,17 +7,10 @@ import Axios, {
 import * as SecureStore from 'expo-secure-store';
 import { env } from '@/config';
 import { STORAGE_KEYS } from '@/constants';
-import { logger } from '@/utils/logger';
+import { logger } from '@/utils';
 
-/**
- * If your API often returns an envelope like:
- *   { data: <payload>, status: number }
- * this unwrap makes TanStack Query results be the payload (no data.data).
- */
 export type UnwrapApiEnvelope<T> = T extends { data: infer D } ? D : T;
 
-// ----- Axios config flags -----
-// We keep these on InternalAxiosRequestConfig so interceptors are happy with Axios v1 typings.
 export type AuthRequestConfig = InternalAxiosRequestConfig & {
   skipAuth?: boolean;
   skipRefresh?: boolean;
@@ -59,7 +51,6 @@ export const AXIOS_INSTANCE = Axios.create({
 
 /**
  * Request interceptor: attach access token via x-auth-token
- * IMPORTANT: return InternalAxiosRequestConfig, not AxiosRequestConfig, to satisfy Axios v1 types.
  */
 AXIOS_INSTANCE.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const cfg = config as AuthRequestConfig;

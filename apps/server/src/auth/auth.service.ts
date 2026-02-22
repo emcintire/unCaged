@@ -1,17 +1,21 @@
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import { User } from '@/users';
-import { createRefreshTokenValue, hashInput, hashRefreshToken, refreshExpiryDate, signAccessToken } from '@/util';
+import {
+  createRefreshTokenValue,
+  getRequiredEnv,
+  hashInput,
+  hashRefreshToken,
+  refreshExpiryDate,
+  signAccessToken,
+  validateSchema,
+} from '@/utils';
 import { RefreshToken } from './refreshToken.model';
 import { LoginDto, loginSchema } from '@/auth';
 
 const getMailConfig = () => {
-  const user = process.env.EMAIL_USERNAME;
-  const pass = process.env.EMAIL_PASSWORD;
-
-  if (!user || !pass) {
-    throw new Error('Email service is not configured. Set EMAIL_USERNAME and EMAIL_PASSWORD.');
-  }
+  const user = getRequiredEnv('EMAIL_USERNAME');
+  const pass = getRequiredEnv('EMAIL_PASSWORD');
 
   const host = process.env.SMTP_HOST ?? 'smtp.zoho.com';
   const port = Number(process.env.SMTP_PORT ?? 465);
@@ -23,10 +27,7 @@ const getMailConfig = () => {
 
 export class AuthService {
   async login(dto: LoginDto) {
-    const validation = loginSchema.safeParse(dto);
-    if (!validation.success) {
-      throw new Error(validation.error.issues[0].message);
-    }
+    validateSchema(loginSchema, dto);
 
     const user = await User.findOne({ email: dto.email });
     if (!user) {
@@ -162,8 +163,8 @@ export class AuthService {
 
   async checkResetCode(email: string, code: string) {
     const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error('Invalid');
+    if (!user || !user.resetCode) {
+      throw new Error('Invalid Code');
     }
 
     if (user.resetCodeExpiry && user.resetCodeExpiry < new Date()) {
@@ -178,8 +179,8 @@ export class AuthService {
 
   async resetPassword(email: string, code: string, newPassword: string) {
     const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error('Invalid');
+    if (!user || !user.resetCode) {
+      throw new Error('Invalid Code');
     }
 
     if (user.resetCodeExpiry && user.resetCodeExpiry < new Date()) {

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import type { Response, NextFunction } from 'express';
 import type { AuthenticatedRequest } from '@/types';
+import { getRequiredEnv } from '@/utils';
 
 export const auth = (
   req: AuthenticatedRequest,
@@ -14,12 +15,9 @@ export const auth = (
   }
 
   try {
-    const jwtPrivateKey = process.env.JWT_PRIVATE_KEY;
-    if (!jwtPrivateKey) {
-      throw new Error('JWT_PRIVATE_KEY is not defined');
-    }
+    const jwtPrivateKey = getRequiredEnv('JWT_PRIVATE_KEY');
     const decoded = jwt.verify(token, jwtPrivateKey) as {
-      _id: string;
+      sub: string;
       isAdmin: boolean;
     };
     req.user = decoded;

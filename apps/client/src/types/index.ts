@@ -1,4 +1,3 @@
-export type { Colors, ColorKey } from './colors';
 export type { SetState } from './setState';
 export type { WelcomeStackParamList, WelcomeAuthTabParamList } from './welcomeStackParamList';
 export type {

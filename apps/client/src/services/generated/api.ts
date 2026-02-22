@@ -26,19 +26,15 @@ export interface AuthTokenData {
 
 export interface Movie {
   _id: string;
+  title: string;
   avgRating?: number;
   date: string;
   description?: string;
   director: string;
-  favoriteCount: number;
   genres: string[];
   img: string;
   rating: string;
-  ratingCount: number;
-  ratingSum: number;
   runtime: string;
-  seenCount: number;
-  title: string;
 }
 
 export interface Quote {
@@ -143,23 +139,6 @@ export type CreateMovieBody = {
   img?: string;
 };
 
-export type GetMoviesBody = { [key: string]: unknown };
-
-export type SearchMoviesBody = {
-  search: string;
-};
-
-export type UpdateMovieBody = {
-  title?: string;
-  director?: string;
-  description?: string;
-  genres?: string[];
-  runtime?: string;
-  rating?: string;
-  date?: string;
-  img?: string;
-};
-
 export type AddQuoteBody = {
   quote: string;
   subquote: string;
@@ -199,7 +178,7 @@ export type ToggleReviewLike200 = {
   liked?: boolean;
 };
 
-export type RegisterBody = {
+export type CreateUserBody = {
   name?: string;
   email: string;
   password: string;
@@ -216,6 +195,7 @@ export type DeleteUserBody = {
 };
 
 export type ChangePasswordBody = {
+  currentPassword: string;
   password: string;
 };
 
@@ -834,298 +814,6 @@ export const useCreateMovie = <TError = unknown,
     }
     
 /**
- * @summary Get movies with sort options
- */
-export const getGetMoviesUrl = () => {
-
-
-  
-
-  return `/api/movies/getMovies`
-}
-
-export const getMovies = async (getMoviesBody: GetMoviesBody, options?: RequestInit): Promise<Movie[]> => {
-  
-  return axiosInstance<Movie[]>(getGetMoviesUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      getMoviesBody,)
-  }
-);}
-
-
-
-
-export const getGetMoviesMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getMovies>>, TError,{data: GetMoviesBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof getMovies>>, TError,{data: GetMoviesBody}, TContext> => {
-
-const mutationKey = ['getMovies'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getMovies>>, {data: GetMoviesBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  getMovies(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GetMoviesMutationResult = NonNullable<Awaited<ReturnType<typeof getMovies>>>
-    export type GetMoviesMutationBody = GetMoviesBody
-    export type GetMoviesMutationError = unknown
-
-    /**
- * @summary Get movies with sort options
- */
-export const useGetMovies = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getMovies>>, TError,{data: GetMoviesBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof getMovies>>,
-        TError,
-        {data: GetMoviesBody},
-        TContext
-      > => {
-      return useMutation(getGetMoviesMutationOptions(options));
-    }
-    
-/**
- * @summary Find movie by ID
- */
-export const getFindMovieByIdUrl = (id: string,) => {
-
-
-  
-
-  return `/api/movies/findByID/${id}`
-}
-
-export const findMovieById = async (id: string, options?: RequestInit): Promise<Movie> => {
-  
-  return axiosInstance<Movie>(getFindMovieByIdUrl(id),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getFindMovieByIdQueryKey = (id: string,) => {
-    return [
-    `/api/movies/findByID/${id}`
-    ] as const;
-    }
-
-    
-export const getFindMovieByIdQueryOptions = <TData = Awaited<ReturnType<typeof findMovieById>>, TError = unknown>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof findMovieById>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getFindMovieByIdQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof findMovieById>>> = ({ signal }) => findMovieById(id, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof findMovieById>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type FindMovieByIdQueryResult = NonNullable<Awaited<ReturnType<typeof findMovieById>>>
-export type FindMovieByIdQueryError = unknown
-
-
-/**
- * @summary Find movie by ID
- */
-
-export function useFindMovieById<TData = Awaited<ReturnType<typeof findMovieById>>, TError = unknown>(
- id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof findMovieById>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
-  
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getFindMovieByIdQueryOptions(id,options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-/**
- * @summary Find movies by title path param
- */
-export const getFindMoviesByTitleParamUrl = (title: string,) => {
-
-
-  
-
-  return `/api/movies/findByTitle/${title}`
-}
-
-export const findMoviesByTitleParam = async (title: string, options?: RequestInit): Promise<Movie[]> => {
-  
-  return axiosInstance<Movie[]>(getFindMoviesByTitleParamUrl(title),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getFindMoviesByTitleParamQueryKey = (title: string,) => {
-    return [
-    `/api/movies/findByTitle/${title}`
-    ] as const;
-    }
-
-    
-export const getFindMoviesByTitleParamQueryOptions = <TData = Awaited<ReturnType<typeof findMoviesByTitleParam>>, TError = unknown>(title: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof findMoviesByTitleParam>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getFindMoviesByTitleParamQueryKey(title);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof findMoviesByTitleParam>>> = ({ signal }) => findMoviesByTitleParam(title, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(title), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof findMoviesByTitleParam>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type FindMoviesByTitleParamQueryResult = NonNullable<Awaited<ReturnType<typeof findMoviesByTitleParam>>>
-export type FindMoviesByTitleParamQueryError = unknown
-
-
-/**
- * @summary Find movies by title path param
- */
-
-export function useFindMoviesByTitleParam<TData = Awaited<ReturnType<typeof findMoviesByTitleParam>>, TError = unknown>(
- title: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof findMoviesByTitleParam>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
-  
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getFindMoviesByTitleParamQueryOptions(title,options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-/**
- * @summary Search movies by title
- */
-export const getSearchMoviesUrl = () => {
-
-
-  
-
-  return `/api/movies/findByTitle`
-}
-
-export const searchMovies = async (searchMoviesBody: SearchMoviesBody, options?: RequestInit): Promise<Movie[]> => {
-  
-  return axiosInstance<Movie[]>(getSearchMoviesUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      searchMoviesBody,)
-  }
-);}
-
-
-
-
-export const getSearchMoviesMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchMovies>>, TError,{data: SearchMoviesBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof searchMovies>>, TError,{data: SearchMoviesBody}, TContext> => {
-
-const mutationKey = ['searchMovies'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof searchMovies>>, {data: SearchMoviesBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  searchMovies(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SearchMoviesMutationResult = NonNullable<Awaited<ReturnType<typeof searchMovies>>>
-    export type SearchMoviesMutationBody = SearchMoviesBody
-    export type SearchMoviesMutationError = unknown
-
-    /**
- * @summary Search movies by title
- */
-export const useSearchMovies = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchMovies>>, TError,{data: SearchMoviesBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof searchMovies>>,
-        TError,
-        {data: SearchMoviesBody},
-        TContext
-      > => {
-      return useMutation(getSearchMoviesMutationOptions(options));
-    }
-    
-/**
  * @summary Get popular movies
  */
 export const getGetPopularMoviesUrl = () => {
@@ -1350,78 +1038,6 @@ export function useGetAverageRating<TData = Awaited<ReturnType<typeof getAverage
 
 
 
-/**
- * @summary Update a movie (admin only)
- */
-export const getUpdateMovieUrl = (id: string,) => {
-
-
-  
-
-  return `/api/movies/${id}`
-}
-
-export const updateMovie = async (id: string,
-    updateMovieBody: UpdateMovieBody, options?: RequestInit): Promise<Movie> => {
-  
-  return axiosInstance<Movie>(getUpdateMovieUrl(id),
-  {      
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateMovieBody,)
-  }
-);}
-
-
-
-
-export const getUpdateMovieMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMovie>>, TError,{id: string;data: UpdateMovieBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateMovie>>, TError,{id: string;data: UpdateMovieBody}, TContext> => {
-
-const mutationKey = ['updateMovie'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMovie>>, {id: string;data: UpdateMovieBody}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateMovie(id,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateMovieMutationResult = NonNullable<Awaited<ReturnType<typeof updateMovie>>>
-    export type UpdateMovieMutationBody = UpdateMovieBody
-    export type UpdateMovieMutationError = unknown
-
-    /**
- * @summary Update a movie (admin only)
- */
-export const useUpdateMovie = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMovie>>, TError,{id: string;data: UpdateMovieBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof updateMovie>>,
-        TError,
-        {id: string;data: UpdateMovieBody},
-        TContext
-      > => {
-      return useMutation(getUpdateMovieMutationOptions(options));
-    }
-    
 /**
  * @summary Get a random quote
  */
@@ -2159,9 +1775,9 @@ export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUs
 
 
 /**
- * @summary Register a new user
+ * @summary Create a new user
  */
-export const getRegisterUrl = () => {
+export const getCreateUserUrl = () => {
 
 
   
@@ -2169,26 +1785,26 @@ export const getRegisterUrl = () => {
   return `/api/users`
 }
 
-export const register = async (registerBody: RegisterBody, options?: RequestInit): Promise<AccessTokenData> => {
+export const createUser = async (createUserBody: CreateUserBody, options?: RequestInit): Promise<AuthTokenData> => {
   
-  return axiosInstance<AccessTokenData>(getRegisterUrl(),
+  return axiosInstance<AuthTokenData>(getCreateUserUrl(),
   {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      registerBody,)
+      createUserBody,)
   }
 );}
 
 
 
 
-export const getRegisterMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,{data: RegisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,{data: RegisterBody}, TContext> => {
+export const getCreateUserMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserBody}, TContext> => {
 
-const mutationKey = ['register'];
+const mutationKey = ['createUser'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -2198,10 +1814,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof register>>, {data: RegisterBody}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, {data: CreateUserBody}> = (props) => {
           const {data} = props ?? {};
 
-          return  register(data,requestOptions)
+          return  createUser(data,requestOptions)
         }
 
 
@@ -2211,22 +1827,22 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RegisterMutationResult = NonNullable<Awaited<ReturnType<typeof register>>>
-    export type RegisterMutationBody = RegisterBody
-    export type RegisterMutationError = unknown
+    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
+    export type CreateUserMutationBody = CreateUserBody
+    export type CreateUserMutationError = unknown
 
     /**
- * @summary Register a new user
+ * @summary Create a new user
  */
-export const useRegister = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof register>>, TError,{data: RegisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+export const useCreateUser = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: CreateUserBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
  ): UseMutationResult<
-        Awaited<ReturnType<typeof register>>,
+        Awaited<ReturnType<typeof createUser>>,
         TError,
-        {data: RegisterBody},
+        {data: CreateUserBody},
         TContext
       > => {
-      return useMutation(getRegisterMutationOptions(options));
+      return useMutation(getCreateUserMutationOptions(options));
     }
     
 /**
@@ -2879,9 +2495,9 @@ export const getRateMovieUrl = () => {
   return `/api/users/rate`
 }
 
-export const rateMovie = async (rateMovieBody: RateMovieBody, options?: RequestInit): Promise<string> => {
+export const rateMovie = async (rateMovieBody: RateMovieBody, options?: RequestInit): Promise<void> => {
   
-  return axiosInstance<string>(getRateMovieUrl(),
+  return axiosInstance<void>(getRateMovieUrl(),
   {      
     ...options,
     method: 'PUT',

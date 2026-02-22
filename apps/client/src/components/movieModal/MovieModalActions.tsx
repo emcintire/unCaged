@@ -1,17 +1,15 @@
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks';
 import { colors, fontFamily, fontSize } from '@/config';
 import {
   useAddToSeen, useRemoveFromSeen, useAddToFavorites, useRemoveFromFavorites, useAddToWatchlist,
-  useRemoveFromWatchlist, type Movie,
-  useGetCurrentUser,
-  getGetCurrentUserQueryKey,
+  useRemoveFromWatchlist, type Movie, useGetCurrentUser, getGetCurrentUserQueryKey,
 } from '@/services';
 import MovieModalRating from './MovieModalRating';
 import Icon from '../Icon';
-import { useAuth } from '@/hooks';
-import { useQueryClient } from '@tanstack/react-query';
 
 type Props = {
   movie: Movie;
@@ -72,6 +70,7 @@ export default function MovieModalActions({ movie }: Props) {
         onSuccess: () => setWatchlist(true),
       });
     }
+    queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
   };
 
   const toggleSeen = () => {
@@ -103,6 +102,7 @@ export default function MovieModalActions({ movie }: Props) {
         },
       });
     }
+    queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
   };
 
   const actions: Array<{

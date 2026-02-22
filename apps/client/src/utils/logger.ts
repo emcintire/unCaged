@@ -2,11 +2,11 @@ import { env } from '@/config';
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
-interface LogOptions {
+type LogOptions = {
   level?: LogLevel;
   context?: string;
   data?: unknown;
-}
+};
 
 class Logger {
   private shouldLog(level: LogLevel): boolean {

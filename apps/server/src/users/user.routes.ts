@@ -1,15 +1,9 @@
 import express from 'express';
-import rateLimit from 'express-rate-limit';
 import { auth } from '@/middleware';
+import { createAuthLimiter } from '@/utils';
 import { UserController } from './user.controller';
 
-const fiveMinutesInMs = 5 * 60 * 1000;
-const authLimiter = rateLimit({
-  windowMs: fiveMinutesInMs,
-  max: 15,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+const registerLimiter = createAuthLimiter({ max: 10 });
 
 export const userRouter = express.Router();
 const controller = new UserController();
@@ -87,8 +81,8 @@ const controller = new UserController();
  *             schema:
  *               $ref: '#/components/schemas/User'
  *   post:
- *     summary: Register a new user
- *     operationId: register
+ *     summary: Create a new user
+ *     operationId: createUser
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -111,7 +105,7 @@ const controller = new UserController();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AccessTokenData'
+ *               $ref: '#/components/schemas/AuthTokenData'
  *   put:
  *     summary: Update current user
  *     operationId: updateUser
@@ -156,7 +150,7 @@ const controller = new UserController();
  *         description: Deleted
  */
 userRouter.get('/', auth, controller.getCurrentUser);
-userRouter.post('/', authLimiter, controller.registerUser);
+userRouter.post('/', registerLimiter, controller.createUser);
 userRouter.put('/', auth, controller.updateUser);
 userRouter.delete('/', auth, controller.deleteUser);
 
@@ -175,8 +169,10 @@ userRouter.delete('/', auth, controller.deleteUser);
  *         application/json:
  *           schema:
  *             type: object
- *             required: [password]
+ *             required: [currentPassword, password]
  *             properties:
+ *               currentPassword:
+ *                 type: string
  *               password:
  *                 type: string
  *     responses:
@@ -343,11 +339,7 @@ userRouter.delete('/watchlist', auth, controller.removeFromWatchlist);
  *                 type: number
  *     responses:
  *       '200':
- *         description: Updated token
- *         content:
- *           application/json:
- *             schema:
- *               type: string
+ *         description: Rating updated
  *   delete:
  *     summary: Delete a rating
  *     operationId: deleteRating
