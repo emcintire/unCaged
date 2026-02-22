@@ -1,6 +1,6 @@
 import type { ZodType } from 'zod';
 
-export function toFormikValidator<T>(schema: ZodType<T>) {
+export const toFormikValidator = <T>(schema: ZodType<T>) => {
   return (values: T): Record<string, string> => {
     const result = schema.safeParse(values);
     if (result.success) return {};

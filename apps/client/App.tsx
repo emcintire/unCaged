@@ -36,7 +36,7 @@ const loadFonts = async (): Promise<boolean> => {
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-function RootNavigator() {
+const RootNavigator = () => {
   const { isAuthenticated } = useAuth();
 
   return (

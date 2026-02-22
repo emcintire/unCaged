@@ -5,6 +5,6 @@ export const getIdFromToken = (token: string): string => {
   if (!jwtPrivateKey) {
     throw new Error('JWT_PRIVATE_KEY is not defined');
   }
-  const decoded = jwt.verify(token, jwtPrivateKey) as { _id: string };
-  return decoded._id;
+  const decoded = jwt.verify(token, jwtPrivateKey) as { sub: string };
+  return decoded.sub;
 };

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Movie, useGetCurrentUser, useGetAllMovies } from '@/services';
-import { useDebounce } from '@/hooks';
+import { type Movie, useGetCurrentUser, useGetAllMovies, getGetCurrentUserQueryKey } from '@/services';
+import { useAuth, useDebounce } from '@/hooks';
 import { colors, spacing, borderRadius, fontSize, fontFamily, movieCard } from '@/config';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
@@ -59,11 +59,14 @@ export default function SearchScreen() {
 
   const debouncedTitle = useDebounce(title);
 
-  const { data: user } = useGetCurrentUser();
+  const { isAuthenticated } = useAuth();
+  const { data: user } = useGetCurrentUser({
+    query: {
+      enabled: isAuthenticated,
+      queryKey: getGetCurrentUserQueryKey(),
+    },
+  });
   const { data: movies = [], isLoading: loading } = useGetAllMovies();
-
-  const favoriteIds = useMemo(() => new Set(user?.favorites ?? []), [user?.favorites]);
-  const seenIds = useMemo(() => new Set(user?.seen ?? []), [user?.seen]);
 
   const displayMovies = useMemo(() => {
     const predicates = [
@@ -122,10 +125,9 @@ export default function SearchScreen() {
         />
       )}
       <MovieGrid
-        emptyMessage="No results :("
         movies={displayMovies}
-        favoriteIds={favoriteIds}
-        seenIds={seenIds}
+        favoriteIds={user?.favorites ?? []}
+        seenIds={user?.seen ?? []}
       />
     </Screen>
   );

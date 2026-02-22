@@ -38,14 +38,14 @@ export default function SignUpScreen() {
     try {
       const email = values.email.toLowerCase().trim();
       const name = values.name?.trim();
-      const token = await registerMutation.mutateAsync({
+      const { accessToken, refreshToken } = await registerMutation.mutateAsync({
         data: {
           ...(name ? { name } : {}),
           email,
           password: values.password,
         },
       });
-      await signIn(token);
+      await signIn(accessToken, refreshToken);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Registration failed';
       showErrorToast(message);

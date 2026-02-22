@@ -142,8 +142,8 @@ const controller = new ReviewController();
  *       '201':
  *         description: Created
  */
-reviewRouter.get('/', controller.getReviewsByMovie.bind(controller));
-reviewRouter.post('/', auth, controller.createReview.bind(controller));
+reviewRouter.get('/', controller.getReviewsByMovie);
+reviewRouter.post('/', auth, controller.createReview);
 
 /**
  * @swagger
@@ -183,7 +183,7 @@ reviewRouter.post('/', auth, controller.createReview.bind(controller));
  *             schema:
  *               $ref: '#/components/schemas/AdminReviewsPage'
  */
-reviewRouter.get('/admin', auth, admin, controller.getAllReviewsAdmin.bind(controller));
+reviewRouter.get('/admin', auth, admin, controller.getAllReviewsAdmin);
 
 /**
  * @swagger
@@ -204,7 +204,7 @@ reviewRouter.get('/admin', auth, admin, controller.getAllReviewsAdmin.bind(contr
  *       '200':
  *         description: Deleted
  */
-reviewRouter.delete('/:reviewId', auth, controller.deleteReview.bind(controller));
+reviewRouter.delete('/:reviewId', auth, controller.deleteReview);
 
 /**
  * @swagger
@@ -232,7 +232,7 @@ reviewRouter.delete('/:reviewId', auth, controller.deleteReview.bind(controller)
  *                 liked:
  *                   type: boolean
  */
-reviewRouter.put('/:reviewId/like', auth, controller.toggleLike.bind(controller));
+reviewRouter.put('/:reviewId/like', auth, controller.toggleLike);
 
 /**
  * @swagger
@@ -253,7 +253,7 @@ reviewRouter.put('/:reviewId/like', auth, controller.toggleLike.bind(controller)
  *       '200':
  *         description: Flagged
  */
-reviewRouter.post('/:reviewId/report', auth, controller.flagReview.bind(controller));
+reviewRouter.post('/:reviewId/report', auth, controller.flagReview);
 
 /**
  * @swagger
@@ -274,4 +274,4 @@ reviewRouter.post('/:reviewId/report', auth, controller.flagReview.bind(controll
  *       '200':
  *         description: Unflagged
  */
-reviewRouter.put('/:reviewId/unflag', auth, admin, controller.unflagReview.bind(controller));
+reviewRouter.put('/:reviewId/unflag', auth, admin, controller.unflagReview);

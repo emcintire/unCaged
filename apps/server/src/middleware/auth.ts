@@ -2,11 +2,11 @@ import jwt from 'jsonwebtoken';
 import type { Response, NextFunction } from 'express';
 import type { AuthenticatedRequest } from '@/types';
 
-export function auth(
+export const auth = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void {
+): void => {
   const token = req.header('x-auth-token');
   if (!token) {
     res.status(401).send('No token provided...');

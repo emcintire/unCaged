@@ -1,4 +1,4 @@
 export type ChangePasswordDto = {
-  currentPassword?: string;
+  currentPassword: string;
   password: string;
 };

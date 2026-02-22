@@ -14,7 +14,7 @@ export default function MovieModalSignIn({ onClose }: Props) {
 
   const handleSignIn = () => {
     onClose();
-    navigation.navigate('Sign In');
+    navigation.navigate('Welcome');
   };
 
   return (

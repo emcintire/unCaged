@@ -1,12 +1,7 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import jwt from 'jsonwebtoken';
 import type { UserData } from './schemas/user.schema';
 
-type UserMethods = {
-  generateAuthToken(): string;
-};
-
-export type UserDocument = Document & UserData & UserMethods & {
+export type UserDocument = Document & UserData & {
   _id: Types.ObjectId;
 };
 
@@ -61,16 +56,5 @@ const userSchema = new Schema<UserDocument>({
   favorites: [String],
   seen: [String],
 });
-
-userSchema.methods.generateAuthToken = function (): string {
-  const jwtPrivateKey = process.env.JWT_PRIVATE_KEY;
-  if (!jwtPrivateKey) {
-    throw new Error('JWT_PRIVATE_KEY is not defined');
-  }
-  return jwt.sign(
-    { _id: this._id, isAdmin: this.isAdmin },
-    jwtPrivateKey
-  );
-};
 
 export const User = mongoose.model<UserDocument>('User', userSchema);

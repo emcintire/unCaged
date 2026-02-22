@@ -3,13 +3,18 @@ import type { PropsWithChildren } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useQueryClient } from '@tanstack/react-query';
 import { STORAGE_KEYS } from '@/constants';
-import { setOnUnauthorized } from '@/services';
+import { setOnUnauthorized, useLogout } from '@/services';
 
 type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (token: string) => Promise<void>;
+  signIn: (accessToken: string, refreshToken: string) => Promise<void>;
   signOut: () => Promise<void>;
+};
+
+const deleteKeys = () => {
+  void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
+  void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -18,20 +23,26 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const queryClient = useQueryClient();
+  const logoutMutation = useLogout();
 
   const signOut = useCallback(async () => {
     setIsAuthenticated(false);
     queryClient.clear();
-    void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
+    deleteKeys();
+    const refreshToken = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
+    if (!refreshToken) { return; }
+
+    logoutMutation.mutate({ data: { refreshToken } });
   }, [queryClient]);
 
-  const signIn = useCallback(async (token: string) => {
-    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, token);
+  const signIn = useCallback(async (accessToken: string, refreshToken: string) => {
+    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, accessToken);
+    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN, refreshToken);
     setIsAuthenticated(true);
   }, []);
 
   useEffect(() => {
-    async function checkAuth() {
+    const checkAuth = async () => {
       setOnUnauthorized(null);
       try {
         const token = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKEN);
@@ -42,7 +53,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setIsAuthenticated(true);
       } catch {
         setIsAuthenticated(false);
-        void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
+        deleteKeys();
       } finally {
         setIsLoading(false);
         setOnUnauthorized(signOut);

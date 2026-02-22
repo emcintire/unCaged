@@ -38,14 +38,13 @@ export class ReviewController {
     }
   }
 
-  async createReview(req: AuthenticatedRequest<CreateReviewDto & { movieId: string }>, res: Response) {
+  async createReview(req: AuthenticatedRequest<CreateReviewDto>, res: Response) {
     try {
       if (!req.user) {
         res.status(401).send('Not authenticated');
         return;
       }
-      const { movieId, ...reviewBody } = req.body;
-      const review = await reviewService.createReview(req.user._id, movieId, reviewBody as CreateReviewDto);
+      const review = await reviewService.createReview(req.user._id, req.body);
       res.status(200).send(review);
     } catch (error) {
       res.status(400).send(error instanceof Error ? error.message : 'An error occurred');

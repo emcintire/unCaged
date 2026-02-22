@@ -6,9 +6,12 @@ import {
   useAddToSeen, useRemoveFromSeen, useAddToFavorites, useRemoveFromFavorites, useAddToWatchlist,
   useRemoveFromWatchlist, type Movie,
   useGetCurrentUser,
+  getGetCurrentUserQueryKey,
 } from '@/services';
 import MovieModalRating from './MovieModalRating';
 import Icon from '../Icon';
+import { useAuth } from '@/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 type Props = {
   movie: Movie;
@@ -21,6 +24,7 @@ export default function MovieModalActions({ movie }: Props) {
   const [rating, setRating] = useState(0);
   const [showStars, setShowStars] = useState(false);
 
+  const queryClient = useQueryClient();
   const addToSeenMutation = useAddToSeen();
   const removeFromSeenMutation = useRemoveFromSeen();
   const addToFavoritesMutation = useAddToFavorites();
@@ -28,7 +32,14 @@ export default function MovieModalActions({ movie }: Props) {
   const addToWatchlistMutation = useAddToWatchlist();
   const removeFromWatchlistMutation = useRemoveFromWatchlist();
 
-  const { data: user } = useGetCurrentUser();
+  const { isAuthenticated } = useAuth();
+
+  const { data: user } = useGetCurrentUser({
+    query: {
+      enabled: isAuthenticated,
+      queryKey: getGetCurrentUserQueryKey(),
+    },
+  });
 
   useEffect(() => {
     if (!user) { return; }
@@ -48,6 +59,7 @@ export default function MovieModalActions({ movie }: Props) {
         onSuccess: () => setFavorite(true),
       });
     }
+    queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
   };
 
   const toggleWatchlist = () => {

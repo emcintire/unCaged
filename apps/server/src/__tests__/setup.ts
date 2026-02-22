@@ -6,24 +6,26 @@ let mongoServer: MongoMemoryServer;
 // Set test environment variables FIRST, before any imports
 process.env.NODE_ENV = 'test';
 process.env.JWT_PRIVATE_KEY = 'test-jwt-secret-key-for-testing';
+process.env.EMAIL_USERNAME = 'test@example.com';
+process.env.EMAIL_PASSWORD = 'test-app-password';
 
-async function ensureMongooseDisconnected() {
+const ensureMongooseDisconnected = async () => {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.close();
   }
 }
 
-async function startInMemoryMongo(): Promise<string> {
+const startInMemoryMongo = async (): Promise<string> => {
   mongoServer = await MongoMemoryServer.create();
   return mongoServer.getUri();
 }
 
-async function stopInMemoryMongo() {
+const stopInMemoryMongo = async () => {
   if (!mongoServer) return;
   await mongoServer.stop({ doCleanup: true, force: true });
 }
 
-async function clearDatabase() {
+const clearDatabase = async () => {
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     await collections[key].deleteMany({});

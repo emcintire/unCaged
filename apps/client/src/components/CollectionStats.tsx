@@ -11,12 +11,12 @@ type Props = {
   reviewCount: number;
 };
 
-function parseRuntime(runtime: string): number {
+const parseRuntime = (runtime: string): number => {
   const match = runtime.match(/(\d+)/);
   return match?.[1] ? parseInt(match[1], 10) : 0;
 }
 
-function formatWatchTime(totalMinutes: number): string {
+const formatWatchTime = (totalMinutes: number): string => {
   if (totalMinutes === 0) return '0m';
   const days = Math.floor(totalMinutes / 1440);
   const hours = Math.floor((totalMinutes % 1440) / 60);
@@ -26,7 +26,7 @@ function formatWatchTime(totalMinutes: number): string {
   return `${minutes}m`;
 }
 
-function getTopGenre(movies: Movie[]): string {
+const getTopGenre = (movies: Movie[]): string => {
   const genreCounts: Record<string, number> = {};
   for (const movie of movies) {
     for (const genre of movie.genres) {

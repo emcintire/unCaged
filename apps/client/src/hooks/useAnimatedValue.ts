@@ -9,7 +9,7 @@ type TimingConfig = {
 /**
  * Wraps Animated.Value with simple helper methods to reduce boilerplate.
  */
-export function useAnimatedValue(initial: number) {
+export const useAnimatedValue = (initial: number) => {
   const value = useRef(new Animated.Value(initial)).current;
 
   const timeTo = useCallback(

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import winston from 'winston';
 import type { Server } from 'http';
 
-function getRequiredEnv(name: string): string {
+const getRequiredEnv = (name: string): string => {
   const value = process.env[name];
   if (!value) {
     throw new Error(`${name} environment variable is not defined`);
@@ -11,7 +11,7 @@ function getRequiredEnv(name: string): string {
   return value;
 }
 
-function createLogger() {
+const createLogger = () => {
   const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -33,14 +33,14 @@ function createLogger() {
   return logger;
 }
 
-async function connectToDatabase(): Promise<void> {
+const connectToDatabase = async (): Promise<void> => {
   mongoose.set('strictQuery', false);
 
   const dbUrl = getRequiredEnv('DB_URL');
   await mongoose.connect(dbUrl);
 }
 
-function startHttpServer(app: Express): Server {
+const startHttpServer = (app: Express): Server => {
   const port = Number(process.env.PORT) || 3000;
   const server = app.listen(port);
 
@@ -61,7 +61,7 @@ function startHttpServer(app: Express): Server {
   return server;
 }
 
-export async function bootstrap(app: Express): Promise<Server> {
+export const bootstrap = async (app: Express): Promise<Server> => {
   const logger = createLogger();
 
   process.on('unhandledRejection', (ex) => {

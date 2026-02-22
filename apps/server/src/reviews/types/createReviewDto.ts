@@ -1,5 +1,6 @@
 export type CreateReviewDto = {
-  text: string;
-  rating?: number;
   isSpoiler?: boolean;
+  movieId: string;
+  rating?: number;
+  text: string;
 };

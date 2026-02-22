@@ -25,14 +25,15 @@ const swaggerOptions: swaggerJSDoc.Options = {
     },
   },
   apis: [
+    './src/auth/auth.routes.ts',
     './src/movies/movie.routes.ts',
-    './src/users/user.routes.ts',
-    './src/reviews/review.routes.ts',
     './src/quotes/quote.routes.ts',
+    './src/reviews/review.routes.ts',
+    './src/users/user.routes.ts',
   ],
 };
 
-export function createApp(): Express {
+export const createApp = (): Express => {
   const app = express();
 
   app.use(cors());

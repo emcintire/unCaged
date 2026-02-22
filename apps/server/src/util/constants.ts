@@ -3,6 +3,9 @@ export const passwordMessage = 'Password must be at least 8 characters with 1 up
 // Password regex: at least 8 characters, 1 digit, 1 lowercase, 1 uppercase
 export const passwordRegex = /^.*(?=.{8,})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/;
 
+export const ACCESS_TTL_SECONDS = 15 * 60; // 15 min
+export const REFRESH_TTL_DAYS = 30;
+
 export const quotes = [
   {
     quote: `"Daddy! Mommy! Un-make me, and save me from the hell of living!"`,

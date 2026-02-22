@@ -68,7 +68,7 @@ export class ReviewService {
     return { reviews: enriched, total, hasMore: skip + enriched.length < total };
   }
 
-  async createReview(userId: string, movieId: string, dto: CreateReviewDto) {
+  async createReview(userId: string, dto: CreateReviewDto) {
     const validation = reviewSchema.safeParse(dto);
     if (!validation.success) {
       throw new Error(validation.error.issues[0].message);
@@ -76,7 +76,7 @@ export class ReviewService {
 
     const review = new Review({
       userId,
-      movieId,
+      movieId: dto.movieId,
       text: dto.text,
       rating: dto.rating,
       isSpoiler: dto.isSpoiler ?? false,

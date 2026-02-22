@@ -103,6 +103,7 @@ export default function SettingsScreen() {
     onPress: () => navigate('Privacy Policy'),
     title: 'Privacy Policy',
   }, {
+    children: <View style={styles.spacer} />,
     iconColor: colors.white,
     iconName: 'help',
     onPress: () => navigate('About'),

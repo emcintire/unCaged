@@ -9,6 +9,9 @@ export default defineConfig({
       target: './apps/client/src/services/generated/api.ts',
       client: 'react-query',
       override: {
+        fetch: {
+          includeHttpResponseReturnType: false,
+        },
         mutator: {
           path: './apps/client/src/services/axiosInstance.ts',
           name: 'axiosInstance',

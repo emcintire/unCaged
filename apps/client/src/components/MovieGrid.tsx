@@ -11,14 +11,21 @@ const NUM_COLUMNS = 2;
 
 type Props = {
   movies: Movie[];
-  favoriteIds?: Set<string>;
-  seenIds?: Set<string>;
+  favoriteIds?: string[];
+  seenIds?: string[];
   ListHeaderComponent?: ReactElement | null;
   ListHeaderComponentStyle?: object;
   emptyMessage?: ReactNode;
 };
 
-export default function MovieGrid({ movies, favoriteIds, seenIds, ListHeaderComponent, ListHeaderComponentStyle, emptyMessage = 'No movies found.' }: Props) {
+export default function MovieGrid({
+  movies,
+  favoriteIds = [],
+  seenIds = [],
+  ListHeaderComponent,
+  ListHeaderComponentStyle,
+  emptyMessage = 'No results :(',
+}: Props) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const renderMovie = useCallback(({ item }: { item: Movie }) => (
@@ -26,8 +33,8 @@ export default function MovieGrid({ movies, favoriteIds, seenIds, ListHeaderComp
       <MovieCard
         movie={item}
         onPress={() => setSelectedMovie(item)}
-        isFavorite={favoriteIds?.has(item._id) ?? false}
-        isSeen={seenIds?.has(item._id) ?? false}
+        isFavorite={favoriteIds.includes(item._id)}
+        isSeen={seenIds.includes(item._id)}
       />
     </View>
   ), [favoriteIds, seenIds]);

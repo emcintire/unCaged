@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { z } from 'zod';
+import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -9,6 +10,7 @@ import { showErrorToast, showSuccessToast, form, screen } from '@/config';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 import { toFormikValidator } from '@/utils/toFormikValidator';
+import { STORAGE_KEYS } from '@/constants';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Email must be a valid email'),
@@ -28,6 +30,7 @@ export default function ForgotPasswordScreen() {
     try {
       const email = values.email.trim().toLowerCase();
       await forgotPasswordMutation.mutateAsync({ data: { email } });
+      await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_EMAIL, email);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to send reset email';
       showErrorToast(message);

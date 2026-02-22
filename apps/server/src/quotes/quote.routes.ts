@@ -59,5 +59,5 @@ const controller = new QuoteController();
  *             schema:
  *               $ref: '#/components/schemas/Quote'
  */
-quoteRouter.get('/', controller.getQuote.bind(controller));
-quoteRouter.post('/', auth, admin, controller.createQuote.bind(controller));
+quoteRouter.get('/', controller.getQuote);
+quoteRouter.post('/', auth, admin, controller.createQuote);

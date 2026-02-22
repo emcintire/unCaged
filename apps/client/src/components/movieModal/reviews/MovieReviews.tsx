@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Review } from '@/services';
-import { useGetCurrentUser, useGetReviewsByMovie } from '@/services';
+import { getGetCurrentUserQueryKey, useGetCurrentUser, useGetReviewsByMovie } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import WriteReviewForm from './WriteReviewForm';
@@ -19,7 +19,12 @@ export default function MovieReviews({ movieId }: Props) {
   const [showWriteForm, setShowWriteForm] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { data: user } = useGetCurrentUser();
+  const { data: user } = useGetCurrentUser({
+    query: {
+      enabled: isAuthenticated,
+      queryKey: getGetCurrentUserQueryKey(),
+    },
+  });
   const { data: reviews, isLoading, isFetching, refetch } = useGetReviewsByMovie({ movieId, page, sort });
 
   const prevSortRef = useRef(sort);

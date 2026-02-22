@@ -1,10 +1,6 @@
+export * from './schemas';
 export * from './types';
 export { UserController } from './user.controller';
 export { UserService } from './user.service';
 export { userRouter } from './user.routes';
 export { User, type UserDocument } from './user.model';
-export { userSchema, type UserData } from './schemas/user.schema';
-export { userRatingSchema } from './schemas/userRating.schema';
-export { loginSchema } from './schemas/login.schema';
-export { newUserSchema } from './schemas/newUser.schema';
-export { updateUserSchema } from './schemas/updateUser.schema';

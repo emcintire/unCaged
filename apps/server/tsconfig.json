@@ -22,13 +22,14 @@
     "target": "ES2020",
     "baseUrl": "./src",
     "paths": {
-      "@/util": ["util"],
-      "@/movies": ["movies"],
+      "@/auth": ["auth"],
       "@/middleware": ["middleware"],
+      "@/movies": ["movies"],
+      "@/quotes": ["quotes"],
+      "@/reviews": ["reviews"],
       "@/types": ["types"],
       "@/users": ["users"],
-      "@/reviews": ["reviews"],
-      "@/quotes": ["quotes"]
+      "@/util": ["util"],
     }
   },
   "include": ["src/**/*", "app.ts"],

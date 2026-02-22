@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { useGetCurrentUser, useGetFavorites, useGetAllMovies, useGetSeen, useGetMyReviews } from '@/services';
+import { useGetCurrentUser, useGetAllMovies, useGetMyReviews } from '@/services';
 import { spacing, colors } from '@/config';
 import CollectionStats from '@/components/CollectionStats';
 import MovieGrid from '@/components/MovieGrid';
@@ -9,20 +9,15 @@ import Screen from '@/components/Screen';
 
 export default function CollectionScreen() {
   const { data: user, isLoading: isUserLoading } = useGetCurrentUser();
-  const { data: seenMovies, isLoading: isSeenLoading } = useGetSeen();
-  const { data: favoriteMovies, isLoading: isFavoritesLoading } = useGetFavorites();
   const { data: allMovies, isLoading: isMoviesLoading } = useGetAllMovies();
   const { data: myReviews, isLoading: isReviewsLoading } = useGetMyReviews();
 
-  const isLoading = isUserLoading || isSeenLoading || isFavoritesLoading || isMoviesLoading || isReviewsLoading;
+  const isLoading = isUserLoading || isMoviesLoading || isReviewsLoading;
 
-  const favoriteIds = useMemo(
-    () => new Set((favoriteMovies ?? []).map((m) => m._id)),
-    [favoriteMovies],
-  );
+  const seenMovies = useMemo(() => allMovies?.filter(m => user?.seen.includes(m._id)) ?? [], [allMovies, user?.seen]);
 
   const sortedMovies = useMemo(
-    () => [...(seenMovies ?? [])].sort((a, b) => a.title.localeCompare(b.title)),
+    () => [...seenMovies].sort((a, b) => a.title.localeCompare(b.title)),
     [seenMovies],
   );
 
@@ -30,7 +25,7 @@ export default function CollectionScreen() {
     <Screen isLoading={isLoading} skeleton={<MovieGridSkeleton />}>
       <MovieGrid
         movies={sortedMovies}
-        favoriteIds={favoriteIds}
+        favoriteIds={user?.favorites ?? []}
         emptyMessage={(
           <Text>
             What are you doing here... you have&nbsp;

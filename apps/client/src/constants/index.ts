@@ -1,7 +1,10 @@
 export { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from '@uncaged/shared';
 
 export const STORAGE_KEYS = {
+  AUTH_CODE: 'code',
+  AUTH_EMAIL: 'email',
   AUTH_TOKEN: 'token',
+  AUTH_REFRESH_TOKEN: 'refreshToken',
   USER_PREFERENCES: 'userPreferences',
 } as const;
 

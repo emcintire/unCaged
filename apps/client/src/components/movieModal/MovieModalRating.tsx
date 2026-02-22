@@ -1,10 +1,11 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import type { SetState } from '@/types';
-import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser } from '@/services';
+import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey } from '@/services';
 import { borderRadius, colors, showErrorToast, spacing } from '@/config';
 import { getStarIcon } from '../StarRating';
 import Icon from '../Icon';
+import { useAuth } from '@/hooks';
 
 const styles = StyleSheet.create({
   stars: {
@@ -19,10 +20,10 @@ const styles = StyleSheet.create({
   },
 });
 
-function getStarColor(star: number, rating: number): string {
+const getStarColor = (star: number, rating: number): string => {
   if (rating >= star - 0.5) return colors.orange;
   return colors.medium;
-}
+};
 
 type Props = {
   movie: Movie;
@@ -35,7 +36,14 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
   const rateMovieMutation = useRateMovie();
   const deleteRatingMutation = useDeleteRating();
   const addToSeenMutation = useAddToSeen();
-  const { data: user } = useGetCurrentUser();
+
+  const { isAuthenticated } = useAuth();
+  const { data: user } = useGetCurrentUser({
+    query: {
+      enabled: isAuthenticated,
+      queryKey: getGetCurrentUserQueryKey(),
+    },
+  });
 
   const submitRating = async (newRating: number) => {
     try {

@@ -12,7 +12,7 @@ type Props = {
   onPress?: (star: number) => void;
 };
 
-export function getStarIcon(star: number, rating: number): 'star' | 'star-half-full' | 'star-outline' {
+export const getStarIcon = (star: number, rating: number): 'star' | 'star-half-full' | 'star-outline' => {
   if (rating >= star) return 'star';
   if (rating >= star - 0.5) return 'star-half-full';
   return 'star-outline';

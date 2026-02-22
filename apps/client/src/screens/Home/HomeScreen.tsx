@@ -1,7 +1,16 @@
 import { useState, useCallback, useMemo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { type Movie, useGetCurrentUser, useGetAllMovies, useGetPopularMovies, useGetStaffPicks, useGetQuote } from '@/services';
+import {
+  type Movie,
+  getGetCurrentUserQueryKey,
+  useGetCurrentUser,
+  useGetAllMovies,
+  useGetPopularMovies,
+  useGetStaffPicks,
+  useGetQuote,
+} from '@/services';
+import { useAuth } from '@/hooks';
 import { colors, spacing, fontSize, fontFamily, borderRadius } from '@/config';
 import Screen from '@/components/Screen';
 import MovieCard from '@/components/MovieCard';
@@ -141,14 +150,18 @@ function HomeScreenSkeleton() {
 
 export default function HomeScreen() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const { isAuthenticated } = useAuth();
 
-  const { data: user } = useGetCurrentUser();
+  const { data: user } = useGetCurrentUser({
+    query: {
+      enabled: isAuthenticated,
+      queryKey: getGetCurrentUserQueryKey(),
+    },
+  });
   const { data: movies = [], isLoading: moviesLoading } = useGetAllMovies();
   const { data: popularMovies = [], isLoading: popularLoading } = useGetPopularMovies();
   const { data: staffPicks = [], isLoading: staffPicksLoading } = useGetStaffPicks();
   const { data: quote, isLoading: quoteLoading } = useGetQuote();
-
-  console.log(quote);
 
   const isLoading = moviesLoading || popularLoading || staffPicksLoading || quoteLoading;
 

@@ -6,6 +6,6 @@ export const adminReviewRouter = express.Router();
 const controller = new ReviewController();
 
 adminReviewRouter.use(auth, admin);
-adminReviewRouter.get('/', controller.getAllReviewsAdmin.bind(controller));
-adminReviewRouter.put('/:reviewId/unflag', controller.unflagReview.bind(controller));
-adminReviewRouter.delete('/:reviewId', controller.deleteReviewAdmin.bind(controller));
+adminReviewRouter.get('/', controller.getAllReviewsAdmin);
+adminReviewRouter.put('/:reviewId/unflag', controller.unflagReview);
+adminReviewRouter.delete('/:reviewId', controller.deleteReviewAdmin);

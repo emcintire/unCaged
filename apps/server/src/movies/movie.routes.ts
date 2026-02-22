@@ -62,7 +62,7 @@ const controller = new MovieController();
  *               items:
  *                 $ref: '#/components/schemas/Movie'
  */
-movieRouter.get('/', controller.getAllMovies.bind(controller));
+movieRouter.get('/', controller.getAllMovies);
 
 /**
  * @swagger
@@ -86,7 +86,7 @@ movieRouter.get('/', controller.getAllMovies.bind(controller));
  *               items:
  *                 $ref: '#/components/schemas/Movie'
  */
-movieRouter.post('/getMovies', controller.getMoviesWithSort.bind(controller));
+movieRouter.post('/getMovies', controller.getMoviesWithSort);
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ movieRouter.post('/getMovies', controller.getMoviesWithSort.bind(controller));
  *             schema:
  *               $ref: '#/components/schemas/Movie'
  */
-movieRouter.get('/findByID/:id', controller.findMovieById.bind(controller));
+movieRouter.get('/findByID/:id', controller.findMovieById);
 
 /**
  * @swagger
@@ -134,7 +134,7 @@ movieRouter.get('/findByID/:id', controller.findMovieById.bind(controller));
  *               items:
  *                 $ref: '#/components/schemas/Movie'
  */
-movieRouter.get('/findByTitle/:title', controller.findMoviesByTitleParam.bind(controller));
+movieRouter.get('/findByTitle/:title', controller.findMoviesByTitleParam);
 
 /**
  * @swagger
@@ -163,7 +163,7 @@ movieRouter.get('/findByTitle/:title', controller.findMoviesByTitleParam.bind(co
  *               items:
  *                 $ref: '#/components/schemas/Movie'
  */
-movieRouter.post('/findByTitle', controller.findMoviesByTitle.bind(controller));
+movieRouter.post('/findByTitle', controller.findMoviesByTitle);
 
 /**
  * @swagger
@@ -182,7 +182,7 @@ movieRouter.post('/findByTitle', controller.findMoviesByTitle.bind(controller));
  *               items:
  *                 $ref: '#/components/schemas/Movie'
  */
-movieRouter.get('/popular', controller.getPopularMovies.bind(controller));
+movieRouter.get('/popular', controller.getPopularMovies);
 
 /**
  * @swagger
@@ -201,7 +201,7 @@ movieRouter.get('/popular', controller.getPopularMovies.bind(controller));
  *               items:
  *                 $ref: '#/components/schemas/Movie'
  */
-movieRouter.get('/staffpicks', controller.getStaffPicks.bind(controller));
+movieRouter.get('/staffpicks', controller.getStaffPicks);
 
 /**
  * @swagger
@@ -224,7 +224,7 @@ movieRouter.get('/staffpicks', controller.getStaffPicks.bind(controller));
  *             schema:
  *               type: string
  */
-movieRouter.get('/avgRating/:id', controller.getAverageRating.bind(controller));
+movieRouter.get('/avgRating/:id', controller.getAverageRating);
 
 /**
  * @swagger
@@ -269,7 +269,7 @@ movieRouter.get('/avgRating/:id', controller.getAverageRating.bind(controller));
  *             schema:
  *               $ref: '#/components/schemas/Movie'
  */
-movieRouter.post('/', auth, admin, controller.createMovie.bind(controller));
+movieRouter.post('/', auth, admin, controller.createMovie);
 
 /**
  * @swagger
@@ -319,6 +319,6 @@ movieRouter.post('/', auth, admin, controller.createMovie.bind(controller));
  *             schema:
  *               $ref: '#/components/schemas/Movie'
  */
-movieRouter.put('/:id', auth, admin, controller.updateMovie.bind(controller));
+movieRouter.put('/:id', auth, admin, controller.updateMovie);
 
-movieRouter.get('/updateRatings', auth, controller.updateAllRatings.bind(controller));
+movieRouter.get('/updateRatings', auth, controller.updateAllRatings);

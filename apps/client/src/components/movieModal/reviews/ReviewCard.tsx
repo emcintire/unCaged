@@ -3,7 +3,7 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Review } from '@/services';
-import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike } from '@/services';
+import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike, getGetCurrentUserQueryKey } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
@@ -19,7 +19,12 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   const [flagged, setFlagged] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { data: user } = useGetCurrentUser();
+  const { data: user } = useGetCurrentUser({
+    query: {
+      enabled: isAuthenticated,
+      queryKey: getGetCurrentUserQueryKey(),
+    },
+  });
 
   const deleteMutation = useDeleteReview();
   const toggleLikeMutation = useToggleReviewLike();
