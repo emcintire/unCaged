@@ -10,7 +10,7 @@ export const auth = (
 ): void => {
   const token = getTokenFromRequest(req);
   if (!token) {
-    res.status(401).send('No token provided...');
+    res.status(401).json({ message: 'Unauthorized', code: 'AUTH_TOKEN_MISSING' });
     return;
   }
 
@@ -23,6 +23,6 @@ export const auth = (
     req.user = decoded;
     next();
   } catch {
-    res.status(401).send('Invalid token...');
+    res.status(401).json({ message: 'Unauthorized', code: 'AUTH_TOKEN_INVALID' });
   }
 }

@@ -7,7 +7,7 @@ export const error = (
   res: Response,
   _next: NextFunction
 ): void => {
-  const requestId = req.headers['x-request-id'];
+  const requestId = (req as Request & { requestId?: string }).requestId ?? req.headers['x-request-id'];
 
   if (isHttpError(err)) {
     const shouldLogAsError = err.status >= 500;

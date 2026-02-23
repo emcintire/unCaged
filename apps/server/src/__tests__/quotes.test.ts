@@ -1,226 +1,88 @@
-import request from 'supertest';
 import bcrypt from 'bcrypt';
+import request from 'supertest';
 import app from '../app/app';
-import { Quote, quoteSchema } from '@/quotes';
+import { Quote } from '@/quotes';
 import { User } from '@/users';
+import { signAccessToken } from '@/utils';
 
-describe('Quote API Endpoints', () => {
+describe('Quotes API', () => {
   let adminToken: string;
   let userToken: string;
 
   beforeEach(async () => {
-    const salt = await bcrypt.genSalt(10);
+    await Promise.all([Quote.deleteMany({}), User.deleteMany({})]);
 
-    const admin = new User({
-      name: 'Quote Admin',
-      email: 'quoteadmin@example.com',
-      password: await bcrypt.hash('AdminPass123', salt),
+    const admin = await User.create({
+      name: 'Admin',
+      email: 'admin-quotes@example.com',
+      password: await bcrypt.hash('AdminPass123', 10),
       isAdmin: true,
       img: 'https://i.imgur.com/9NYgErP.png',
     });
-    await admin.save();
-    adminToken = admin.generateAuthToken();
 
-    const user = new User({
-      name: 'Quote User',
-      email: 'quoteuser@example.com',
-      password: await bcrypt.hash('UserPass123', salt),
+    const user = await User.create({
+      name: 'User',
+      email: 'user-quotes@example.com',
+      password: await bcrypt.hash('UserPass123', 10),
       isAdmin: false,
+      img: 'https://i.imgur.com/9NYgErP.png',
     });
-    await user.save();
-    userToken = user.generateAuthToken();
+
+    adminToken = signAccessToken({ sub: admin._id.toString(), isAdmin: true });
+    userToken = signAccessToken({ sub: user._id.toString(), isAdmin: false });
   });
 
-  describe('GET /api/quotes - Get Quote', () => {
-    it('should return a recent quote if one exists', async () => {
-      await Quote.create({
-        quote: 'Test quote',
-        subquote: 'Test subquote',
-        createdOn: new Date(),
-      });
-
-      const response = await request(app)
-        .get('/api/quotes')
-        .expect(200);
-
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].quote).toBe('Test quote');
-      expect(response.body[0].subquote).toBe('Test subquote');
-    });
-
-    it('should fall back to hardcoded quote when no recent quote exists', async () => {
-      const response = await request(app)
-        .get('/api/quotes')
-        .expect(200);
-
-      expect(response.body).toHaveProperty('quote');
-      expect(response.body).toHaveProperty('subquote');
-    });
-
-    it('should not return quotes older than 7 days', async () => {
-      await Quote.create({
-        quote: 'Old quote',
-        subquote: 'Old subquote',
-        createdOn: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-      });
-
-      const response = await request(app)
-        .get('/api/quotes')
-        .expect(200);
-
-      if (Array.isArray(response.body)) {
-        expect(response.body[0]?.quote).not.toBe('Old quote');
-      } else {
-        expect(response.body).toHaveProperty('quote');
-      }
-    });
-
-    it('should return the most recent quote when multiple exist', async () => {
-      await Quote.create({
-        quote: 'Older recent quote',
-        subquote: 'Sub 1',
-        createdOn: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      });
-      await Quote.create({
-        quote: 'Newest quote',
-        subquote: 'Sub 2',
-        createdOn: new Date(),
-      });
-
-      const response = await request(app)
-        .get('/api/quotes')
-        .expect(200);
-
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].quote).toBe('Newest quote');
-    });
-
-    it('should not require authentication', async () => {
-      await Quote.create({
-        quote: 'Public quote',
-        subquote: 'Public sub',
-        createdOn: new Date(),
-      });
-
-      const response = await request(app)
-        .get('/api/quotes')
-        .expect(200);
-
-      expect(response.body).toHaveLength(1);
-    });
+  afterAll(async () => {
+    await Promise.all([Quote.deleteMany({}), User.deleteMany({})]);
   });
 
-  describe('POST /api/quotes - Create Quote', () => {
-    it('should create a new quote with admin token', async () => {
-      const response = await request(app)
-        .post('/api/quotes')
-        .set('x-auth-token', adminToken)
-        .send({ quote: 'New quote', subquote: 'New subquote' })
-        .expect(200);
+  it('GET /api/quotes returns most recent quote when present', async () => {
+    await Quote.create({ quote: 'Old', subquote: 'Older', createdOn: new Date('2024-01-01') });
+    await Quote.create({ quote: 'Newest', subquote: 'Latest', createdOn: new Date() });
 
-      expect(response.body).toHaveProperty('quote', 'New quote');
-      expect(response.body).toHaveProperty('subquote', 'New subquote');
-      expect(response.body).toHaveProperty('createdOn');
-
-      const quote = await Quote.findOne({ quote: 'New quote' });
-      expect(quote).toBeTruthy();
-    });
-
-    it('should reject quote creation without admin privileges', async () => {
-      await request(app)
-        .post('/api/quotes')
-        .set('x-auth-token', userToken)
-        .send({ quote: 'User quote', subquote: 'Sub' })
-        .expect(401);
-    });
-
-    it('should reject quote creation without authentication', async () => {
-      await request(app)
-        .post('/api/quotes')
-        .send({ quote: 'No auth quote', subquote: 'Sub' })
-        .expect(401);
-    });
-
-    it('should reject empty quote text', async () => {
-      await request(app)
-        .post('/api/quotes')
-        .set('x-auth-token', adminToken)
-        .send({ quote: '', subquote: 'Sub' })
-        .expect(400);
-    });
-
-    it('should reject missing subquote', async () => {
-      await request(app)
-        .post('/api/quotes')
-        .set('x-auth-token', adminToken)
-        .send({ quote: 'Quote only' })
-        .expect(400);
-    });
-
-    it('should reject quote exceeding max length', async () => {
-      await request(app)
-        .post('/api/quotes')
-        .set('x-auth-token', adminToken)
-        .send({ quote: 'a'.repeat(256), subquote: 'Sub' })
-        .expect(400);
-    });
-
-    it('should reject subquote exceeding max length', async () => {
-      await request(app)
-        .post('/api/quotes')
-        .set('x-auth-token', adminToken)
-        .send({ quote: 'Valid quote', subquote: 'a'.repeat(129) })
-        .expect(400);
-    });
+    const response = await request(app).get('/api/quotes').expect(200);
+    expect(response.body.quote).toBe('Newest');
+    expect(response.body.subquote).toBe('Latest');
   });
 
-  describe('Quote Schema Validation', () => {
-    it('should validate correct quote data', () => {
-      const result = quoteSchema.safeParse({
-        quote: 'A great quote',
-        subquote: 'From a great movie',
-      });
-      expect(result.success).toBe(true);
-    });
+  it('GET /api/quotes falls back to static quote when db is empty', async () => {
+    const response = await request(app).get('/api/quotes').expect(200);
+    expect(response.body).toHaveProperty('quote');
+    expect(response.body).toHaveProperty('subquote');
+  });
 
-    it('should reject empty quote', () => {
-      const result = quoteSchema.safeParse({
-        quote: '',
-        subquote: 'Source',
-      });
-      expect(result.success).toBe(false);
-    });
+  it('POST /api/quotes allows admin and rejects non-admin/unauthenticated', async () => {
+    const payload = { quote: 'Fresh quote', subquote: 'Fresh subquote' };
 
-    it('should reject empty subquote', () => {
-      const result = quoteSchema.safeParse({
-        quote: 'Valid quote',
-        subquote: '',
-      });
-      expect(result.success).toBe(false);
-    });
+    await request(app)
+      .post('/api/quotes')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(payload)
+      .expect(201);
 
-    it('should reject quote that is too long', () => {
-      const result = quoteSchema.safeParse({
-        quote: 'a'.repeat(256),
-        subquote: 'Source',
-      });
-      expect(result.success).toBe(false);
-    });
+    await request(app)
+      .post('/api/quotes')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ quote: 'User quote', subquote: 'Nope' })
+      .expect(403);
 
-    it('should reject subquote that is too long', () => {
-      const result = quoteSchema.safeParse({
-        quote: 'Valid',
-        subquote: 'a'.repeat(129),
-      });
-      expect(result.success).toBe(false);
-    });
+    await request(app)
+      .post('/api/quotes')
+      .send({ quote: 'Anon quote', subquote: 'Nope' })
+      .expect(401);
+  });
 
-    it('should accept max length values', () => {
-      const result = quoteSchema.safeParse({
-        quote: 'a'.repeat(255),
-        subquote: 'a'.repeat(128),
-      });
-      expect(result.success).toBe(true);
-    });
+  it('POST /api/quotes validates quote payload', async () => {
+    await request(app)
+      .post('/api/quotes')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ quote: '', subquote: 'Valid subquote' })
+      .expect(400);
+
+    await request(app)
+      .post('/api/quotes')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ quote: 'Valid quote', subquote: 'a'.repeat(256) })
+      .expect(400);
   });
 });

@@ -191,16 +191,16 @@ export class UserController {
         User.findById(userId).select('name img'),
       ]);
 
-      const ids = [...new Set(reviews.map((r) => r.id))];
+      const ids = [...new Set(reviews.map((r) => r.movieId))];
       const movies = await Movie.find({ _id: { $in: ids } }).select('title img');
       const movieMap = new Map(movies.map((m) => [m._id.toString(), m]));
 
       const result = reviews.map((review) => {
-        const movie = movieMap.get(review.id);
+        const movie = movieMap.get(review.movieId);
         return {
           _id: review._id.toString(),
           userId: review.userId,
-          id: review.id,
+          movieId: review.movieId,
           text: review.text,
           rating: review.rating,
           isSpoiler: review.isSpoiler,

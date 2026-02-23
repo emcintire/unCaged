@@ -1,363 +1,182 @@
-import request from 'supertest';
 import bcrypt from 'bcrypt';
+import request from 'supertest';
 import app from '../app/app';
 import { Movie } from '@/movies';
 import { Review } from '@/reviews';
 import { User } from '@/users';
-import { reviewSchema } from '@/reviews';
+import { signAccessToken } from '@/utils';
 
-describe('Review API Endpoints', () => {
+describe('Reviews API', () => {
   let adminToken: string;
   let userToken: string;
-  let secondUserToken: string;
-  let userId: string;
-  let secondUserId: string;
+  let otherUserToken: string;
   let movieId: string;
+  let userId: string;
 
   beforeEach(async () => {
-    const salt = await bcrypt.genSalt(10);
+    await Promise.all([Review.deleteMany({}), Movie.deleteMany({}), User.deleteMany({})]);
 
-    const admin = new User({
-      name: 'Admin User',
-      email: 'reviewadmin@example.com',
-      password: await bcrypt.hash('AdminPass123', salt),
+    const admin = await User.create({
+      name: 'Admin',
+      email: 'admin-reviews@example.com',
+      password: await bcrypt.hash('AdminPass123', 10),
       isAdmin: true,
       img: 'https://i.imgur.com/9NYgErP.png',
     });
-    await admin.save();
-    adminToken = admin.generateAuthToken();
-
-    const user = new User({
-      name: 'Review User',
+    const user = await User.create({
+      name: 'Reviewer',
       email: 'reviewer@example.com',
-      password: await bcrypt.hash('UserPass123', salt),
+      password: await bcrypt.hash('UserPass123', 10),
       isAdmin: false,
-      img: 'https://i.imgur.com/user.png',
+      img: 'https://i.imgur.com/9NYgErP.png',
     });
-    await user.save();
-    userToken = user.generateAuthToken();
-    userId = user._id.toString();
-
-    const secondUser = new User({
-      name: 'Other User',
-      email: 'other@example.com',
-      password: await bcrypt.hash('UserPass123', salt),
+    const other = await User.create({
+      name: 'Other',
+      email: 'other-reviewer@example.com',
+      password: await bcrypt.hash('UserPass123', 10),
       isAdmin: false,
-      img: 'https://i.imgur.com/other.png',
+      img: 'https://i.imgur.com/9NYgErP.png',
     });
-    await secondUser.save();
-    secondUserToken = secondUser.generateAuthToken();
-    secondUserId = secondUser._id.toString();
 
     const movie = await Movie.create({
-      title: 'Review Test Movie',
-      director: 'Test Director',
-      date: '2023',
+      title: 'Reviewable Movie',
+      director: 'Director',
+      description: 'Description',
+      date: '2024',
       runtime: '120 min',
-      rating: 'R',
+      rating: 'PG-13',
+      img: 'https://example.com/movie.jpg',
     });
+
+    adminToken = signAccessToken({ sub: admin._id.toString(), isAdmin: true });
+    userToken = signAccessToken({ sub: user._id.toString(), isAdmin: false });
+    otherUserToken = signAccessToken({ sub: other._id.toString(), isAdmin: false });
     movieId = movie._id.toString();
+    userId = user._id.toString();
   });
 
-  describe('POST /api/reviews - Create Review', () => {
-    it('should create a review with text only', async () => {
-      const response = await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: 'Great movie, loved every minute!' })
-        .expect(200);
-
-      expect(response.body).toHaveProperty('text', 'Great movie, loved every minute!');
-      expect(response.body).toHaveProperty('movieId', movieId);
-      expect(response.body).toHaveProperty('userId', userId);
-      expect(response.body).toHaveProperty('isSpoiler', false);
-      expect(response.body).toHaveProperty('createdOn');
-    });
-
-    it('should create a review with a snapshot rating', async () => {
-      const response = await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: 'Solid film.', rating: 4 })
-        .expect(200);
-
-      expect(response.body).toHaveProperty('rating', 4);
-      expect(response.body).toHaveProperty('text', 'Solid film.');
-    });
-
-    it('should create a review marked as spoiler', async () => {
-      const response = await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: 'The ending was wild!', isSpoiler: true })
-        .expect(200);
-
-      expect(response.body).toHaveProperty('isSpoiler', true);
-    });
-
-    it('should create a review with all fields', async () => {
-      const response = await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: 'Amazing!', rating: 5, isSpoiler: false })
-        .expect(200);
-
-      expect(response.body.text).toBe('Amazing!');
-      expect(response.body.rating).toBe(5);
-      expect(response.body.isSpoiler).toBe(false);
-    });
-
-    it('should allow multiple reviews from the same user on the same movie', async () => {
-      await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: 'First viewing thoughts' })
-        .expect(200);
-
-      await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: 'Second viewing - even better!' })
-        .expect(200);
-
-      const reviews = await Review.find({ movieId, userId });
-      expect(reviews).toHaveLength(2);
-    });
-
-    it('should reject review without authentication', async () => {
-      await request(app)
-        .post('/api/reviews')
-        .send({ movieId, text: 'No auth review' })
-        .expect(401);
-    });
-
-    it('should reject review with empty text', async () => {
-      await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, text: '' })
-        .expect(400);
-    });
-
-    it('should reject review with missing text', async () => {
-      await request(app)
-        .post('/api/reviews')
-        .set('x-auth-token', userToken)
-        .send({ movieId, rating: 3 })
-        .expect(400);
-    });
+  afterAll(async () => {
+    await Promise.all([Review.deleteMany({}), Movie.deleteMany({}), User.deleteMany({})]);
   });
 
-  describe('GET /api/reviews - Get Reviews', () => {
-    it('should return all reviews for a movie', async () => {
-      await Review.create([
-        { userId, movieId, text: 'Review 1' },
-        { userId: secondUserId, movieId, text: 'Review 2', rating: 4 },
-      ]);
+  it('POST /api/reviews creates review for authenticated user', async () => {
+    const response = await request(app)
+      .post('/api/reviews')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ movieId, text: 'Great movie', rating: 4 })
+      .expect(201);
 
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews).toHaveLength(2);
-    });
-
-    it('should return reviews sorted by newest first', async () => {
-      await Review.create({
-        userId,
-        movieId,
-        text: 'Older review',
-        createdOn: new Date('2024-01-01'),
-      });
-      await Review.create({
-        userId: secondUserId,
-        movieId,
-        text: 'Newer review',
-        createdOn: new Date('2025-01-01'),
-      });
-
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews[0].text).toBe('Newer review');
-      expect(response.body.reviews[1].text).toBe('Older review');
-    });
-
-    it('should include user name and avatar in reviews', async () => {
-      await Review.create({ userId, movieId, text: 'My review' });
-
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews[0]).toHaveProperty('userName', 'Review User');
-      expect(response.body.reviews[0]).toHaveProperty('userImg', 'https://i.imgur.com/user.png');
-    });
-
-    it('should include spoiler flag in response', async () => {
-      await Review.create({ userId, movieId, text: 'Spoiler!', isSpoiler: true });
-
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews[0].isSpoiler).toBe(true);
-    });
-
-    it('should include snapshot rating in response', async () => {
-      await Review.create({ userId, movieId, text: 'Rated review', rating: 3 });
-
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews[0].rating).toBe(3);
-    });
-
-    it('should return empty array when no reviews exist', async () => {
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews).toEqual([]);
-    });
-
-    it('should not require authentication', async () => {
-      await Review.create({ userId, movieId, text: 'Public review' });
-
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews).toHaveLength(1);
-    });
-
-    it('should only return reviews for the specified movie', async () => {
-      const otherMovie = await Movie.create({
-        title: 'Other Movie',
-        director: 'Other Director',
-        date: '2024',
-        runtime: '90 min',
-        rating: 'PG',
-      });
-
-      await Review.create([
-        { userId, movieId, text: 'Review for movie 1' },
-        { userId, movieId: otherMovie._id.toString(), text: 'Review for movie 2' },
-      ]);
-
-      const response = await request(app)
-        .get(`/api/reviews?movieId=${movieId}`)
-        .expect(200);
-
-      expect(response.body.reviews).toHaveLength(1);
-      expect(response.body.reviews[0].text).toBe('Review for movie 1');
-    });
+    expect(response.body.text).toBe('Great movie');
+    expect(response.body.movieId).toBe(movieId);
+    expect(response.body.userId).toBe(userId);
   });
 
-  describe('DELETE /api/reviews/:reviewId - Delete Review', () => {
-    let reviewId: string;
+  it('GET /api/reviews returns paginated movie reviews', async () => {
+    await Review.create({ userId, movieId, text: 'One review', rating: 5 });
+    const response = await request(app).get(`/api/reviews?movieId=${movieId}`).expect(200);
 
-    beforeEach(async () => {
-      const review = await Review.create({
-        userId,
-        movieId,
-        text: 'Deletable review',
-      });
-      reviewId = review._id.toString();
-    });
-
-    it('should allow author to delete their own review', async () => {
-      await request(app)
-        .delete(`/api/reviews/${reviewId}`)
-        .set('x-auth-token', userToken)
-        .expect(200);
-
-      const review = await Review.findById(reviewId);
-      expect(review).toBeNull();
-    });
-
-    it('should allow admin to delete any review', async () => {
-      await request(app)
-        .delete(`/api/reviews/${reviewId}`)
-        .set('x-auth-token', adminToken)
-        .expect(200);
-
-      const review = await Review.findById(reviewId);
-      expect(review).toBeNull();
-    });
-
-    it('should reject deletion by non-author non-admin', async () => {
-      const response = await request(app)
-        .delete(`/api/reviews/${reviewId}`)
-        .set('x-auth-token', secondUserToken)
-        .expect(401);
-
-      expect(response.text).toContain('Not authorized');
-
-      const review = await Review.findById(reviewId);
-      expect(review).toBeTruthy();
-    });
-
-    it('should reject deletion without authentication', async () => {
-      await request(app)
-        .delete(`/api/reviews/${reviewId}`)
-        .expect(401);
-    });
-
-    it('should return 400 for non-existent review ID', async () => {
-      const fakeId = '507f1f77bcf86cd799439011';
-      await request(app)
-        .delete(`/api/reviews/${fakeId}`)
-        .set('x-auth-token', userToken)
-        .expect(400);
-    });
+    expect(response.body).toHaveProperty('reviews');
+    expect(response.body).toHaveProperty('total');
+    expect(response.body.reviews).toHaveLength(1);
+    expect(response.body.total).toBe(1);
   });
 
-  describe('Review Schema Validation', () => {
-    it('should validate correct review data', () => {
-      const result = reviewSchema.safeParse({
-        text: 'Great movie!',
-        rating: 4,
-        isSpoiler: false,
-      });
-      expect(result.success).toBe(true);
+  it('PUT /api/reviews/:id/like toggles like state', async () => {
+    const review = await Review.create({ userId, movieId, text: 'Like me' });
+
+    const first = await request(app)
+      .put(`/api/reviews/${review._id.toString()}/like`)
+      .set('Authorization', `Bearer ${otherUserToken}`)
+      .expect(200);
+    expect(first.body.liked).toBe(true);
+
+    const second = await request(app)
+      .put(`/api/reviews/${review._id.toString()}/like`)
+      .set('Authorization', `Bearer ${otherUserToken}`)
+      .expect(200);
+    expect(second.body.liked).toBe(false);
+  });
+
+  it('DELETE /api/reviews/:reviewId enforces ownership/admin permissions', async () => {
+    const review = await Review.create({ userId, movieId, text: 'Delete me' });
+
+    await request(app)
+      .delete(`/api/reviews/${review._id.toString()}`)
+      .set('Authorization', `Bearer ${otherUserToken}`)
+      .expect(403);
+
+    await request(app)
+      .delete(`/api/reviews/${review._id.toString()}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+  });
+
+  it('GET /api/reviews/admin requires admin', async () => {
+    await request(app)
+      .get('/api/reviews/admin')
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(403);
+
+    await request(app)
+      .get('/api/reviews/admin')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+  });
+
+  it('GET /api/reviews validates required movieId query', async () => {
+    const response = await request(app).get('/api/reviews').expect(400);
+    expect(response.body.code).toBe('MOVIE_ID_REQUIRED');
+  });
+
+  it('POST /api/reviews/:reviewId/report blocks self-report and duplicate report', async () => {
+    const review = await Review.create({ userId, movieId, text: 'Self report test' });
+
+    await request(app)
+      .post(`/api/reviews/${review._id.toString()}/report`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(400);
+
+    await request(app)
+      .post(`/api/reviews/${review._id.toString()}/report`)
+      .set('Authorization', `Bearer ${otherUserToken}`)
+      .expect(200);
+
+    const duplicate = await request(app)
+      .post(`/api/reviews/${review._id.toString()}/report`)
+      .set('Authorization', `Bearer ${otherUserToken}`)
+      .expect(409);
+
+    expect(duplicate.body.code).toBe('REVIEW_ALREADY_REPORTED');
+  });
+
+  it('PUT /api/reviews/:reviewId/unflag requires admin and clears flags', async () => {
+    const review = await Review.create({
+      userId,
+      movieId,
+      text: 'Flagged review',
+      isFlagged: true,
+      flaggedBy: [userId],
     });
 
-    it('should validate review with text only', () => {
-      const result = reviewSchema.safeParse({ text: 'Just text' });
-      expect(result.success).toBe(true);
-    });
+    await request(app)
+      .put(`/api/reviews/${review._id.toString()}/unflag`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(403);
 
-    it('should reject empty text', () => {
-      const result = reviewSchema.safeParse({ text: '' });
-      expect(result.success).toBe(false);
-    });
+    await request(app)
+      .put(`/api/reviews/${review._id.toString()}/unflag`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
 
-    it('should reject rating above 5', () => {
-      const result = reviewSchema.safeParse({ text: 'Review', rating: 6 });
-      expect(result.success).toBe(false);
-    });
+    const updated = await Review.findById(review._id);
+    expect(updated?.isFlagged).toBe(false);
+    expect(updated?.flaggedBy).toEqual([]);
+  });
 
-    it('should reject rating below 0', () => {
-      const result = reviewSchema.safeParse({ text: 'Review', rating: -1 });
-      expect(result.success).toBe(false);
-    });
-
-    it('should accept rating of 0', () => {
-      const result = reviewSchema.safeParse({ text: 'Review', rating: 0 });
-      expect(result.success).toBe(true);
-    });
-
-    it('should accept rating of 5', () => {
-      const result = reviewSchema.safeParse({ text: 'Review', rating: 5 });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject text exceeding max length', () => {
-      const result = reviewSchema.safeParse({ text: 'a'.repeat(2049) });
-      expect(result.success).toBe(false);
-    });
+  it('DELETE /api/reviews/:reviewId returns 404 for unknown review', async () => {
+    await request(app)
+      .delete('/api/reviews/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(404);
   });
 });

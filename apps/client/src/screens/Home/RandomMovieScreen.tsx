@@ -3,12 +3,13 @@ import { StyleSheet, View, Modal, TouchableOpacity, Text, Animated } from 'react
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { type Movie, useGetCurrentUser, useGetAllMovies } from '@/services';
-import { borderRadius, changeResolution, colors, fontFamily, fontSize, shadow, spacing } from '@/config';
+import { borderRadius, colors, fontFamily, fontSize, shadow, spacing } from '@/config';
+import { useAnimatedValue } from '@/hooks';
+import { changeResolution } from '@/utils';
 import AdBanner from '@/components/AdBanner';
 import MovieModal from '@/components/movieModal/MovieModal';
 import RandomMovieFilters from '@/components/RandomMovieFilters';
 import Screen from '@/components/Screen';
-import { useAnimatedValue } from '@/hooks';
 
 export default function RandomMovieScreen() {
   const [filtersModalVisible, setFiltersModalVisible] = useState(false);

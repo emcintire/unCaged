@@ -59,7 +59,7 @@ export default function AdminScreen() {
   const addQuoteMutation = useAddQuote();
   const createMovieMutation = useCreateMovie();
 
-  const submitQuote = (values: QuoteFormValues, { resetForm }: { resetForm: () => void }) => {
+  const submitQuote = async (values: QuoteFormValues, { resetForm }: { resetForm: () => void }) => {
     addQuoteMutation.mutate({
       data: {
         quote: values.quote.trim(),

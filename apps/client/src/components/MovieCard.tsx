@@ -3,7 +3,8 @@ import { View, TouchableOpacity, StyleSheet, type ViewStyle } from 'react-native
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Movie } from '@/services';
-import { changeResolution, colors, movieCard } from '@/config';
+import { colors, movieCard } from '@/config';
+import { changeResolution } from '@/utils';
 
 type Props = {
   movie: Movie;

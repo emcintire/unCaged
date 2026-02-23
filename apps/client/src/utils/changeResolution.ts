@@ -7,11 +7,3 @@ export const changeResolution = (res: string, movie: Movie): Movie => {
 
   return { ...movie, img: newImg };
 };
-
-export const changeProfilePicRes = (res: string, imgStr: string): string => {
-  const str = imgStr.split('');
-  str[imgStr.length - 5] = res;
-  const newImgStr = str.join('');
-
-  return newImgStr;
-};

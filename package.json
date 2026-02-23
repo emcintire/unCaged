@@ -24,8 +24,5 @@
   "dependencies": {
     "orval": "^8.4.0",
     "swagger-jsdoc": "^6.2.8"
-  },
-  "overrides": {
-    "minimatch": "^10.2.1"
   }
 }

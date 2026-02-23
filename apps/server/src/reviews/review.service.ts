@@ -216,7 +216,7 @@ export class ReviewService {
         flaggedBy: review.flaggedBy ?? [],
         createdOn: review.createdOn,
         userName: user?.name || '',
-        userEmail: (user as any)?.email || '',
+        userEmail: user?.email || '',
         userImg: user?.img || '',
         movieTitle: movie?.title || '',
         movieImg: movie?.img || '',

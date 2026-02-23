@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 
-let mongoServer: MongoMemoryServer;
+let mongoServer: MongoMemoryReplSet;
 
 // Set test environment variables FIRST, before any imports
 process.env.NODE_ENV = 'test';
@@ -16,7 +16,9 @@ const ensureMongooseDisconnected = async () => {
 }
 
 const startInMemoryMongo = async (): Promise<string> => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryReplSet.create({
+    replSet: { count: 1, storageEngine: 'wiredTiger' },
+  });
   return mongoServer.getUri();
 }
 

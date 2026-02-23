@@ -7,7 +7,7 @@ export function admin(
   next: NextFunction
 ): void {
   if (!req.user?.isAdmin) {
-    res.status(401).send("Ah ah ah! You didn't say the magic word!");
+    res.status(403).json({ message: "Ah ah ah! You didn't say the magic word!", code: 'ADMIN_REQUIRED' });
     return;
   }
   next();

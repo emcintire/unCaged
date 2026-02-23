@@ -1,4 +1,4 @@
-import { AuthService } from 'auth/auth.service';
+import { AuthService } from './auth.service';
 import type { NextFunction, Request, Response } from 'express';
 import type { AuthenticatedRequest } from '@/types';
 import type { LoginDto } from './schemas';

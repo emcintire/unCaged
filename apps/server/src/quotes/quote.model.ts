@@ -14,9 +14,9 @@ const quoteMongooseSchema = new Schema<QuoteDocument>({
   },
   subquote: {
     type: String,
-    required: false,
+    required: true,
     minlength: 1,
-    maxLength: 128,
+    maxLength: 255,
   },
   createdOn: {
     type: Date,

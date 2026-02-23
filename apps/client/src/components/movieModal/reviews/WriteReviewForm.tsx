@@ -4,6 +4,7 @@ import { useCreateReview, useRateMovie } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
 import { showErrorToast } from '@/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 type Props = {
   movieId: string;

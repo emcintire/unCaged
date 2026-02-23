@@ -39,7 +39,7 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
   const addToSeenMutation = useAddToSeen();
 
   const { isAuthenticated } = useAuth();
-  const { data: user } = useGetCurrentUser({
+  const { data: user, refetch } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
       queryKey: getGetCurrentUserQueryKey(),
@@ -47,18 +47,13 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
   });
 
   const submitRating = async (newRating: number) => {
-    try {
-      await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
-      setRating(newRating);
+    await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
+    setRating(newRating);
 
-      const isMovieSeen = user && user.seen.includes(movie._id);
-      if (!isMovieSeen) {
-        await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
-        onSeenAdded();
-      }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to update rating';
-      showErrorToast(message);
+    const isMovieSeen = user && user.seen.includes(movie._id);
+    if (!isMovieSeen) {
+      await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
+      onSeenAdded();
     }
   };
 
@@ -66,12 +61,12 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
     if (rating === star) {
       await submitRating(star - 0.5);
     } else if (rating === star - 0.5) {
-      deleteRatingMutation.mutate({ data: { id: movie._id } }, {
-        onSuccess: () => setRating(0),
-      });
+      await deleteRatingMutation.mutateAsync({ data: { id: movie._id } });
+      setRating(0);
     } else {
       await submitRating(star);
     }
+    refetch();
   };
 
   return (

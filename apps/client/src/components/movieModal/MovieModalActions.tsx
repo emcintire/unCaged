@@ -1,7 +1,6 @@
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
-import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks';
 import { colors, fontFamily, fontSize } from '@/config';
 import {
@@ -22,7 +21,6 @@ export default function MovieModalActions({ movie }: Props) {
   const [rating, setRating] = useState(0);
   const [showStars, setShowStars] = useState(false);
 
-  const queryClient = useQueryClient();
   const addToSeenMutation = useAddToSeen();
   const removeFromSeenMutation = useRemoveFromSeen();
   const addToFavoritesMutation = useAddToFavorites();
@@ -32,7 +30,7 @@ export default function MovieModalActions({ movie }: Props) {
 
   const { isAuthenticated } = useAuth();
 
-  const { data: user } = useGetCurrentUser({
+  const { data: user, refetch } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
       queryKey: getGetCurrentUserQueryKey(),
@@ -47,62 +45,57 @@ export default function MovieModalActions({ movie }: Props) {
     setRating(user.ratings.find((r) => r.movie === movie._id)?.rating || 0);
   }, [user, movie]);
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     if (favorite) {
-      removeFromFavoritesMutation.mutate({ data: { id: movie._id }}, {
-        onSuccess: () => setFavorite(false),
-      });
+      await removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id }});
+      setFavorite(false);
     } else {
-      addToFavoritesMutation.mutate({ data: { id: movie._id }}, {
-        onSuccess: () => setFavorite(true),
-      });
+      await addToFavoritesMutation.mutateAsync({ data: { id: movie._id }});
+      setFavorite(true);
     }
-    queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
+    refetch();
   };
 
-  const toggleWatchlist = () => {
+  const toggleWatchlist = async () => {
     if (watchlist) {
-      removeFromWatchlistMutation.mutate({ data: { id: movie._id }}, {
-        onSuccess: () => setWatchlist(false),
-      });
+      await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id }});
+      setWatchlist(false);
     } else {
-      addToWatchlistMutation.mutate({ data: { id: movie._id }}, {
-        onSuccess: () => setWatchlist(true),
-      });
+      await addToWatchlistMutation.mutateAsync({ data: { id: movie._id }});
+      setWatchlist(true);
     }
-    queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
+    refetch();
   };
 
-  const toggleSeen = () => {
+  const toggleSeen = async () => {
     if (seen) {
-      removeFromSeenMutation.mutate({ data: { id: movie._id }}, {
-        onSuccess: () => setSeen(false),
-      });
+      await removeFromSeenMutation.mutateAsync({ data: { id: movie._id }});
+      refetch();
+      setSeen(false);
     } else {
       const isFirstSeen = user?.seen.length === 0;
-      addToSeenMutation.mutate({ data: { id: movie._id }}, {
-        onSuccess: () => {
-          setSeen(true);
-          if (watchlist) {
-            toggleWatchlist();
-          }
-          if (isFirstSeen) {
-            Alert.alert(
-              'Hello traveler',
-              'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. Nay, I do it for the people. Consider helping me in my holy mission.',
-              [
-                { text: 'Later', style: 'cancel' },
-                {
-                  text: 'Help the mission',
-                  onPress: () => Linking.openURL('https://www.buymeacoffee.com/greasyfingers'),
-                },
-              ],
-            );
-          }
-        },
-      });
+      await addToSeenMutation.mutateAsync({ data: { id: movie._id }});
+      setSeen(true);
+
+      if (watchlist) {
+        await toggleWatchlist();
+      }
+      refetch();
+
+      if (isFirstSeen) {
+        Alert.alert(
+          'Hello traveler',
+          'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. Nay, I do it for the people. Consider helping me in my holy mission.',
+          [
+            { text: 'Later', style: 'cancel' },
+            {
+              text: 'Help the mission',
+              onPress: () => Linking.openURL('https://www.buymeacoffee.com/greasyfingers'),
+            },
+          ],
+        );
+      }
     }
-    queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
   };
 
   const actions: Array<{

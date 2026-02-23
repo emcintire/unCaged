@@ -7,6 +7,7 @@ import {
   hashInput,
   hashRefreshToken,
   HttpError,
+  logger,
   refreshExpiryDate,
   signAccessToken,
   validateSchema,
@@ -119,7 +120,7 @@ export class AuthService {
   async forgotPassword(email: string) {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new HttpError(404, 'No user with that email address', 'USER_NOT_FOUND');
+      return;
     }
 
     const randomNum = Math.floor(100000 + Math.random() * 900000).toString();
@@ -158,11 +159,11 @@ export class AuthService {
       await transporter.sendMail(mailOptions);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown mail error';
-      throw new HttpError(
-        502,
-        `Failed to send password reset email: ${message}`,
-        'EMAIL_DELIVERY_FAILED'
-      );
+      logger.error('Failed to send password reset email', {
+        userId: user._id.toString(),
+        email,
+        reason: message,
+      });
     }
   }
 
