@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Linking, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { logger } from '@/utils';
 import AppButton from './AppButton';
 
 type Props = {
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
 const handlePress = () => {
   const url = 'https://www.buymeacoffee.com/greasyfingers';
   Linking.openURL(url).catch((err) =>
-    console.error('Failed to open URL:', err),
+    logger.error('Failed to open URL:', err),
   );
 };
 

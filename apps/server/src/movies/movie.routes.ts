@@ -125,7 +125,7 @@ movieRouter.get('/avgRating/:id', controller.getAverageRating);
  *     operationId: createMovie
  *     tags: [Movies]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

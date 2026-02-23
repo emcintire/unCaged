@@ -1,5 +1,5 @@
 import type { PipelineStage } from 'mongoose';
-import { validateSchema } from '@/utils';
+import { HttpError, validateSchema } from '@/utils';
 import { Review } from './review.model';
 import { User } from '@/users';
 import { Movie } from '@/movies';
@@ -86,11 +86,11 @@ export class ReviewService {
   async deleteReview(reviewId: string, userId: string, isAdmin: boolean) {
     const review = await Review.findById(reviewId);
     if (!review) {
-      throw new Error('The review with the given ID was not found.');
+      throw new HttpError(404, 'The review with the given ID was not found.', 'REVIEW_NOT_FOUND');
     }
 
     if (review.userId !== userId && !isAdmin) {
-      throw new Error('Not authorized to delete this review.');
+      throw new HttpError(403, 'Not authorized to delete this review.', 'REVIEW_DELETE_FORBIDDEN');
     }
 
     await Review.findByIdAndDelete(reviewId);
@@ -99,7 +99,7 @@ export class ReviewService {
   async toggleLike(reviewId: string, userId: string) {
     const review = await Review.findById(reviewId);
     if (!review) {
-      throw new Error('The review with the given ID was not found.');
+      throw new HttpError(404, 'The review with the given ID was not found.', 'REVIEW_NOT_FOUND');
     }
 
     const hasLiked = review.likes.includes(userId);
@@ -115,15 +115,15 @@ export class ReviewService {
   async flagReview(reviewId: string, userId: string) {
     const review = await Review.findById(reviewId);
     if (!review) {
-      throw new Error('The review with the given ID was not found.');
+      throw new HttpError(404, 'The review with the given ID was not found.', 'REVIEW_NOT_FOUND');
     }
 
     if (review.userId === userId) {
-      throw new Error('You cannot report your own review.');
+      throw new HttpError(400, 'You cannot report your own review.', 'CANNOT_REPORT_OWN_REVIEW');
     }
 
     if (review.flaggedBy.includes(userId)) {
-      throw new Error('You have already reported this review.');
+      throw new HttpError(409, 'You have already reported this review.', 'REVIEW_ALREADY_REPORTED');
     }
 
     await Review.findByIdAndUpdate(reviewId, {
@@ -135,7 +135,7 @@ export class ReviewService {
   async unflagReview(reviewId: string) {
     const review = await Review.findById(reviewId);
     if (!review) {
-      throw new Error('The review with the given ID was not found.');
+      throw new HttpError(404, 'The review with the given ID was not found.', 'REVIEW_NOT_FOUND');
     }
 
     await Review.findByIdAndUpdate(reviewId, {

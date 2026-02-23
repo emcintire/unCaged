@@ -1,4 +1,5 @@
 export * from './constants';
+export { getTokenFromRequest } from './authHeader';
 export { createAuthLimiter } from './authLimiter';
 export { createRefreshTokenValue, hashRefreshToken, refreshExpiryDate, signAccessToken } from './authToken';
 export { escapeRegex } from './escapeRegex';
@@ -6,4 +7,6 @@ export { getIdFromToken } from './getIdFromToken';
 export { getRequiredEnv } from './getRequiredEnv';
 export { getUserIdFromRequest } from './getUserIdFromRequest';
 export { hashInput } from './hashInput';
+export { HttpError, isHttpError } from './httpError';
+export { logger } from './logger';
 export { validateSchema } from './validateSchema';

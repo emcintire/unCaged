@@ -1,62 +1,86 @@
 import { AuthService } from 'auth/auth.service';
-import { LoginDto } from 'auth/types';
-import type { Request, Response } from 'express';
-import { AuthenticatedRequest } from '@/types';
-
-const authService = new AuthService();
+import type { NextFunction, Request, Response } from 'express';
+import type { AuthenticatedRequest } from '@/types';
+import type { LoginDto } from './schemas';
 
 export class AuthController {
-  async login(req: Request<unknown, unknown, LoginDto>, res: Response) {
+  private readonly authService = new AuthService();
+
+  login = async (
+    req: Request<unknown, unknown, LoginDto>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const tokenData = await authService.login(req.body);
+      const tokenData = await this.authService.login(req.body);
       res.send(tokenData);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async logout(req: AuthenticatedRequest<{ refreshToken: string }>, res: Response) {
+  logout = async (
+    req: AuthenticatedRequest<{ refreshToken: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await authService.logout(req.body.refreshToken);
+      await this.authService.logout(req.body.refreshToken);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async refresh(req: Request<unknown, unknown, { refreshToken: string }>, res: Response) {
+  refresh = async (
+    req: Request<unknown, unknown, { refreshToken: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const tokenData = await authService.refresh(req.body.refreshToken);
+      const tokenData = await this.authService.refresh(req.body.refreshToken);
       res.send(tokenData);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async forgotPassword(req: Request<unknown, unknown, { email: string }>, res: Response) {
+  forgotPassword = async (
+    req: Request<unknown, unknown, { email: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await authService.forgotPassword(req.body.email);
+      await this.authService.forgotPassword(req.body.email);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async checkResetCode(req: Request<unknown, unknown, { email: string; code: string }>, res: Response) {
+  checkResetCode = async (
+    req: Request<unknown, unknown, { email: string; code: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await authService.checkResetCode(req.body.email, req.body.code);
+      await this.authService.checkResetCode(req.body.email, req.body.code);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
   
-  async resetPassword(req: Request<unknown, unknown, { code: string; email: string; newPassword: string; }>, res: Response) {
+  resetPassword = async (
+    req: Request<unknown, unknown, { code: string; email: string; newPassword: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await authService.resetPassword(req.body.email, req.body.code, req.body.newPassword);
+      await this.authService.resetPassword(req.body.email, req.body.code, req.body.newPassword);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 }

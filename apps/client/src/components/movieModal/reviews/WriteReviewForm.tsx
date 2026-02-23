@@ -3,7 +3,7 @@ import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'rea
 import { useCreateReview, useRateMovie } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
-import { logger, showErrorToast } from '@/utils';
+import { showErrorToast } from '@/utils';
 
 type Props = {
   movieId: string;
@@ -49,8 +49,7 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
       setRating(null);
       setIsSpoiler(false);
       onSuccess();
-    } catch (error) {
-      logger.error('Failed to submit review:', error);
+    } catch {
       showErrorToast('Failed to submit review. Please try again.');
     }
   };

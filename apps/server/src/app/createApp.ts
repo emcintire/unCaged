@@ -16,10 +16,10 @@ const swaggerOptions: swaggerJSDoc.Options = {
     servers: [{ url: `http://localhost:${Number(process.env.PORT) || 3000}` }],
     components: {
       securitySchemes: {
-        xAuthToken: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'x-auth-token',
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
         },
       },
     },

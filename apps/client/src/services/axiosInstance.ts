@@ -50,7 +50,7 @@ export const AXIOS_INSTANCE = Axios.create({
 });
 
 /**
- * Request interceptor: attach access token via x-auth-token
+ * Request interceptor: attach access token via Authorization Bearer token
  */
 AXIOS_INSTANCE.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const cfg = config as AuthRequestConfig;
@@ -61,7 +61,7 @@ AXIOS_INSTANCE.interceptors.request.use(async (config: InternalAxiosRequestConfi
   if (token) {
     // Axios v1 headers can be AxiosHeaders; safest is to treat as unknown and assign.
     cfg.headers = cfg.headers ?? ({} as any);
-    (cfg.headers as any)['x-auth-token'] = token;
+    (cfg.headers as any).Authorization = `Bearer ${token}`;
   }
 
   return cfg;
@@ -77,7 +77,7 @@ const refreshTokens = async (): Promise<RefreshResponse> => {
   const refreshToken = await getRefreshToken();
   if (!refreshToken) throw new Error('Missing refresh token');
 
-  // skipAuth: don't attach x-auth-token on refresh
+  // skipAuth: don't attach Authorization header on refresh
   // skipRefresh: don't attempt refresh again if refresh itself 401s
   const res = await AXIOS_INSTANCE.post<RefreshResponse>(
     '/api/auth/refresh',
@@ -144,7 +144,7 @@ AXIOS_INSTANCE.interceptors.response.use(
 
         // Retry original request with fresh access token
         cfg.headers = cfg.headers ?? ({} as any);
-        (cfg.headers as any)['x-auth-token'] = refreshed.accessToken;
+        (cfg.headers as any).Authorization = `Bearer ${refreshed.accessToken}`;
 
         return AXIOS_INSTANCE.request(cfg);
       } catch (refreshErr) {

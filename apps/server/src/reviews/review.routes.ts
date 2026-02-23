@@ -121,7 +121,7 @@ const controller = new ReviewController();
  *     operationId: createReview
  *     tags: [Reviews]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -153,7 +153,7 @@ reviewRouter.post('/', auth, controller.createReview);
  *     operationId: getAdminReviews
  *     tags: [Reviews]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -193,7 +193,7 @@ reviewRouter.get('/admin', auth, admin, controller.getAllReviewsAdmin);
  *     operationId: deleteReview
  *     tags: [Reviews]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: reviewId
@@ -214,7 +214,7 @@ reviewRouter.delete('/:reviewId', auth, controller.deleteReview);
  *     operationId: toggleReviewLike
  *     tags: [Reviews]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: reviewId
@@ -242,7 +242,7 @@ reviewRouter.put('/:reviewId/like', auth, controller.toggleLike);
  *     operationId: flagReview
  *     tags: [Reviews]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: reviewId
@@ -263,7 +263,7 @@ reviewRouter.post('/:reviewId/report', auth, controller.flagReview);
  *     operationId: unflagReview
  *     tags: [Reviews]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: reviewId

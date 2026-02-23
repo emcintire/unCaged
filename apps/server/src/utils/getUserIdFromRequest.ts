@@ -1,6 +1,6 @@
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '@/types';
-import { getIdFromToken } from '@/utils';
+import { getIdFromToken, getTokenFromRequest } from '@/utils';
 
 /**
  * Extract user ID from authentication token
@@ -10,7 +10,7 @@ export const getUserIdFromRequest = (
   req: AuthenticatedRequest,
   res: Response
 ): string | null => {
-  const token = req.header('x-auth-token');
+  const token = getTokenFromRequest(req);
   if (!token) {
     res.status(401).send('No token provided');
     return null;

@@ -1,14 +1,14 @@
 import jwt from 'jsonwebtoken';
 import type { Response, NextFunction } from 'express';
 import type { AuthenticatedRequest } from '@/types';
-import { getRequiredEnv } from '@/utils';
+import { getRequiredEnv, getTokenFromRequest } from '@/utils';
 
 export const auth = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.header('x-auth-token');
+  const token = getTokenFromRequest(req);
   if (!token) {
     res.status(401).send('No token provided...');
     return;

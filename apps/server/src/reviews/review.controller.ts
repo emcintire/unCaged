@@ -1,22 +1,26 @@
-import type { Response, Request } from 'express';
-import { getIdFromToken } from '@/utils';
+import type { NextFunction, Response, Request } from 'express';
+import { getIdFromToken, getTokenFromRequest, HttpError } from '@/utils';
 import type { AuthenticatedRequest } from '@/types';
 import { ReviewService, type SortOption } from './review.service';
 import type { CreateReviewDto } from './schemas';
 
-const reviewService = new ReviewService();
-
 export class ReviewController {
-  async getReviewsByMovie(req: Request, res: Response) {
+  private readonly reviewService = new ReviewService();
+
+  getReviewsByMovie = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const movieId = req.query.movieId as string;
+      if (!movieId) {
+        throw new HttpError(400, 'movieId query parameter is required', 'MOVIE_ID_REQUIRED');
+      }
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const sort = (req.query.sort as SortOption) || 'recent';
 
       // Optionally extract userId from token without hard-requiring auth
       let currentUserId: string | undefined;
-      const token = req.header('x-auth-token');
+      const token = getTokenFromRequest(req);
       if (token) {
         try {
           currentUserId = getIdFromToken(token);
@@ -25,7 +29,7 @@ export class ReviewController {
         }
       }
 
-      const result = await reviewService.getReviewsByMovie(movieId, {
+      const result = await this.reviewService.getReviewsByMovie(movieId, {
         page,
         limit,
         sort,
@@ -33,60 +37,76 @@ export class ReviewController {
       });
       res.status(200).send(result);
     } catch (error) {
-      res.status(500).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async createReview(req: AuthenticatedRequest<CreateReviewDto>, res: Response) {
+  createReview = async (
+    req: AuthenticatedRequest<CreateReviewDto>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const review = await reviewService.createReview(req.user!.sub, req.body);
+      const review = await this.reviewService.createReview(req.user!.sub, req.body);
       res.status(201).send(review);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async deleteReview(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
+  deleteReview = async (
+    req: AuthenticatedRequest<unknown, { reviewId: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
+      await this.reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
       res.sendStatus(200);
     } catch (error) {
-      if (error instanceof Error && error.message === 'Not authorized to delete this review.') {
-        res.status(403).send(error.message);
-        return;
-      }
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async toggleLike(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
+  toggleLike = async (
+    req: AuthenticatedRequest<unknown, { reviewId: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const result = await reviewService.toggleLike(req.params.reviewId, req.user!.sub);
+      const result = await this.reviewService.toggleLike(req.params.reviewId, req.user!.sub);
       res.status(200).send(result);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async flagReview(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
+  flagReview = async (
+    req: AuthenticatedRequest<unknown, { reviewId: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await reviewService.flagReview(req.params.reviewId, req.user!.sub);
+      await this.reviewService.flagReview(req.params.reviewId, req.user!.sub);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async unflagReview(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
+  unflagReview = async (
+    req: AuthenticatedRequest<unknown, { reviewId: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await reviewService.unflagReview(req.params.reviewId);
+      await this.reviewService.unflagReview(req.params.reviewId);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async getAllReviewsAdmin(req: Request, res: Response) {
+  getAllReviewsAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
@@ -94,19 +114,29 @@ export class ReviewController {
       const userEmail = req.query.userEmail as string | undefined;
       const movieTitle = req.query.movieTitle as string | undefined;
 
-      const result = await reviewService.getAllReviewsAdmin({ page, limit, flaggedOnly, userEmail, movieTitle });
+      const result = await this.reviewService.getAllReviewsAdmin({
+        page,
+        limit,
+        flaggedOnly,
+        userEmail,
+        movieTitle,
+      });
       res.status(200).send(result);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async deleteReviewAdmin(req: AuthenticatedRequest<unknown, { reviewId: string }>, res: Response) {
+  deleteReviewAdmin = async (
+    req: AuthenticatedRequest<unknown, { reviewId: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
+      await this.reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 }

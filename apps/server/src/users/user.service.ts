@@ -5,13 +5,21 @@ import {
   createRefreshTokenValue,
   hashInput,
   hashRefreshToken,
+  HttpError,
   refreshExpiryDate,
   signAccessToken,
   validateSchema,
 } from '@/utils';
 import { Movie } from '@/movies';
-import { CreateUserDto, createUserDtoSchema, UpdateUserDto, updateUserDtoSchema, RateMovieDto, rateMovieDtoSchema } from './schemas';
 import { User } from './user.model';
+import {
+  type CreateUserDto,
+  createUserDtoSchema,
+  type RateMovieDto,
+  rateMovieDtoSchema,
+  type UpdateUserDto,
+  updateUserDtoSchema,
+} from './schemas';
 
 type UserCollectionField = 'favorites' | 'seen' | 'watchlist';
 type MovieCounterField = 'favoriteCount' | 'seenCount';
@@ -20,7 +28,7 @@ export class UserService {
   private async ensureUserExists(userId: string) {
     const exists = await User.findById(userId);
     if (!exists) {
-      throw new Error('The user with the given ID was not found.');
+      throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
     }
   }
 
@@ -32,7 +40,7 @@ export class UserService {
 
     const movie = await movieQuery;
     if (!movie) {
-      throw new Error('The movie with the given ID was not found.');
+      throw new HttpError(404, 'The movie with the given ID was not found.', 'MOVIE_NOT_FOUND');
     }
 
     movie.avgRating = movie.ratingCount > 0
@@ -92,7 +100,7 @@ export class UserService {
       .select('_id email favorites img isAdmin name ratings seen watchlist')
       .lean();
     if (!user) {
-      throw new Error('The user with the given ID was not found.');
+      throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
     }
     return user;
   }
@@ -103,7 +111,11 @@ export class UserService {
     const email = dto.email.trim();
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      throw new Error('There is already an account associated with this email.');
+      throw new HttpError(
+        409,
+        'There is already an account associated with this email.',
+        'EMAIL_ALREADY_REGISTERED'
+      );
     }
 
     const hashedPassword = await hashInput(dto.password);
@@ -135,7 +147,7 @@ export class UserService {
 
     const user = await User.findByIdAndUpdate(userId, { $set: dto });
     if (!user) {
-      throw new Error('The user with the given ID was not found.');
+      throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
     }
   }
 
@@ -144,12 +156,12 @@ export class UserService {
 
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('The user with the given ID was not found.');
+      throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
     }
 
     const validPassword = await bcrypt.compare(dto.currentPassword!, user.password);
     if (!validPassword) {
-      throw new Error('Invalid password');
+      throw new HttpError(401, 'Invalid password', 'INVALID_PASSWORD');
     }
 
     const newPassword = await hashInput(dto.password!);
@@ -160,7 +172,7 @@ export class UserService {
   async deleteUser(userId: string) {
     const user = await User.findByIdAndDelete(userId);
     if (!user) {
-      throw new Error('The user with the given ID was not found.');
+      throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
     }
   }
 
@@ -197,7 +209,7 @@ export class UserService {
       await session.withTransaction(async () => {
         const user = await User.findById(userId).session(session);
         if (!user) {
-          throw new Error('The user with the given ID was not found.');
+          throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
         }
 
         const existingRating = user.ratings.find((r) => String(r.movie) === String(dto.id));
@@ -242,12 +254,12 @@ export class UserService {
       await session.withTransaction(async () => {
         const user = await User.findById(userId).session(session);
         if (!user) {
-          throw new Error('The user with the given ID was not found.');
+          throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
         }
 
         const existingRating = user.ratings.find((r) => String(r.movie) === String(movieId));
         if (!existingRating) {
-          throw new Error('The rating with the given ID was not found.');
+          throw new HttpError(404, 'The rating with the given ID was not found.', 'RATING_NOT_FOUND');
         }
 
         await User.findByIdAndUpdate(
@@ -263,7 +275,7 @@ export class UserService {
         );
 
         if (!movie) {
-          throw new Error('The movie with the given ID was not found.');
+          throw new HttpError(404, 'The movie with the given ID was not found.', 'MOVIE_NOT_FOUND');
         }
 
         await this.recalculateMovieAverage(movieId, session);

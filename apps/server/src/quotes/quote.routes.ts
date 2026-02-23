@@ -38,7 +38,7 @@ const controller = new QuoteController();
  *     operationId: addQuote
  *     tags: [Quotes]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

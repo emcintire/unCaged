@@ -2,6 +2,7 @@ import { Component } from 'react';
 import type { ErrorInfo, PropsWithChildren } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, fontFamily, fontSize, spacing } from '@/config';
+import { logger } from '@/utils';
 import AppButton from './AppButton';
 
 type State = {
@@ -16,9 +17,7 @@ export default class ErrorBoundary extends Component<PropsWithChildren, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    if (__DEV__) {
-      console.error('ErrorBoundary caught:', error, info.componentStack);
-    }
+    logger.error('ErrorBoundary caught:', error, info.componentStack);
   }
 
   handleReset = () => {

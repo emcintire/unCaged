@@ -1,3 +1,4 @@
+import type { ErrorInfo } from 'react';
 import { env } from '@/config';
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
@@ -44,7 +45,7 @@ class Logger {
     }
   }
 
-  error(message: string, error?: Error | unknown, options?: Omit<LogOptions, 'level'>): void {
+  error(message: string, error?: Error | unknown, info?: ErrorInfo | unknown, options?: Omit<LogOptions, 'level'>): void {
     if (this.shouldLog('error')) {
       console.error(this.formatMessage(message, options));
       if (error instanceof Error) {
@@ -52,6 +53,9 @@ class Logger {
         console.error('Stack:', error.stack);
       } else if (error) {
         console.error('Error:', error);
+      }
+      if (info) {
+        console.error('Info:', info);
       }
       if (options?.data) {
         console.error('Data:', options.data);

@@ -72,7 +72,7 @@ const controller = new UserController();
  *     operationId: getCurrentUser
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     responses:
  *       '200':
  *         description: Current user
@@ -111,7 +111,7 @@ const controller = new UserController();
  *     operationId: updateUser
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -134,7 +134,7 @@ const controller = new UserController();
  *     operationId: deleteUser
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -162,7 +162,7 @@ userRouter.delete('/', auth, controller.deleteUser);
  *     operationId: changePassword
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -189,7 +189,7 @@ userRouter.put('/changePassword', auth, controller.changePassword);
  *     operationId: addToFavorites
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -208,7 +208,7 @@ userRouter.put('/changePassword', auth, controller.changePassword);
  *     operationId: removeFromFavorites
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -234,7 +234,7 @@ userRouter.delete('/favorites', auth, controller.removeFavorite);
  *     operationId: addToSeen
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -253,7 +253,7 @@ userRouter.delete('/favorites', auth, controller.removeFavorite);
  *     operationId: removeFromSeen
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -279,7 +279,7 @@ userRouter.delete('/seen', auth, controller.removeFromSeen);
  *     operationId: addToWatchlist
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -298,7 +298,7 @@ userRouter.delete('/seen', auth, controller.removeFromSeen);
  *     operationId: removeFromWatchlist
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -324,7 +324,7 @@ userRouter.delete('/watchlist', auth, controller.removeFromWatchlist);
  *     operationId: rateMovie
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -345,7 +345,7 @@ userRouter.delete('/watchlist', auth, controller.removeFromWatchlist);
  *     operationId: deleteRating
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -371,7 +371,7 @@ userRouter.delete('/rate', auth, controller.deleteRating);
  *     operationId: getMyReviews
  *     tags: [Users]
  *     security:
- *       - xAuthToken: []
+ *       - bearerAuth: []
  *     responses:
  *       '200':
  *         description: User reviews with movie info

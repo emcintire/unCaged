@@ -6,12 +6,13 @@ import {
   getRequiredEnv,
   hashInput,
   hashRefreshToken,
+  HttpError,
   refreshExpiryDate,
   signAccessToken,
   validateSchema,
 } from '@/utils';
 import { RefreshToken } from './refreshToken.model';
-import { LoginDto, loginSchema } from '@/auth';
+import { type LoginDto, loginDtoSchema } from './schemas';
 
 const getMailConfig = () => {
   const user = getRequiredEnv('EMAIL_USERNAME');
@@ -27,16 +28,16 @@ const getMailConfig = () => {
 
 export class AuthService {
   async login(dto: LoginDto) {
-    validateSchema(loginSchema, dto);
+    validateSchema(loginDtoSchema, dto);
 
     const user = await User.findOne({ email: dto.email });
     if (!user) {
-      throw new Error('Invalid email or password');
+      throw new HttpError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
     const validPassword = await bcrypt.compare(dto.password, user.password);
     if (!validPassword) {
-      throw new Error('Invalid email or password');
+      throw new HttpError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
     const accessToken = signAccessToken({ sub: String(user._id), isAdmin: user.isAdmin });
@@ -73,7 +74,7 @@ export class AuthService {
 
   async refresh(refreshTokenValue: string) {
     if (!refreshTokenValue) {
-      throw new Error('Refresh token required');
+      throw new HttpError(400, 'Refresh token required', 'REFRESH_TOKEN_REQUIRED');
     }
 
     const incomingHash = hashRefreshToken(refreshTokenValue);
@@ -85,12 +86,12 @@ export class AuthService {
     });
 
     if (!existing) {
-      throw new Error('Invalid or expired refresh token');
+      throw new HttpError(401, 'Invalid or expired refresh token', 'INVALID_REFRESH_TOKEN');
     }
 
     const user = await User.findById(existing.userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpError(404, 'User not found', 'USER_NOT_FOUND');
     }
 
     const newRefreshToken = createRefreshTokenValue();
@@ -118,7 +119,7 @@ export class AuthService {
   async forgotPassword(email: string) {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('No user with that email address');
+      throw new HttpError(404, 'No user with that email address', 'USER_NOT_FOUND');
     }
 
     const randomNum = Math.floor(100000 + Math.random() * 900000).toString();
@@ -157,39 +158,43 @@ export class AuthService {
       await transporter.sendMail(mailOptions);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown mail error';
-      throw new Error(`Failed to send password reset email: ${message}`);
+      throw new HttpError(
+        502,
+        `Failed to send password reset email: ${message}`,
+        'EMAIL_DELIVERY_FAILED'
+      );
     }
   }
 
   async checkResetCode(email: string, code: string) {
     const user = await User.findOne({ email });
     if (!user || !user.resetCode) {
-      throw new Error('Invalid Code');
+      throw new HttpError(400, 'Invalid Code', 'INVALID_RESET_CODE');
     }
 
     if (user.resetCodeExpiry && user.resetCodeExpiry < new Date()) {
-      throw new Error('Reset code has expired');
+      throw new HttpError(400, 'Reset code has expired', 'EXPIRED_RESET_CODE');
     }
 
     const validCode = await bcrypt.compare(code, user.resetCode);
     if (!validCode) {
-      throw new Error('Invalid Code');
+      throw new HttpError(400, 'Invalid Code', 'INVALID_RESET_CODE');
     }
   }
 
   async resetPassword(email: string, code: string, newPassword: string) {
     const user = await User.findOne({ email });
     if (!user || !user.resetCode) {
-      throw new Error('Invalid Code');
+      throw new HttpError(400, 'Invalid Code', 'INVALID_RESET_CODE');
     }
 
     if (user.resetCodeExpiry && user.resetCodeExpiry < new Date()) {
-      throw new Error('Reset code has expired');
+      throw new HttpError(400, 'Reset code has expired', 'EXPIRED_RESET_CODE');
     }
 
     const validCode = await bcrypt.compare(code, user.resetCode);
     if (!validCode) {
-      throw new Error('Invalid Code');
+      throw new HttpError(400, 'Invalid Code', 'INVALID_RESET_CODE');
     }
 
     const hashedPassword = await hashInput(newPassword);

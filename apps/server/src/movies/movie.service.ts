@@ -1,5 +1,5 @@
 import { User } from '@/users';
-import { validateSchema } from '@/utils';
+import { HttpError, validateSchema } from '@/utils';
 import { Movie } from './movie.model';
 import { movieSchema } from './movie.schema';
 import type { CreateMovieDto } from './schemas';
@@ -12,7 +12,7 @@ export class MovieService {
   async findMovieById(id: string) {
     const movie = await Movie.findById(id);
     if (!movie) {
-      throw new Error('The movie with the given ID was not found.');
+      throw new HttpError(404, 'The movie with the given ID was not found.', 'MOVIE_NOT_FOUND');
     }
     return movie;
   }
@@ -22,7 +22,7 @@ export class MovieService {
 
     const movieAlreadyExists = await Movie.exists({ title: dto.title });
     if (movieAlreadyExists) {
-      throw new Error('Movie already registered');
+      throw new HttpError(409, 'Movie already registered', 'MOVIE_ALREADY_EXISTS');
     }
 
     const movie = new Movie({
@@ -56,7 +56,7 @@ export class MovieService {
   async getStaffPicks() {
     const admin = await User.findOne({ isAdmin: true });
     if (!admin) {
-      throw new Error('No admin user found.');
+      throw new HttpError(500, 'No admin user found.', 'ADMIN_USER_NOT_FOUND');
     }
     return await Movie.find({ _id: { $in: admin.favorites } }).sort({ title: 1 });
   }

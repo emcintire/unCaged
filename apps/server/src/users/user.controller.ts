@@ -1,132 +1,188 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { AuthenticatedRequest } from '@/types';
 import { Review } from '@/reviews';
 import { Movie } from '@/movies';
-import { UserService } from './user.service';
 import { User } from './user.model';
-import { CreateUserDto, RateMovieDto, UpdateUserDto } from './schemas';
-
-const userService = new UserService();
+import { UserService } from './user.service';
+import type { CreateUserDto, RateMovieDto, UpdateUserDto } from './schemas';
 
 export class UserController {
-  async getCurrentUser(req: AuthenticatedRequest, res: Response) {
+  private readonly userService = new UserService();
+
+  getCurrentUser = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const user = await userService.getUserById(req.user!.sub);
+      const user = await this.userService.getUserById(req.user!.sub);
       res.status(200).send(user);
     } catch (error) {
-      res.status(401).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async createUser(req: Request<unknown, unknown, CreateUserDto>, res: Response) {
+  createUser = async (
+    req: Request<unknown, unknown, CreateUserDto>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const tokenData = await userService.registerUser(req.body);
-      res.send(tokenData);
+      const tokenData = await this.userService.registerUser(req.body);
+      res.status(201).send(tokenData);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async updateUser(req: AuthenticatedRequest<UpdateUserDto>, res: Response) {
+  updateUser = async (
+    req: AuthenticatedRequest<UpdateUserDto>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.updateUser(req.user!.sub, req.body);
+      await this.userService.updateUser(req.user!.sub, req.body);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async changePassword(req: AuthenticatedRequest<UpdateUserDto>, res: Response) {
+  changePassword = async (
+    req: AuthenticatedRequest<UpdateUserDto>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.changePassword(req.user!.sub, req.body);
+      await this.userService.changePassword(req.user!.sub, req.body);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async deleteUser(req: AuthenticatedRequest, res: Response) {
+  deleteUser = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      await userService.deleteUser(req.user!.sub);
+      await this.userService.deleteUser(req.user!.sub);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async addFavorite(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  addFavorite = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.addFavorite(req.user!.sub, req.body.id);
+      await this.userService.addFavorite(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async removeFavorite(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  removeFavorite = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.removeFavorite(req.user!.sub, req.body.id);
+      await this.userService.removeFavorite(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async markAsSeen(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  markAsSeen = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.markAsSeen(req.user!.sub, req.body.id);
+      await this.userService.markAsSeen(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async removeFromSeen(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  removeFromSeen = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.removeFromSeen(req.user!.sub, req.body.id);
+      await this.userService.removeFromSeen(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async addToWatchlist(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  addToWatchlist = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.addToWatchlist(req.user!.sub, req.body.id);
+      await this.userService.addToWatchlist(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async removeFromWatchlist(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  removeFromWatchlist = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.removeFromWatchlist(req.user!.sub, req.body.id);
+      await this.userService.removeFromWatchlist(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async rateMovie(req: AuthenticatedRequest<RateMovieDto>, res: Response) {
+  rateMovie = async (
+    req: AuthenticatedRequest<RateMovieDto>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.rateMovie(req.user!.sub, req.body);
+      await this.userService.rateMovie(req.user!.sub, req.body);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async deleteRating(req: AuthenticatedRequest<{ id: string }>, res: Response) {
+  deleteRating = async (
+    req: AuthenticatedRequest<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      await userService.deleteRating(req.user!.sub, req.body.id);
+      await this.userService.deleteRating(req.user!.sub, req.body.id);
       res.sendStatus(200);
     } catch (error) {
-      res.status(400).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 
-  async getUserReviews(req: AuthenticatedRequest, res: Response) {
+  getUserReviews = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const userId = req.user!.sub;
 
@@ -161,7 +217,7 @@ export class UserController {
 
       res.status(200).send(result);
     } catch (error) {
-      res.status(500).send(error instanceof Error ? error.message : 'An error occurred');
+      next(error);
     }
-  }
+  };
 }
