@@ -14,6 +14,7 @@ import { colors, toastConfig, layout } from '@/config';
 import { AuthProvider, useAuth } from '@/hooks';
 import WelcomeStack from '@/navigation/stacks/Welcome/WelcomeStack';
 import HomeStack from '@/navigation/stacks/Home/HomeStack';
+import { logger } from '@/utils';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +31,7 @@ const loadFonts = async (): Promise<boolean> => {
     });
     return true;
   } catch (error) {
+    logger.error('Error loading fonts', error);
     return false;
   }
 };

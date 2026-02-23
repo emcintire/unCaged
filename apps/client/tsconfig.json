@@ -28,6 +28,7 @@
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "types": ["jest"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],

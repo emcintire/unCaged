@@ -74,10 +74,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
   },
-  scrollContainer: {
-    height: '100%',
-    width: '100%',
-  },
   formContainer: form.container,
   submitButton: form.submitButton,
   currentPasswordContainer: {

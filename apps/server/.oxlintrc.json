@@ -1,0 +1,33 @@
+{
+  "ignorePatterns": [
+    "dist/**",
+    "coverage/**"
+  ],
+  "rules": {
+    "typescript": "error",
+    "eslint": "error",
+
+    "eslint/default-case": "off",
+    "eslint/no-console": ["warn", { "allow": ["warn", "error"] }],
+    "eslint/eqeqeq": ["error", "smart"],
+    "eslint/max-depth": ["error", { "max": 4 }],
+    "eslint/max-lines-per-function": ["warn", { "max": 500 }],
+    "eslint/max-nested-callbacks": ["error", { "max": 3 }],
+    "eslint/max-params": ["error", { "max": 15 }],
+    "eslint/no-magic-numbers": "off",
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+
+    "typescript/ban-ts-comment": "warn",
+    "typescript/consistent-indexed-object-style": ["error", "record"],
+    "typescript/consistent-type-definitions": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-unused-vars": "error"
+  },
+  "env": {
+    "node": true,
+    "es2021": true
+  }
+}

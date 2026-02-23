@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { Image } from 'expo-image';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -21,24 +21,18 @@ type Props = {
 };
 
 export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props) {
-  const [movie, setMovie] = useState<Movie | null>(propsMovie);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [loadedMovieId, setLoadedMovieId] = useState<string | null>(null);
 
   const { isAuthenticated } = useAuth();
   const { data: rating, isLoading } = useGetAverageRating(propsMovie?._id || '');
 
   const movieRating = rating ? Number(rating) : 0;
+  const imageLoaded = loadedMovieId === propsMovie?._id;
 
-  useEffect(() => {
-    if (!isOpen || propsMovie == null) { return; }
-
-    setImageLoaded(false);
-    const parsedMovie = {
-      ...(propsMovie.img.length === 32 ? changeResolution('h', propsMovie) : propsMovie),
-    };
-
-    setMovie(parsedMovie);
-  }, [propsMovie, isOpen]);
+  const movie = useMemo(() => {
+    if (propsMovie == null) return null;
+    return propsMovie.img.length === 32 ? changeResolution('h', propsMovie) : propsMovie;
+  }, [propsMovie]);
 
   if (!isOpen) { return null; }
 
@@ -67,7 +61,7 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
                   <Icon name="close" size={50} backgroundColor="transparent" iconColor={colors.white} />
                 </TouchableOpacity>
               </View>
-              <Image source={movie.img} style={styles.image} accessibilityLabel={`${movie.title} poster`} onLoadEnd={() => setImageLoaded(true)} />
+              <Image source={movie.img} style={styles.image} accessibilityLabel={`${movie.title} poster`} onLoadEnd={() => setLoadedMovieId(movie._id)} />
               <View style={styles.titleContainer}>
                 <Text style={styles.title}>{movie.title}</Text>
                 <View style={styles.subtitle}>
@@ -145,13 +139,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.medium,
     fontSize: fontSize.lg,
     textAlign: 'left',
-  },
-  adContainerTop: {
-    position: 'absolute',
-    width: '100%',
-    height: 'auto',
-    left: 0,
-    top: 0,
   },
   skeletonOverlay: {
     ...StyleSheet.absoluteFillObject,

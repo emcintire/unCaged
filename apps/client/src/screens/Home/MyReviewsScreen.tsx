@@ -89,7 +89,7 @@ export default function MyReviewsScreen() {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View style={styles.sortRow}>
-            {(['recent', 'popular'] as SortMode[]).map((mode) => (
+            {(['recent', 'popular'] as Array<SortMode>).map((mode) => (
               <TouchableOpacity
                 key={mode}
                 style={[styles.chip, sort === mode && styles.chipActive]}
@@ -105,7 +105,7 @@ export default function MyReviewsScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="pencil-off-outline" size={48} color={colors.medium} />
-            <Text style={styles.emptyText}>You haven't written any reviews yet.</Text>
+            <Text style={styles.emptyText}>You haven&apos;t written any reviews yet.</Text>
           </View>
         }
       />

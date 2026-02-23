@@ -3,7 +3,7 @@ import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { type Movie, useGetCurrentUser, useGetAllMovies, getGetCurrentUserQueryKey } from '@/services';
 import { useAuth, useDebounce } from '@/hooks';
-import { colors, spacing, borderRadius, fontSize, fontFamily, movieCard } from '@/config';
+import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/config';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
 import Screen from '@/components/Screen';
@@ -32,15 +32,6 @@ const styles = StyleSheet.create({
     color: 'black',
     height: 40,
     width: '80%',
-  },
-  noResults: {
-    color: 'white',
-    fontFamily: fontFamily.bold,
-    fontSize: fontSize.xxxl,
-  },
-  noResultsContainer: {
-    ...movieCard.scrollContainer,
-    flex: 1,
   },
   filtersBtn: {
     alignSelf: 'flex-end',

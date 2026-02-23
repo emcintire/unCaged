@@ -13,6 +13,8 @@
     "dev": "start cmd /k npm run dev:server && npm run dev:client",
     "dev:server": "npm run dev -w uncaged-server",
     "dev:client": "npm run dev -w uncaged-client",
+    "lint:client": "npm run lint -w uncaged-client",
+    "lint:server": "npm run lint -w uncaged-server",
     "test:server": "npm test -w uncaged-server",
     "build": "npm run build -w uncaged-server",
     "start": "npm start -w uncaged-server",

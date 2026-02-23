@@ -1,4 +1,7 @@
 {
+  "ignorePatterns": [
+    "src/services/generated/**"
+  ],
   "rules": {
     "typescript": "error",
     "react": "warn",
@@ -11,7 +14,7 @@
     "eslint/eqeqeq": ["error", "smart"],
     "eslint/max-depth": ["error", { "max": 4 }],
     "eslint/max-lines": ["warn", { "max": 500 }],
-    "eslint/max-lines-per-function": ["error", { "max": 500 }],
+    "eslint/max-lines-per-function": ["warn", { "max": 500 }],
     "eslint/max-nested-callbacks": ["error", { "max": 3 }],
     "eslint/max-params": ["error", { "max": 15 }],
     "eslint/max-len": ["error", { "code": 116, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true }],
@@ -43,6 +46,7 @@
     "oxc/no-rest-spread-properties": "off",
     "promise/catch-or-return": "warn",
     "react/exhaustive-deps": "warn",
+    "react-hooks/set-state-in-effect": "off",
     "react/jsx-filename-extension": [
       "error",
       {
@@ -52,7 +56,10 @@
     ],
     "react/jsx-handler-names": "off",
     "react/no-set-state": "off",
+    "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "eslint/no-console": ["warn", { "allow": ["warn", "error"] }],
     "typescript/array-type": ["error", { "default": "generic", "readonly": "generic" }],
     "typescript/ban-ts-comment": "warn",
     "typescript/consistent-indexed-object-style": ["error", "record"],
@@ -72,7 +79,7 @@
   },
   "settings": {
     "react": {
-      "version": "detect"
+      "version": "19"
     }
   }
 }

@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 
 /**
  * Returns an Animated.Value that pulses between min and max opacity in a loop.
  */
 export function usePulse(min = 0.3, max = 0.7, duration = 800) {
-  const opacity = useRef(new Animated.Value(min)).current;
+  const [opacity] = useState(() => new Animated.Value(min));
 
   useEffect(() => {
     const animation = Animated.loop(

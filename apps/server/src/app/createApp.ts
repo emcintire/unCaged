@@ -36,7 +36,6 @@ const swaggerOptions: swaggerJSDoc.Options = {
 export const createApp = (): Express => {
   const app = express();
   const isDevelopment = process.env.NODE_ENV === 'development';
-  console.log(isDevelopment);
 
   app.use(helmet());
   app.use(requestId);

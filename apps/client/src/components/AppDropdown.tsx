@@ -10,7 +10,7 @@ type Props = {
   buttonStyle?: ViewStyle;
   buttonTextStyle?: TextStyle;
   chevronColor?: string;
-  items: readonly string[];
+  items: ReadonlyArray<string>;
   itemStyle?: ViewStyle;
   itemTextStyle?: TextStyle;
   listStyle?: ViewStyle;

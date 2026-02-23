@@ -5,7 +5,7 @@ import type { Movie, User } from '@/services';
 import { colors, borderRadius, spacing, fontFamily, fontSize } from '@/config';
 
 type Props = {
-  seenMovies: Movie[];
+  seenMovies: Array<Movie>;
   totalMovies: number;
   userRatings: User['ratings'];
   reviewCount: number;
@@ -26,7 +26,7 @@ const formatWatchTime = (totalMinutes: number): string => {
   return `${minutes}m`;
 }
 
-const getTopGenre = (movies: Movie[]): string => {
+const getTopGenre = (movies: Array<Movie>): string => {
   const genreCounts: Record<string, number> = {};
   for (const movie of movies) {
     for (const genre of movie.genres) {

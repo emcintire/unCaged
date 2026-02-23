@@ -21,11 +21,11 @@ export default function AppTextInput({ icon, rightElement, width = '100%', style
   }, [border]);
 
   const handleBlur = useCallback(
-    (e: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
+    (event: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
       border.timeTo(0, { useNativeDriver: false });
-      otherProps.onBlur?.(e);
+      otherProps.onBlur?.(event);
     },
-    [border, otherProps.onBlur],
+    [border, otherProps],
   );
 
   const borderColor = border.value.interpolate({

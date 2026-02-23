@@ -1,12 +1,13 @@
+// oxlint-disable no-console
 import type { ErrorInfo } from 'react';
 import { env } from '@/config';
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 type LogOptions = {
-  level?: LogLevel;
   context?: string;
   data?: unknown;
+  level?: LogLevel;
 };
 
 class Logger {

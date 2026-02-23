@@ -10,9 +10,9 @@ import BuyMeCoffeeButton from './BuyMeCoffeeButton';
 const NUM_COLUMNS = 2;
 
 type Props = {
-  movies: Movie[];
-  favoriteIds?: string[];
-  seenIds?: string[];
+  movies: Array<Movie>;
+  favoriteIds?: Array<string>;
+  seenIds?: Array<string>;
   ListHeaderComponent?: ReactElement | null;
   ListHeaderComponentStyle?: object;
   emptyMessage?: ReactNode;

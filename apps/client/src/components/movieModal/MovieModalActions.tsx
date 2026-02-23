@@ -1,5 +1,5 @@
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
 import { useAuth } from '@/hooks';
 import { colors, fontFamily, fontSize } from '@/config';
@@ -15,10 +15,6 @@ type Props = {
 };
 
 export default function MovieModalActions({ movie }: Props) {
-  const [favorite, setFavorite] = useState(false);
-  const [seen, setSeen] = useState(false);
-  const [watchlist, setWatchlist] = useState(false);
-  const [rating, setRating] = useState(0);
   const [showStars, setShowStars] = useState(false);
 
   const addToSeenMutation = useAddToSeen();
@@ -37,45 +33,36 @@ export default function MovieModalActions({ movie }: Props) {
     },
   });
 
-  useEffect(() => {
-    if (!user) { return; }
-    setFavorite(user.favorites.includes(movie._id));
-    setSeen(user.seen.includes(movie._id));
-    setWatchlist(user.watchlist.includes(movie._id));
-    setRating(user.ratings.find((r) => r.movie === movie._id)?.rating || 0);
-  }, [user, movie]);
+  const favorite = user?.favorites.includes(movie._id) ?? false;
+  const seen = user?.seen.includes(movie._id) ?? false;
+  const watchlist = user?.watchlist.includes(movie._id) ?? false;
+  const rating = user?.ratings.find((r) => r.movie === movie._id)?.rating ?? 0;
 
-  const toggleFavorite = async () => {
+  const toggleFavorite = useCallback(async () => {
     if (favorite) {
       await removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id }});
-      setFavorite(false);
     } else {
       await addToFavoritesMutation.mutateAsync({ data: { id: movie._id }});
-      setFavorite(true);
     }
     refetch();
-  };
+  }, [favorite, movie._id, addToFavoritesMutation, removeFromFavoritesMutation, refetch]);
 
-  const toggleWatchlist = async () => {
+  const toggleWatchlist = useCallback(async () => {
     if (watchlist) {
       await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id }});
-      setWatchlist(false);
     } else {
       await addToWatchlistMutation.mutateAsync({ data: { id: movie._id }});
-      setWatchlist(true);
     }
     refetch();
-  };
+  }, [watchlist, movie._id, addToWatchlistMutation, removeFromWatchlistMutation, refetch]);
 
-  const toggleSeen = async () => {
+  const toggleSeen = useCallback(async () => {
     if (seen) {
       await removeFromSeenMutation.mutateAsync({ data: { id: movie._id }});
       refetch();
-      setSeen(false);
     } else {
       const isFirstSeen = user?.seen.length === 0;
       await addToSeenMutation.mutateAsync({ data: { id: movie._id }});
-      setSeen(true);
 
       if (watchlist) {
         await toggleWatchlist();
@@ -96,7 +83,7 @@ export default function MovieModalActions({ movie }: Props) {
         );
       }
     }
-  };
+  }, [seen, movie, addToSeenMutation, removeFromSeenMutation, refetch, user, watchlist, toggleWatchlist]);
 
   const actions: Array<{
     active: boolean;
@@ -128,7 +115,7 @@ export default function MovieModalActions({ movie }: Props) {
     label: 'Watchlist',
     onPress: toggleWatchlist,
     labelColor: watchlist ? colors.orange : colors.medium,
-  }], [favorite, rating, seen, showStars, watchlist]);
+  }], [seen, rating, favorite, watchlist, toggleSeen, toggleFavorite, toggleWatchlist, showStars]);
 
   return (
     <>
@@ -147,7 +134,7 @@ export default function MovieModalActions({ movie }: Props) {
           </View>
         ))}
       </View>
-      {showStars && <MovieModalRating rating={rating} setRating={setRating} movie={movie} onSeenAdded={() => setSeen(true)} />}
+      {showStars && <MovieModalRating rating={rating} setRating={() => {}} movie={movie} onSeenAdded={() => {}} />}
     </>
   );
 }

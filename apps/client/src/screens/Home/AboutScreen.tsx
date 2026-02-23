@@ -62,17 +62,4 @@ const styles = StyleSheet.create({
     fontSize: fontSize.lg,
     color: colors.white,
   },
-  tagline: {
-    marginTop: spacing.sm,
-    fontFamily: fontFamily.medium,
-    fontSize: fontSize.lg,
-    color: colors.white,
-    alignSelf: 'center',
-  },
-  subTagline: {
-    fontFamily: fontFamily.light,
-    fontSize: fontSize.md,
-    color: colors.white,
-    alignSelf: 'flex-start',
-  },
 });

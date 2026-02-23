@@ -33,7 +33,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (!refreshToken) { return; }
 
     logoutMutation.mutate({ data: { refreshToken } });
-  }, [queryClient]);
+  }, [logoutMutation, queryClient]);
 
   const signIn = useCallback(async (accessToken: string, refreshToken: string) => {
     await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, accessToken);

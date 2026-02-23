@@ -15,7 +15,7 @@ type Props = {
 export default function MovieReviews({ movieId }: Props) {
   const [sort, setSort] = useState<'recent' | 'popular'>('recent');
   const [page, setPage] = useState(1);
-  const [accumulatedReviews, setAccumulatedReviews] = useState<Review[]>([]);
+  const [accumulatedReviews, setAccumulatedReviews] = useState<Array<Review>>([]);
   const [showWriteForm, setShowWriteForm] = useState(false);
 
   const { isAuthenticated } = useAuth();

@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useMemo } from 'react';
+import { Fragment, ReactNode, useCallback, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
@@ -39,7 +39,7 @@ export default function SettingsScreen() {
   const { signOut } = useAuth();
   const { navigate } = useNavigation<NativeStackNavigationProp<SettingsTabParamList>>();
 
-  const deleteAccount = () => {
+  const deleteAccount = useCallback(() => {
     Alert.alert('Are you sure?', 'Nicolas would not be pleased', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -62,9 +62,9 @@ export default function SettingsScreen() {
         },
       },
     ]);
-  };
+  }, [user, deleteUserMutation, signOut]);
 
-  const logOut = () => {
+  const logOut = useCallback(() => {
     Alert.alert('Are you sure you want to log out?', '', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -72,7 +72,7 @@ export default function SettingsScreen() {
         onPress: () => signOut(),
       },
     ]);
-  };
+  }, [signOut]);
 
   const accountItems: Array<{
     children?: ReactNode;

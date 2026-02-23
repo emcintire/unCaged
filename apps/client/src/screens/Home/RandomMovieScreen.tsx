@@ -20,7 +20,7 @@ export default function RandomMovieScreen() {
   const [movieKey, setMovieKey] = useState(0);
   const [watchlistFilter, setWatchlistFilter] = useState(false);
   const [unseenFilter, setUnseenFilter] = useState(false);
-  const poolRef = useRef<Movie[]>([]);
+  const poolRef = useRef<Array<Movie>>([]);
 
   const { data: user, isLoading: isUserLoading } = useGetCurrentUser();
   const { data: allMovies = [], isLoading: isMoviesLoading } = useGetAllMovies();
@@ -37,7 +37,7 @@ export default function RandomMovieScreen() {
     return allMovies.filter(m => predicates.every(p => p(m)));
   }, [allMovies, genreFilter, mandyFilter, unseenFilter, watchlistFilter, user]);
 
-  const pickRandom = useCallback((from: Movie[]) => {
+  const pickRandom = useCallback((from: Array<Movie>) => {
     if (!from.length) { setMovie(null); return []; }
     const idx = Math.floor(Math.random() * from.length);
     const picked = from[idx];
@@ -155,7 +155,7 @@ export default function RandomMovieScreen() {
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.filtersBtn} onPress={() => setFiltersModalVisible(true)}>
-            <MaterialCommunityIcons name="tune" color="grey" size={35} />
+            <MaterialCommunityIcons name="tune" color={colors.medium} size={35} />
           </TouchableOpacity>
         </View>
       </View>
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   refreshBtn: {
     height: 60,
     width: 150,
-    backgroundColor: '#976000',
+    backgroundColor: colors.orangeBg,
     borderRadius: borderRadius.md,
   },
   inner: {
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: fontSize.xxl,
     fontFamily: fontFamily.black,
-    color: 'white',
+    color: colors.white,
   },
   filtersBtn: {
     position: 'absolute',
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: colors.black + 'CC',
+    backgroundColor: `${colors.black}CC`,
     borderRadius: 16,
     width: 32,
     height: 32,

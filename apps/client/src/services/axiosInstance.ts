@@ -1,4 +1,5 @@
 import Axios, {
+  AxiosHeaders,
   type AxiosRequestConfig,
   type AxiosRequestHeaders,
   type InternalAxiosRequestConfig,
@@ -12,6 +13,12 @@ import { logger } from '@/utils';
 export type UnwrapApiEnvelope<T> = T extends { data: infer D } ? D : T;
 
 export type AuthRequestConfig = InternalAxiosRequestConfig & {
+  skipAuth?: boolean;
+  skipRefresh?: boolean;
+  _retry?: boolean;
+};
+
+type ExtendedAxiosRequestConfig = AxiosRequestConfig & {
   skipAuth?: boolean;
   skipRefresh?: boolean;
   _retry?: boolean;
@@ -45,6 +52,15 @@ const clearTokens = async () => {
   ]);
 }
 
+const setAuthorizationHeader = (
+  config: { headers?: InternalAxiosRequestConfig['headers']},
+  token: string,
+) => {
+  const headers = AxiosHeaders.from(config.headers ?? {});
+  headers.set('Authorization', `Bearer ${token}`);
+  config.headers = headers;
+};
+
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: env.apiBaseUrl,
 });
@@ -59,9 +75,7 @@ AXIOS_INSTANCE.interceptors.request.use(async (config: InternalAxiosRequestConfi
 
   const token = await getAccessToken();
   if (token) {
-    // Axios v1 headers can be AxiosHeaders; safest is to treat as unknown and assign.
-    cfg.headers = cfg.headers ?? ({} as any);
-    (cfg.headers as any).Authorization = `Bearer ${token}`;
+    setAuthorizationHeader(cfg, token);
   }
 
   return cfg;
@@ -82,7 +96,7 @@ const refreshTokens = async (): Promise<RefreshResponse> => {
   const res = await AXIOS_INSTANCE.post<RefreshResponse>(
     '/api/auth/refresh',
     { refreshToken },
-    { skipAuth: true, skipRefresh: true } as any,
+    { skipAuth: true, skipRefresh: true } as ExtendedAxiosRequestConfig,
   );
 
   const { accessToken, refreshToken: newRefreshToken } = res.data ?? {};
@@ -112,8 +126,8 @@ AXIOS_INSTANCE.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const status: number = error.response.status;
-    const cfg: AuthRequestConfig = (error.config ?? {}) as AuthRequestConfig;
+    const { response: { status } } = error;
+    const cfg = (error.config ?? {}) as AuthRequestConfig;
 
     logger.error('API Error:', {
       url: cfg.url,
@@ -143,8 +157,7 @@ AXIOS_INSTANCE.interceptors.response.use(
         const refreshed = await refreshPromise;
 
         // Retry original request with fresh access token
-        cfg.headers = cfg.headers ?? ({} as any);
-        (cfg.headers as any).Authorization = `Bearer ${refreshed.accessToken}`;
+        setAuthorizationHeader(cfg, refreshed.accessToken);
 
         return AXIOS_INSTANCE.request(cfg);
       } catch (refreshErr) {

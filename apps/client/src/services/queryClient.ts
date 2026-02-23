@@ -18,7 +18,7 @@ const getErrorMessage = (error: unknown): string => {
   const responseData = maybeError?.response?.data;
   if (typeof responseData === 'string' && responseData.length > 0) return responseData;
   if (typeof responseData === 'object' && responseData && 'message' in responseData) {
-    const message = (responseData as { message?: string }).message;
+    const { message } = (responseData as { message?: string });
     if (typeof message === 'string' && message.length > 0) return message;
   }
 
@@ -31,7 +31,7 @@ const getErrorMessage = (error: unknown): string => {
 
 const logQueryError = (
   error: unknown,
-  query: Query<unknown, unknown, unknown, readonly unknown[]>
+  query: Query<unknown, unknown, unknown, ReadonlyArray<unknown>>
 ) => {
   logger.error('Query failed', error, undefined, {
     context: 'react-query',

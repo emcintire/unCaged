@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Animated } from 'react-native';
 
 type TimingConfig = {
@@ -10,7 +10,7 @@ type TimingConfig = {
  * Wraps Animated.Value with simple helper methods to reduce boilerplate.
  */
 export const useAnimatedValue = (initial: number) => {
-  const value = useRef(new Animated.Value(initial)).current;
+  const [value] = useState(() => new Animated.Value(initial));
 
   const timeTo = useCallback(
     (toValue: number, config?: TimingConfig & { onDone?: () => void }) => {

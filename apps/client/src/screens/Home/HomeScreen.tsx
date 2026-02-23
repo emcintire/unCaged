@@ -11,7 +11,7 @@ import {
   useGetQuote,
 } from '@/services';
 import { useAuth } from '@/hooks';
-import { colors, spacing, fontSize, fontFamily, borderRadius } from '@/config';
+import { spacing, fontSize, fontFamily, borderRadius } from '@/config';
 import Screen from '@/components/Screen';
 import MovieCard from '@/components/MovieCard';
 import MovieModal from '@/components/movieModal/MovieModal';
@@ -54,19 +54,6 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
     width: 135,
     height: 200,
-  },
-  tagline: {
-    marginTop: spacing.sm,
-    fontFamily: fontFamily.medium,
-    fontSize: fontSize.md,
-    color: colors.white,
-    alignSelf: 'center',
-  },
-  subTagline: {
-    fontFamily: fontFamily.light,
-    fontSize: fontSize.sm,
-    color: colors.white,
-    alignSelf: 'flex-start',
   },
   scrollContent: {
     marginLeft: 15,
@@ -168,7 +155,7 @@ export default function HomeScreen() {
   const favoriteIds = useMemo(() => new Set(user?.favorites ?? []), [user?.favorites]);
   const seenIds = useMemo(() => new Set(user?.seen ?? []), [user?.seen]);
 
-  const seededShuffle = useCallback(<T,>(arr: T[], seed: string): T[] => {
+  const seededShuffle = useCallback(<T,>(arr: Array<T>, seed: string): Array<T> => {
     let s = Array.from(seed).reduce((acc, c) => acc + c.charCodeAt(0), 0)
     return [...arr].sort(() => { s = (s * 1664525 + 1013904223) & 0xffffffff; return s / 0x100000000 - 0.5 })
   }, [])

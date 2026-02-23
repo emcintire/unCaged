@@ -1,7 +1,23 @@
 #!/bin/sh
 
+EXIT_CODE=0
+
 if git diff --cached --name-only | grep -q "^apps/server/"; then
-  echo "Server changes detected — running tests..."
-  cd apps/server && npm test
-  exit $?
+  echo "Server changes detected — running lint..."
+  (cd apps/server && npm run lint)
+  if [ $? -ne 0 ]; then EXIT_CODE=1; fi
+
+  if [ $EXIT_CODE -eq 0 ]; then
+    echo "Server lint passed — running tests..."
+    (cd apps/server && npm test)
+    if [ $? -ne 0 ]; then EXIT_CODE=1; fi
+  fi
 fi
+
+if git diff --cached --name-only | grep -q "^apps/client/"; then
+  echo "Client changes detected — running lint..."
+  (cd apps/client && npm run lint)
+  if [ $? -ne 0 ]; then EXIT_CODE=1; fi
+fi
+
+exit $EXIT_CODE

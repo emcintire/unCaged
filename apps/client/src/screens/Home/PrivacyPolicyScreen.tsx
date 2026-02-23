@@ -1,3 +1,4 @@
+// oxlint-disable max-lines-per-function
 import { ScrollView } from 'react-native';
 import HTMLView from 'react-native-htmlview';
 

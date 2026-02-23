@@ -57,7 +57,7 @@ export default function PicturePicker({ modalVisible, setModalVisible }: Props) 
           {imgs.map((image, index) => (
             <View style={styles.imgContainer} key={image}>
               <View style={selected === index ? styles.selected : styles.notSelected}>
-                <MaterialCommunityIcons name="check" size={40} color="white" />
+                <MaterialCommunityIcons name="check" size={40} color={colors.white} />
               </View>
               <TouchableOpacity style={styles.imgBtn} onPress={() => setSelected(index)} accessibilityRole="button" accessibilityLabel={`Profile picture ${index + 1}${selected === index ? ', selected' : ''}`}>
                 <Image source={image} style={styles.img} accessibilityLabel={`Profile picture option ${index + 1}`} />
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: '100%',
-    backgroundColor: '#00000080',
+    backgroundColor: `${colors.black}80`,
   },
   container: {
     backgroundColor: colors.bg,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selected: {
-    backgroundColor: '#00000080',
+    backgroundColor: `${colors.black}80`,
     height: 120,
     width: 120,
     zIndex: 1,

@@ -30,7 +30,7 @@ export default function WatchlistScreen() {
             <Text style={{ color: colors.orange }}>
               {movies.length}
             </Text>
-            &nbsp;of Nicolas Cage's cinematic masterpieces, or your watchlist is empty...
+            &nbsp;of Nicolas Cage&apos;s cinematic masterpieces, or your watchlist is empty...
           </Text>
         )}
       />

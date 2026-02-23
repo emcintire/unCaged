@@ -139,7 +139,7 @@ export default function AdminReviewsScreen() {
     <Screen isLoading={isLoading && page === 1} style={styles.screen}>
       {/* Filter Chips */}
       <View style={styles.filterRow}>
-        {(['all', 'flagged'] as FilterMode[]).map((mode) => (
+        {(['all', 'flagged'] as Array<FilterMode>).map((mode) => (
           <TouchableOpacity
             key={mode}
             style={[styles.chip, filterMode === mode && styles.chipActive]}

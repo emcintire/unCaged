@@ -5,7 +5,7 @@ import { typography } from '@/config';
 import { useAnimatedValue } from '@/hooks';
 
 type Props = {
-  error?: string | Array<string>;
+  error?: string | string[];
   visible?: boolean;
 };
 
