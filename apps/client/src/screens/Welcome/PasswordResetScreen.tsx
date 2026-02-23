@@ -7,7 +7,7 @@ import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
 import { useResetPassword } from '@/services';
 import { useAuth } from '@/hooks';
 import { form, screen, typography, utils } from '@/config';
-import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
+import { showSuccessToast, toFormikValidator } from '@/utils';
 import PasswordInput from '@/components/forms/PasswordInput';
 import Screen from '@/components/Screen';
 import { AppForm, SubmitButton } from '@/components/forms';
@@ -29,21 +29,16 @@ export default function PasswordResetScreen() {
   const resetPasswordMutation = useResetPassword();
 
   const handleSubmit = async (values: PasswordResetFormValues) => {
-    try {
-      const code = await SecureStore.getItemAsync('code');
-      const email = await SecureStore.getItemAsync('email');
-      if (!code || !email) {
-        navigate('Welcome');
-        return;
-      }
-
-      const { accessToken, refreshToken } = await resetPasswordMutation.mutateAsync({ data: { code, email, newPassword: values.newPassword } });
-      await signIn(accessToken, refreshToken);
-      showSuccessToast('Password reset successful!');
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to reset password';
-      showErrorToast(message);
+    const code = await SecureStore.getItemAsync('code');
+    const email = await SecureStore.getItemAsync('email');
+    if (!code || !email) {
+      navigate('Welcome');
+      return;
     }
+
+    const { accessToken, refreshToken } = await resetPasswordMutation.mutateAsync({ data: { code, email, newPassword: values.newPassword } });
+    await signIn(accessToken, refreshToken);
+    showSuccessToast('Password reset successful!');
   };
 
   return (

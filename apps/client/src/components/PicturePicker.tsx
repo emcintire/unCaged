@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { borderRadius, colors, spacing } from '@/config';
-import { showErrorToast } from '@/utils';
 import AppButton from './AppButton';
 import Icon from './Icon';
 import { useGetCurrentUser, useUpdateUser } from '@/services';
@@ -39,14 +38,9 @@ export default function PicturePicker({ modalVisible, setModalVisible }: Props) 
     const selectedImg = imgs[selected];
     if (!selectedImg) return;
 
-    try {
-      await updateUserMutation.mutateAsync({ data: { img: selectedImg } });
-      setModalVisible(false);
-      refetch();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to update picture';
-      showErrorToast(message);
-    }
+    await updateUserMutation.mutateAsync({ data: { img: selectedImg } });
+    setModalVisible(false);
+    refetch();
   };
 
   if (!modalVisible) { return null; }

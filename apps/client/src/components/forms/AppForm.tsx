@@ -1,13 +1,11 @@
-import { Formik } from 'formik';
-import type { FormikValues, FormikHelpers, FormikErrors } from 'formik';
-import type { ReactNode } from 'react';
+import { Formik, type FormikValues, type FormikHelpers, type FormikErrors } from 'formik';
+import type { PropsWithChildren } from 'react';
 
-type Props<Values extends FormikValues> = {
+type Props<Values extends FormikValues> = PropsWithChildren<{
   initialValues: Values;
-  onSubmit: (values: Values, formikHelpers: FormikHelpers<Values>) => void;
+  onSubmit: (values: Values, formikHelpers: FormikHelpers<Values>) => void | Promise<void>;
   validate: (values: Values) => FormikErrors<Values>;
-  children: ReactNode;
-};
+}>;
   
 export default function AppForm<Values extends FormikValues>({
   initialValues,
@@ -19,7 +17,12 @@ export default function AppForm<Values extends FormikValues>({
     <Formik<Values>
       enableReinitialize
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={async (values, formikHelpers) => {
+        try {
+          await onSubmit(values, formikHelpers);
+        } catch {
+        }
+      }}
       validate={validate}
     >
       {() => <>{children}</>}

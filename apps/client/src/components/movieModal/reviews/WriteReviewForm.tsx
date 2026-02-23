@@ -3,8 +3,6 @@ import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'rea
 import { useCreateReview, useRateMovie } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
-import { showErrorToast } from '@/utils';
-import { useQueryClient } from '@tanstack/react-query';
 
 type Props = {
   movieId: string;
@@ -32,27 +30,23 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
-    try {
-      await createReviewMutation.mutateAsync({
-        data: {
-          movieId,
-          text: text.trim(),
-          ...(rating != null && { rating }),
-          isSpoiler,
-        },
-      });
-    
-      if (rating != null) {
-        await rateMovieMutation.mutateAsync({ data: { id: movieId, rating } });
-      }
+    await createReviewMutation.mutateAsync({
+      data: {
+        movieId,
+        text: text.trim(),
+        ...(rating != null && { rating }),
+        isSpoiler,
+      },
+    });
 
-      setText('');
-      setRating(null);
-      setIsSpoiler(false);
-      onSuccess();
-    } catch {
-      showErrorToast('Failed to submit review. Please try again.');
+    if (rating != null) {
+      await rateMovieMutation.mutateAsync({ data: { id: movieId, rating } });
     }
+
+    setText('');
+    setRating(null);
+    setIsSpoiler(false);
+    onSuccess();
   };
 
   return (

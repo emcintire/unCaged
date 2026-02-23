@@ -30,16 +30,11 @@ export default function SecurityScreen() {
       return showErrorToast('New password must be different from current password');
     }
 
-    try {
-      await changePasswordMutation.mutateAsync({
-        data: { currentPassword: values.currentPassword, password: values.newPassword,
-      }});
-      showSuccessToast('Password updated!');
-      navigate('SettingsTab');
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to update password';
-      showErrorToast(message);
-    }
+    await changePasswordMutation.mutateAsync({
+      data: { currentPassword: values.currentPassword, password: values.newPassword,
+    }});
+    showSuccessToast('Password updated!');
+    navigate('SettingsTab');
   };
 
   return (

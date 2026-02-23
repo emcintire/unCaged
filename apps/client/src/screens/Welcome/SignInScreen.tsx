@@ -6,7 +6,7 @@ import type { LoginBody } from '@/services';
 import { useAuth } from '@/hooks';
 import { AppForm, AppFormField, PasswordInput, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
-import { showErrorToast, toFormikValidator } from '@/utils';
+import { toFormikValidator } from '@/utils';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Email must be a valid email'),
@@ -21,13 +21,8 @@ export default function SignInScreen() {
 
   const handleSubmit = async (values: LoginBody): Promise<void> => {
     const email = values.email.toLowerCase().trim();
-    try {
-      const { accessToken, refreshToken } = await loginMutation.mutateAsync({ data: { email, password: values.password }});
-      await signIn(accessToken, refreshToken);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Sign in failed';
-      showErrorToast(message);
-    }
+    const { accessToken, refreshToken } = await loginMutation.mutateAsync({ data: { email, password: values.password }});
+    await signIn(accessToken, refreshToken);
   };
 
   return (

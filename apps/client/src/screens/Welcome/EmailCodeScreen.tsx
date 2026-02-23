@@ -7,7 +7,7 @@ import type { WelcomeAuthTabParamList } from '@/types';
 import { useCheckCode } from '@/services';
 import { STORAGE_KEYS } from '@/constants';
 import { form, typography, utils, screen } from '@/config';
-import { showErrorToast, toFormikValidator } from '@/utils';
+import { toFormikValidator } from '@/utils';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 
@@ -26,19 +26,15 @@ export default function EmailCodeScreen() {
   const { navigate } = useNavigation<NativeStackNavigationProp<WelcomeAuthTabParamList>>();
 
   const handleSubmit = async (values: EmailCodeFormValues) => {
-    try {
-      const email = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_EMAIL);
-      if (!email) {
-        navigate('Forgot Password');
-        return;
-      }
-
-      await checkCodeMutation.mutateAsync({ data: { code: values.code, email } });
-      await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_CODE, values.code);
-      navigate('Password Reset');
-    } catch {
-      showErrorToast('Invalid code');
+    const email = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_EMAIL);
+    if (!email) {
+      navigate('Forgot Password');
+      return;
     }
+
+    await checkCodeMutation.mutateAsync({ data: { code: values.code, email } });
+    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_CODE, values.code);
+    navigate('Password Reset');
   };
 
   return (

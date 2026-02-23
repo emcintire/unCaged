@@ -35,21 +35,16 @@ export default function SignUpScreen() {
       return;
     }
 
-    try {
-      const email = values.email.toLowerCase().trim();
-      const name = values.name?.trim();
-      const { accessToken, refreshToken } = await createUserMutation.mutateAsync({
-        data: {
-          ...(name ? { name } : {}),
-          email,
-          password: values.password,
-        },
-      });
-      await signIn(accessToken, refreshToken);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Registration failed';
-      showErrorToast(message);
-    }
+    const email = values.email.toLowerCase().trim();
+    const name = values.name?.trim();
+    const { accessToken, refreshToken } = await createUserMutation.mutateAsync({
+      data: {
+        ...(name ? { name } : {}),
+        email,
+        password: values.password,
+      },
+    });
+    await signIn(accessToken, refreshToken);
   };
 
   return (

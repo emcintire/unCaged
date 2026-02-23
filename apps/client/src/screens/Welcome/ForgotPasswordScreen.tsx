@@ -9,7 +9,7 @@ import { useForgotPassword } from '@/services';
 import { form, screen } from '@/config';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
-import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
+import { showSuccessToast, toFormikValidator } from '@/utils';
 import { STORAGE_KEYS } from '@/constants';
 
 const schema = z.object({
@@ -27,17 +27,11 @@ export default function ForgotPasswordScreen() {
   const { navigate } = useNavigation<NativeStackNavigationProp<WelcomeAuthTabParamList>>();
 
   const handleSubmit = async (values: ForgotPasswordFormValues) => {
-    try {
-      const email = values.email.trim().toLowerCase();
-      await forgotPasswordMutation.mutateAsync({ data: { email } });
-      await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_EMAIL, email);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to send reset email';
-      showErrorToast(message);
-    } finally {
-      showSuccessToast('If you have an account, a reset code has been sent to your email.');
-      navigate('Email Code');
-    }
+    const email = values.email.trim().toLowerCase();
+    await forgotPasswordMutation.mutateAsync({ data: { email } });
+    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_EMAIL, email);
+    showSuccessToast('If you have an account, a reset code has been sent to your email.');
+    navigate('Email Code');
   };
 
   return (

@@ -9,7 +9,7 @@ import { z } from 'zod';
 import type { HomeStackParamList } from '@/types';
 import { useGetCurrentUser, useUpdateUser } from '@/services';
 import { spacing } from '@/config';
-import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
+import { showSuccessToast, toFormikValidator } from '@/utils';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 import PicturePicker from '@/components/PicturePicker';
@@ -36,17 +36,12 @@ export default function AccountDetailsScreen() {
   const handleSubmit = async (values: FormValues) => {
     if (user == null || (values.name === user.name && values.email === user.email)) { return; }
 
-    try {
-      const email = values.email.toLowerCase().trim();
-      const name = (values.name ?? '').trim();
-      await updateUserMutation.mutateAsync({ data: { email, name }});
-      navigate('SettingsTab');
-      refetch();
-      showSuccessToast();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to update account';
-      showErrorToast(message);
-    }
+    const email = values.email.toLowerCase().trim();
+    const name = (values.name ?? '').trim();
+    await updateUserMutation.mutateAsync({ data: { email, name }});
+    navigate('SettingsTab');
+    refetch();
+    showSuccessToast();
   };
 
   return (

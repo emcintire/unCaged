@@ -44,19 +44,21 @@ export default function SettingsScreen() {
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Ok',
-        onPress: async () => {
-          try {
-            if (!user?._id) {
-              showErrorToast('Failed to delete account');
-              return;
-            }
-            await deleteUserMutation.mutateAsync({ data: { id: user._id } });
-            showSuccessToast('Account deleted :(');
-            await signOut();
-          } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to delete account';
-            showErrorToast(message);
+        onPress: () => {
+          if (!user?._id) {
+            showErrorToast('Failed to delete account');
+            return;
           }
+
+          deleteUserMutation.mutate(
+            { data: { id: user._id } },
+            {
+              onSuccess: async () => {
+                showSuccessToast('Account deleted :(');
+                await signOut();
+              },
+            },
+          );
         },
       },
     ]);
