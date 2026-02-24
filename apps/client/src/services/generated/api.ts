@@ -174,6 +174,12 @@ userEmail?: string;
 movieTitle?: string;
 };
 
+export type UpdateReviewBody = {
+  text?: string;
+  rating?: number;
+  isSpoiler?: boolean;
+};
+
 export type ToggleReviewLike200 = {
   liked?: boolean;
 };
@@ -1419,6 +1425,78 @@ export function useGetAdminReviews<TData = Awaited<ReturnType<typeof getAdminRev
 
 
 
+/**
+ * @summary Update a review
+ */
+export const getUpdateReviewUrl = (reviewId: string,) => {
+
+
+  
+
+  return `/api/reviews/${reviewId}`
+}
+
+export const updateReview = async (reviewId: string,
+    updateReviewBody: UpdateReviewBody, options?: RequestInit): Promise<Review> => {
+  
+  return axiosInstance<Review>(getUpdateReviewUrl(reviewId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateReviewBody,)
+  }
+);}
+
+
+
+
+export const getUpdateReviewMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateReview>>, TError,{reviewId: string;data: UpdateReviewBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateReview>>, TError,{reviewId: string;data: UpdateReviewBody}, TContext> => {
+
+const mutationKey = ['updateReview'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateReview>>, {reviewId: string;data: UpdateReviewBody}> = (props) => {
+          const {reviewId,data} = props ?? {};
+
+          return  updateReview(reviewId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateReviewMutationResult = NonNullable<Awaited<ReturnType<typeof updateReview>>>
+    export type UpdateReviewMutationBody = UpdateReviewBody
+    export type UpdateReviewMutationError = unknown
+
+    /**
+ * @summary Update a review
+ */
+export const useUpdateReview = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateReview>>, TError,{reviewId: string;data: UpdateReviewBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateReview>>,
+        TError,
+        {reviewId: string;data: UpdateReviewBody},
+        TContext
+      > => {
+      return useMutation(getUpdateReviewMutationOptions(options));
+    }
+    
 /**
  * @summary Delete a review
  */

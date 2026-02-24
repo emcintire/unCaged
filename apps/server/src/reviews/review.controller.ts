@@ -2,7 +2,7 @@ import type { NextFunction, Response, Request } from 'express';
 import { getIdFromToken, getTokenFromRequest, HttpError } from '@/utils';
 import type { AuthenticatedRequest } from '@/types';
 import { ReviewService, type SortOption } from './review.service';
-import type { CreateReviewDto } from './schemas';
+import type { CreateReviewDto, UpdateReviewDto } from './schemas';
 
 export class ReviewController {
   private readonly reviewService = new ReviewService();
@@ -49,6 +49,23 @@ export class ReviewController {
     try {
       const review = await this.reviewService.createReview(req.user!.sub, req.body);
       res.status(201).send(review);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateReview = async (
+    req: AuthenticatedRequest<UpdateReviewDto, { reviewId: string }>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const updated = await this.reviewService.updateReview(
+        req.params.reviewId,
+        req.user!.sub,
+        req.body,
+      );
+      res.status(200).send(updated);
     } catch (error) {
       next(error);
     }

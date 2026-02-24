@@ -13,16 +13,26 @@ import { logger } from '@/utils';
 export type UnwrapApiEnvelope<T> = T extends { data: infer D } ? D : T;
 
 export type AuthRequestConfig = InternalAxiosRequestConfig & {
-  skipAuth?: boolean;
   skipRefresh?: boolean;
   _retry?: boolean;
 };
 
 type ExtendedAxiosRequestConfig = AxiosRequestConfig & {
-  skipAuth?: boolean;
   skipRefresh?: boolean;
   _retry?: boolean;
 };
+
+/**
+ * Endpoints that should never trigger a token refresh on 401.
+ * Add any auth endpoints here whose 401 means "bad credentials", not "expired token".
+ */
+const SKIP_REFRESH_ENDPOINTS: Array<string> = [
+  '/api/auth/login',
+  '/api/auth/register',
+];
+
+const isSkipRefreshEndpoint = (url: string | undefined): boolean =>
+  SKIP_REFRESH_ENDPOINTS.some(endpoint => url?.includes(endpoint));
 
 let onUnauthorizedCallback: (() => void) | null = null;
 
@@ -71,8 +81,6 @@ export const AXIOS_INSTANCE = Axios.create({
 AXIOS_INSTANCE.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const cfg = config as AuthRequestConfig;
 
-  if (cfg.skipAuth) return cfg;
-
   const token = await getAccessToken();
   if (token) {
     setAuthorizationHeader(cfg, token);
@@ -91,12 +99,10 @@ const refreshTokens = async (): Promise<RefreshResponse> => {
   const refreshToken = await getRefreshToken();
   if (!refreshToken) throw new Error('Missing refresh token');
 
-  // skipAuth: don't attach Authorization header on refresh
-  // skipRefresh: don't attempt refresh again if refresh itself 401s
   const res = await AXIOS_INSTANCE.post<RefreshResponse>(
     '/api/auth/refresh',
     { refreshToken },
-    { skipAuth: true, skipRefresh: true } as ExtendedAxiosRequestConfig,
+    { skipRefresh: true } as ExtendedAxiosRequestConfig,
   );
 
   const { accessToken, refreshToken: newRefreshToken } = res.data ?? {};
@@ -108,7 +114,7 @@ const refreshTokens = async (): Promise<RefreshResponse> => {
 
 /**
  * Response interceptor:
- * - On 401: attempt one refresh + retry original request (unless skipRefresh/skipAuth)
+ * - On 401: attempt one refresh + retry original request (unless skipRefresh or a skip-refresh endpoint)
  * - If refresh fails: clear tokens + call onUnauthorizedCallback
  */
 AXIOS_INSTANCE.interceptors.response.use(
@@ -143,8 +149,7 @@ AXIOS_INSTANCE.interceptors.response.use(
     }
 
     // Attempt refresh on 401 (only once) unless explicitly disabled.
-    // We also avoid trying to refresh requests that were marked skipAuth (login/register/etc.).
-    if (status === 401 && !cfg._retry && !cfg.skipRefresh && !cfg.skipAuth) {
+    if (status === 401 && !cfg._retry && !cfg.skipRefresh && !isSkipRefreshEndpoint(cfg.url)) {
       cfg._retry = true;
 
       try {
@@ -168,7 +173,7 @@ AXIOS_INSTANCE.interceptors.response.use(
     }
 
     // If we got a 401 and didn't refresh (auth endpoints or skipRefresh), treat as signed out
-    if (status === 401) {
+    if (status === 401 && !isSkipRefreshEndpoint(cfg.url)) {
       await clearTokens();
       onUnauthorizedCallback?.();
     }

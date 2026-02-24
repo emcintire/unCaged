@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useCreateReview, useRateMovie } from '@/services';
+import { useCreateReview, useRateMovie, useUpdateReview } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
 
@@ -8,14 +8,29 @@ type Props = {
   movieId: string;
   onSuccess: () => void;
   onCancel: () => void;
+  editReviewId?: string;
+  initialText?: string;
+  initialRating?: number | null;
+  initialIsSpoiler?: boolean;
 };
 
-export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props) {
-  const [text, setText] = useState('');
-  const [rating, setRating] = useState<number | null>(null);
-  const [isSpoiler, setIsSpoiler] = useState(false);
+export default function WriteReviewForm({
+  movieId,
+  onSuccess,
+  onCancel,
+  editReviewId,
+  initialText = '',
+  initialRating = null,
+  initialIsSpoiler = false,
+}: Props) {
+  const [text, setText] = useState(initialText);
+  const [rating, setRating] = useState<number | null>(initialRating ?? null);
+  const [isSpoiler, setIsSpoiler] = useState(initialIsSpoiler);
+
+  const isEditMode = editReviewId != null;
 
   const createReviewMutation = useCreateReview();
+  const updateReviewMutation = useUpdateReview();
   const rateMovieMutation = useRateMovie();
 
   const handleStarPress = (star: number) => {
@@ -30,28 +45,41 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
-    await createReviewMutation.mutateAsync({
-      data: {
-        movieId,
-        text: text.trim(),
-        ...(rating != null && { rating }),
-        isSpoiler,
-      },
-    });
 
-    if (rating != null) {
-      await rateMovieMutation.mutateAsync({ data: { id: movieId, rating } });
+    if (isEditMode) {
+      await updateReviewMutation.mutateAsync({
+        reviewId: editReviewId,
+        data: {
+          text: text.trim(),
+          ...(rating != null && { rating }),
+          isSpoiler,
+        },
+      });
+    } else {
+      await createReviewMutation.mutateAsync({
+        data: {
+          movieId,
+          text: text.trim(),
+          ...(rating != null && { rating }),
+          isSpoiler,
+        },
+      });
+
+      if (rating != null) {
+        await rateMovieMutation.mutateAsync({ data: { id: movieId, rating } });
+      }
     }
 
-    setText('');
-    setRating(null);
-    setIsSpoiler(false);
     onSuccess();
   };
 
+  const isPending = isEditMode
+    ? updateReviewMutation.isPending
+    : createReviewMutation.isPending;
+
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionLabel}>Write a Review</Text>
+      <Text style={styles.sectionLabel}>{isEditMode ? 'Edit Review' : 'Write a Review'}</Text>
 
       {/* Star Rating Selector */}
       <View style={styles.starRow}>
@@ -94,12 +122,12 @@ export default function WriteReviewForm({ movieId, onSuccess, onCancel }: Props)
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.submitBtn, (!text.trim() || createReviewMutation.isPending) && styles.submitBtnDisabled]}
+          style={[styles.submitBtn, (!text.trim() || isPending) && styles.submitBtnDisabled]}
           onPress={handleSubmit}
-          disabled={!text.trim() || createReviewMutation.isPending}
+          disabled={!text.trim() || isPending}
         >
           <Text style={styles.submitText}>
-            {createReviewMutation.isPending ? 'Submitting...' : 'Submit'}
+            {isPending ? 'Saving...' : isEditMode ? 'Save' : 'Submit'}
           </Text>
         </TouchableOpacity>
       </View>

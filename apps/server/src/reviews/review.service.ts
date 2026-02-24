@@ -3,7 +3,12 @@ import { HttpError, validateSchema } from '@/utils';
 import { Review } from './review.model';
 import { User } from '@/users';
 import { Movie } from '@/movies';
-import { createReviewDtoSchema, type CreateReviewDto } from './schemas';
+import {
+  createReviewDtoSchema,
+  updateReviewDtoSchema,
+  type CreateReviewDto,
+  type UpdateReviewDto,
+} from './schemas';
 
 export type SortOption = 'recent' | 'popular';
 
@@ -81,6 +86,27 @@ export class ReviewService {
 
     await review.save();
     return review;
+  }
+
+  async updateReview(reviewId: string, userId: string, dto: UpdateReviewDto) {
+    validateSchema(updateReviewDtoSchema, dto);
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      throw new HttpError(404, 'The review with the given ID was not found.', 'REVIEW_NOT_FOUND');
+    }
+
+    if (review.userId !== userId) {
+      throw new HttpError(403, 'Not authorized to edit this review.', 'REVIEW_EDIT_FORBIDDEN');
+    }
+
+    const updated = await Review.findByIdAndUpdate(
+      reviewId,
+      { $set: dto },
+      { new: true },
+    );
+
+    return updated;
   }
 
   async deleteReview(reviewId: string, userId: string, isAdmin: boolean) {

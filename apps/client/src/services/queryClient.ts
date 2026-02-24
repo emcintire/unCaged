@@ -8,6 +8,7 @@ import {
 import { logger, showErrorToast } from '@/utils';
 
 const getErrorMessage = (error: unknown): string => {
+  console.log(error);
   if (typeof error === 'string' && error.length > 0) return error;
 
   const maybeError = error as {

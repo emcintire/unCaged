@@ -7,6 +7,7 @@ import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike,
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
+import WriteReviewForm from './WriteReviewForm';
 
 type Props = {
   isOwnReview?: boolean;
@@ -17,6 +18,7 @@ type Props = {
 export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   const [spoilerRevealed, setSpoilerRevealed] = useState(false);
   const [flagged, setFlagged] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { isAuthenticated } = useAuth();
   const { data: user } = useGetCurrentUser({
@@ -31,6 +33,7 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   const flagMutation = useFlagReview();
 
   const canDelete = isAuthenticated && (isOwnReview || user?.isAdmin);
+  const canEdit = isAuthenticated && isOwnReview;
   const canReport = isAuthenticated && !isOwnReview && !flagged;
 
   const handleDelete = () => {
@@ -62,6 +65,11 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
     ]);
   };
 
+  const handleEditSuccess = () => {
+    setIsEditing(false);
+    onSuccess();
+  };
+
   const formattedDate = new Date(review.createdOn).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -69,6 +77,20 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   });
 
   const isSpoilerHidden = review.isSpoiler && !spoilerRevealed;
+
+  if (isEditing) {
+    return (
+      <WriteReviewForm
+        movieId={review.movieId}
+        editReviewId={review._id}
+        initialText={review.text}
+        initialRating={review.rating ?? null}
+        initialIsSpoiler={review.isSpoiler ?? false}
+        onSuccess={handleEditSuccess}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -87,11 +109,18 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
             <Text style={styles.date}>{formattedDate}</Text>
           </View>
         </View>
-        {canDelete && (
-          <TouchableOpacity onPress={handleDelete} hitSlop={8}>
-            <MaterialCommunityIcons name="trash-can-outline" size={20} color={colors.danger} />
-          </TouchableOpacity>
-        )}
+        <View style={styles.headerActions}>
+          {canEdit && (
+            <TouchableOpacity onPress={() => setIsEditing(true)} hitSlop={8}>
+              <MaterialCommunityIcons name="pencil-outline" size={20} color={colors.medium} />
+            </TouchableOpacity>
+          )}
+          {canDelete && (
+            <TouchableOpacity onPress={handleDelete} hitSlop={8}>
+              <MaterialCommunityIcons name="trash-can-outline" size={20} color={colors.danger} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* Star Rating */}
@@ -187,6 +216,11 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.light,
     fontSize: fontSize.xs,
     marginTop: 2,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   ratingRow: {
     flexDirection: 'row',

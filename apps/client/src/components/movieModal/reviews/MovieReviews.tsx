@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Review } from '@/services';
-import { getGetCurrentUserQueryKey, useGetCurrentUser, useGetReviewsByMovie } from '@/services';
+import { getGetCurrentUserQueryKey, getGetReviewsByMovieQueryKey, useGetCurrentUser, useGetReviewsByMovie } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import WriteReviewForm from './WriteReviewForm';
@@ -25,7 +26,10 @@ export default function MovieReviews({ movieId }: Props) {
       queryKey: getGetCurrentUserQueryKey(),
     },
   });
-  const { data: reviews, isLoading, isFetching, refetch } = useGetReviewsByMovie({ movieId, page, sort });
+  const queryClient = useQueryClient();
+  const { data: reviews, isLoading, isFetching } = useGetReviewsByMovie({ movieId, page, sort });
+
+  const invalidateReviews = () => queryClient.invalidateQueries({ queryKey: getGetReviewsByMovieQueryKey() });
 
   const prevSortRef = useRef(sort);
 
@@ -93,7 +97,7 @@ export default function MovieReviews({ movieId }: Props) {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Your Reviews</Text>
           {ownReviews.map((review) => (
-            <ReviewCard key={review._id} onSuccess={refetch} review={review} isOwnReview />
+            <ReviewCard key={review._id} onSuccess={invalidateReviews} review={review} isOwnReview />
           ))}
         </View>
       )}
@@ -110,7 +114,7 @@ export default function MovieReviews({ movieId }: Props) {
           movieId={movieId}
           onSuccess={() => {
             setShowWriteForm(false);
-            refetch();
+            invalidateReviews();
           }}
           onCancel={() => setShowWriteForm(false)}
         />
@@ -130,7 +134,7 @@ export default function MovieReviews({ movieId }: Props) {
           {otherReviews.map((review) => (
             <ReviewCard
               key={review._id}
-              onSuccess={refetch}
+              onSuccess={invalidateReviews}
               review={review}
               isOwnReview={false}
             />

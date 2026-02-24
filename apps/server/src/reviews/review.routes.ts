@@ -188,6 +188,38 @@ reviewRouter.get('/admin', auth, admin, controller.getAllReviewsAdmin);
 /**
  * @swagger
  * /api/reviews/{reviewId}:
+ *   patch:
+ *     summary: Update a review
+ *     operationId: updateReview
+ *     tags: [Reviews]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               isSpoiler:
+ *                 type: boolean
+ *     responses:
+ *       '200':
+ *         description: Updated review
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Review'
  *   delete:
  *     summary: Delete a review
  *     operationId: deleteReview
@@ -204,6 +236,7 @@ reviewRouter.get('/admin', auth, admin, controller.getAllReviewsAdmin);
  *       '200':
  *         description: Deleted
  */
+reviewRouter.patch('/:reviewId', auth, controller.updateReview);
 reviewRouter.delete('/:reviewId', auth, controller.deleteReview);
 
 /**
