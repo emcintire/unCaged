@@ -8,7 +8,6 @@ type Props = {
   size?: number;
   gap?: number;
   color?: string;
-  /** Color for unselected (outline) stars. Defaults to the same as color. */
   emptyColor?: string;
   onPress?: (star: number) => void;
 };
@@ -17,7 +16,7 @@ export const getStarIcon = (star: number, rating: number): 'star' | 'star-half-f
   if (rating >= star) return 'star';
   if (rating >= star - 0.5) return 'star-half-full';
   return 'star-outline';
-}
+};
 
 export default function StarRating({
   rating,

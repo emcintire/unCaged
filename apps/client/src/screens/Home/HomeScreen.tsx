@@ -162,9 +162,9 @@ export default function HomeScreen() {
   const seenIds = useMemo(() => new Set(user?.seen ?? []), [user?.seen]);
 
   const seededShuffle = useCallback(<T,>(arr: Array<T>, seed: string): Array<T> => {
-    let s = Array.from(seed).reduce((acc, c) => acc + c.charCodeAt(0), 0)
-    return [...arr].sort(() => { s = (s * 1664525 + 1013904223) & 0xffffffff; return s / 0x100000000 - 0.5 })
-  }, [])
+    let s = Array.from(seed).reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return [...arr].sort(() => { s = (s * 1664525 + 1013904223) & 0xffffffff; return s / 0x100000000 - 0.5; });
+  }, []);
 
   const customRows = useMemo(
     () => [

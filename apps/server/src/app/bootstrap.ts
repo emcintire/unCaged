@@ -8,12 +8,12 @@ const connectToDatabase = async (): Promise<void> => {
   mongoose.set('strictQuery', false);
   const dbUrl = getRequiredEnv('DB_URL');
   await mongoose.connect(dbUrl);
-}
+};
 
 const startHttpServer = (app: Express): Server => {
   const port = Number(process.env.PORT) || 3000;
   return app.listen(port);
-}
+};
 
 export const bootstrap = async (app: Express): Promise<Server> => {
   await connectToDatabase();
@@ -76,4 +76,4 @@ export const bootstrap = async (app: Express): Promise<Server> => {
   });
 
   return server;
-}
+};

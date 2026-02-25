@@ -5,55 +5,55 @@ export const DEFAULT_USER_IMG = 'https://i.imgur.com/9NYgErP.png';
 
 export const quotes = [
   {
-    quote: `"Daddy! Mommy! Un-make me, and save me from the hell of living!"`,
-    subquote: `-Longlegs, 'Longlegs'`,
+    quote: '"Daddy! Mommy! Un-make me, and save me from the hell of living!"',
+    subquote: '-Longlegs, \'Longlegs\'',
   },
   {
     quote: '"I never disrobe before gunplay."',
     subquote: "-John Miltion, 'Drive Angry'",
   },
   {
-    quote: `"Cause I was made for this sewer baby and I am the king."`,
-    subquote: `-Rick Santoro, 'Snake Eyes'.`,
+    quote: '"Cause I was made for this sewer baby and I am the king."',
+    subquote: '-Rick Santoro, \'Snake Eyes\'.',
   },
   {
-    quote: `"Put the bunny back in the box."`,
-    subquote: `-Cameron Poe, 'Con Air'.`,
+    quote: '"Put the bunny back in the box."',
+    subquote: '-Cameron Poe, \'Con Air\'.',
   },
   {
-    quote: `"What's in the bag? A shark or something?"`,
-    subquote: `-Edward Malus, 'The Wicker Man'.`,
+    quote: '"What\'s in the bag? A shark or something?"',
+    subquote: '-Edward Malus, \'The Wicker Man\'.',
   },
   {
-    quote: `"Shoot him again... His soul's still dancing."`,
-    subquote: `-Terence McDonagh, 'Bad Lieutenant: Port of Call New Orleans'`,
+    quote: '"Shoot him again... His soul\'s still dancing."',
+    subquote: '-Terence McDonagh, \'Bad Lieutenant: Port of Call New Orleans\'',
   },
   {
-    quote: `"I did a bare 360 triple backflip in front of twenty-two thousand people. It's kind of funny, it's on YouTube, check it out"`,
-    subquote: `-Johnny Blaze, 'Ghost Rider: Spirit Of Vengeance'`,
-  },
-  { 
-    quote: `"I just stole fifty cars in one night! I'm a little tired, little wired, and I think I deserve a little appreciation!"`,
-    subquote: `-Randall 'Memphis' Raines, 'Gone In Sixty Seconds'`,
+    quote: '"I did a bare 360 triple backflip in front of twenty-two thousand people. It\'s kind of funny, it\'s on YouTube, check it out"',
+    subquote: '-Johnny Blaze, \'Ghost Rider: Spirit Of Vengeance\'',
   },
   {
-    quote: `"Bangers and mash! Bubbles and squeak! Smoked eel pie! Haggis!"`,
-    subquote: `-Ben Gates, 'National Treasure 2: Book Of Secrets'`,
+    quote: '"I just stole fifty cars in one night! I\'m a little tired, little wired, and I think I deserve a little appreciation!"',
+    subquote: '-Randall \'Memphis\' Raines, \'Gone In Sixty Seconds\'',
   },
   {
-    quote: `"Honey? Uh... You wanna know who really killed JFK?"`,
-    subquote: `-Stanley Godspeed, 'Rock'`,
+    quote: '"Bangers and mash! Bubbles and squeak! Smoked eel pie! Haggis!"',
+    subquote: '-Ben Gates, \'National Treasure 2: Book Of Secrets\'',
   },
   {
-    quote: `"You'll be seeing a lot of changes around here. Papa's got a brand new bag."`,
-    subquote: `-Castor Troy, 'Face/Off'`,
+    quote: '"Honey? Uh... You wanna know who really killed JFK?"',
+    subquote: '-Stanley Godspeed, \'Rock\'',
   },
   {
-    quote: `"I'll be taking these Huggies and whatever cash ya got."`,
-    subquote: `-H.I., 'Raising Arizona'.`,
+    quote: '"You\'ll be seeing a lot of changes around here. Papa\'s got a brand new bag."',
+    subquote: '-Castor Troy, \'Face/Off\'',
   },
   {
-    quote: `"People don't throw things at me anymore. Maybe because I carry a bow around."`,
-    subquote: `-David Spritz, 'The Weather Man'.`,
+    quote: '"I\'ll be taking these Huggies and whatever cash ya got."',
+    subquote: '-H.I., \'Raising Arizona\'.',
+  },
+  {
+    quote: '"People don\'t throw things at me anymore. Maybe because I carry a bow around."',
+    subquote: '-David Spritz, \'The Weather Man\'.',
   },
 ];

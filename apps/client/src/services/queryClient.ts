@@ -28,11 +28,11 @@ const getErrorMessage = (error: unknown): string => {
   }
 
   return 'Something went wrong';
-}
+};
 
 const logQueryError = (
   error: unknown,
-  query: Query<unknown, unknown, unknown, ReadonlyArray<unknown>>
+  query: Query<unknown, unknown, unknown, ReadonlyArray<unknown>>,
 ) => {
   logger.error('Query failed', error, undefined, {
     context: 'react-query',
@@ -44,7 +44,7 @@ const logQueryError = (
 
 const logMutationError = (
   error: unknown,
-  mutation: Mutation<unknown, unknown, unknown, unknown>
+  mutation: Mutation<unknown, unknown, unknown, unknown>,
 ) => {
   logger.error('Mutation failed', error, undefined, {
     context: 'react-query',
@@ -60,7 +60,7 @@ const shouldRetry = (failureCount: number, error: unknown): boolean => {
   // Never retry auth or permission failures — the 401 interceptor handles signOut
   if (status === 401 || status === 403 || status === 404) return false;
   return failureCount < 1;
-}
+};
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({

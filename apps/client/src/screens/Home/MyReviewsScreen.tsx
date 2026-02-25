@@ -102,11 +102,11 @@ type SortMode = 'recent' | 'popular';
 export default function MyReviewsScreen() {
   const [sort, setSort] = useState<SortMode>('recent');
   const { data: reviews = [], isLoading, refetch } = useGetMyReviews();
-  
+
   const sorted = [...reviews].sort((a, b) =>
     sort === 'popular'
       ? b.likeCount - a.likeCount
-      : new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime()
+      : new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime(),
   );
 
   return (

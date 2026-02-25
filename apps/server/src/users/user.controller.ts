@@ -27,7 +27,7 @@ export class UserController {
   createUser = async (
     req: Request<unknown, unknown, CreateUserDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const tokenData = await this.userService.registerUser(req.body);
@@ -40,7 +40,7 @@ export class UserController {
   updateUser = async (
     req: AuthenticatedRequest<UpdateUserDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.updateUser(req.user!.sub, req.body);
@@ -53,7 +53,7 @@ export class UserController {
   changePassword = async (
     req: AuthenticatedRequest<ChangePasswordDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.changePassword(req.user!.sub, req.body);
@@ -79,7 +79,7 @@ export class UserController {
   addFavorite = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.addFavorite(req.user!.sub, req.body.id);
@@ -92,7 +92,7 @@ export class UserController {
   removeFavorite = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.removeFavorite(req.user!.sub, req.body.id);
@@ -105,7 +105,7 @@ export class UserController {
   markAsSeen = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.markAsSeen(req.user!.sub, req.body.id);
@@ -118,7 +118,7 @@ export class UserController {
   removeFromSeen = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.removeFromSeen(req.user!.sub, req.body.id);
@@ -131,7 +131,7 @@ export class UserController {
   addToWatchlist = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.addToWatchlist(req.user!.sub, req.body.id);
@@ -144,7 +144,7 @@ export class UserController {
   removeFromWatchlist = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.removeFromWatchlist(req.user!.sub, req.body.id);
@@ -157,7 +157,7 @@ export class UserController {
   rateMovie = async (
     req: AuthenticatedRequest<RateMovieDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.rateMovie(req.user!.sub, req.body);
@@ -170,7 +170,7 @@ export class UserController {
   deleteRating = async (
     req: AuthenticatedRequest<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.userService.deleteRating(req.user!.sub, req.body.id);

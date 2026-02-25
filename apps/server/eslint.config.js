@@ -25,6 +25,12 @@ module.exports = [
     rules: {
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single', { avoidEscape: true }],
+      'comma-dangle': ['error', 'always-multiline'],
+      'no-trailing-spaces': 'error',
+      'no-multi-spaces': 'error',
+      'object-shorthand': ['error', 'always'],
     },
   },
 ];

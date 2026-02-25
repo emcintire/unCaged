@@ -55,4 +55,4 @@ export const createApp = (): Express => {
   app.use(error);
 
   return app;
-}
+};

@@ -19,13 +19,13 @@ class Logger {
 
   private formatMessage(message: string, options?: LogOptions): string {
     const parts: Array<string> = [];
-    
+
     if (options?.context) {
       parts.push(`[${options.context}]`);
     }
-    
+
     parts.push(message);
-    
+
     return parts.join(' ');
   }
 

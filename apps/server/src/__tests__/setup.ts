@@ -13,26 +13,26 @@ const ensureMongooseDisconnected = async () => {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.close();
   }
-}
+};
 
 const startInMemoryMongo = async (): Promise<string> => {
   mongoServer = await MongoMemoryReplSet.create({
     replSet: { count: 1, storageEngine: 'wiredTiger' },
   });
   return mongoServer.getUri();
-}
+};
 
 const stopInMemoryMongo = async () => {
   if (!mongoServer) return;
   await mongoServer.stop({ doCleanup: true, force: true });
-}
+};
 
 const clearDatabase = async () => {
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     await collections[key].deleteMany({});
   }
-}
+};
 
 // Set up in-memory MongoDB before all tests
 beforeAll(async () => {

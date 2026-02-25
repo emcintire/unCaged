@@ -12,4 +12,4 @@ export const toFormikValidator = <T>(schema: ZodType<T>) => {
     }
     return errors;
   };
-}
+};

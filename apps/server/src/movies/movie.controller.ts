@@ -20,7 +20,7 @@ export class MovieController {
   createMovie = async (
     req: AuthenticatedRequest<CreateMovieDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.movieService.createMovie(req.body);
@@ -51,7 +51,7 @@ export class MovieController {
   getAverageRating = async (
     req: Request<{ id: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const avgRating = await this.movieService.getAverageRating(req.params.id);

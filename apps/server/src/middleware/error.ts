@@ -6,7 +6,7 @@ export const error = (
   err: unknown,
   req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   const requestId = (req as Request & { requestId?: string }).requestId ?? req.headers['x-request-id'];
 
@@ -45,4 +45,4 @@ export const error = (
   });
 
   res.status(500).json({ message: 'Internal server error' });
-}
+};

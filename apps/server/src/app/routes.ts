@@ -16,4 +16,4 @@ export const setupRoutes = (app: Express) => {
   app.use('/api/reviews', reviewRouter);
   app.use('/api/quotes', quoteRouter);
   app.use('/api/movies', movieRouter);
-}
+};

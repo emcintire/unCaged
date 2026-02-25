@@ -18,7 +18,7 @@ export class QuoteController {
   createQuote = async (
     req: Request<unknown, unknown, CreateQuoteDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const quote = await this.quoteService.createQuote(req.body);

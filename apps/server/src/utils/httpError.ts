@@ -3,7 +3,7 @@ export class HttpError extends Error {
     public readonly status: number,
     message: string,
     public readonly code?: string,
-    public readonly details?: unknown
+    public readonly details?: unknown,
   ) {
     super(message);
     this.name = 'HttpError';

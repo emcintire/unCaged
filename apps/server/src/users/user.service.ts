@@ -62,12 +62,12 @@ export class UserService {
     userId: string,
     field: UserCollectionField,
     movieId: string,
-    counterField?: MovieCounterField
+    counterField?: MovieCounterField,
   ) {
     const query: Record<string, unknown> = { _id: userId, [field]: { $ne: movieId } };
     const update: Record<string, unknown> = { $addToSet: { [field]: movieId } };
     const result = await User.updateOne(query, update);
-    
+
     if (result.matchedCount === 0) {
       await this.ensureUserExists(userId);
       return;
@@ -82,12 +82,12 @@ export class UserService {
     userId: string,
     field: UserCollectionField,
     movieId: string,
-    counterField?: MovieCounterField
+    counterField?: MovieCounterField,
   ) {
     const query: Record<string, unknown> = { _id: userId, [field]: movieId };
     const update: Record<string, unknown> = { $pull: { [field]: movieId } };
     const result = await User.updateOne(query, update);
-    
+
     if (result.matchedCount === 0) {
       await this.ensureUserExists(userId);
       return;
@@ -118,7 +118,7 @@ export class UserService {
       throw new HttpError(
         409,
         'There is already an account associated with this email.',
-        'EMAIL_ALREADY_REGISTERED'
+        'EMAIL_ALREADY_REGISTERED',
       );
     }
 
@@ -186,13 +186,13 @@ export class UserService {
 
     if (user.favorites.length > 0) {
       cleanupOps.push(
-        Movie.updateMany({ _id: { $in: user.favorites } }, { $inc: { favoriteCount: -1 } })
+        Movie.updateMany({ _id: { $in: user.favorites } }, { $inc: { favoriteCount: -1 } }),
       );
     }
 
     if (user.seen.length > 0) {
       cleanupOps.push(
-        Movie.updateMany({ _id: { $in: user.seen } }, { $inc: { seenCount: -1 } })
+        Movie.updateMany({ _id: { $in: user.seen } }, { $inc: { seenCount: -1 } }),
       );
     }
 
@@ -257,25 +257,25 @@ export class UserService {
           await Movie.findByIdAndUpdate(
             dto.id,
             { $inc: { ratingSum: diff } },
-            { session }
+            { session },
           );
           await User.findByIdAndUpdate(
             userId,
             { $pull: { ratings: { movie: dto.id } } },
-            { session }
+            { session },
           );
         } else {
           await Movie.findByIdAndUpdate(
             dto.id,
             { $inc: { ratingCount: 1, ratingSum: dto.rating } },
-            { session }
+            { session },
           );
         }
 
         await User.findByIdAndUpdate(
           userId,
           { $push: { ratings: { movie: dto.id, rating: dto.rating } } },
-          { session }
+          { session },
         );
 
         await this.recalculateMovieAverage(dto.id, session);
@@ -303,13 +303,13 @@ export class UserService {
         await User.findByIdAndUpdate(
           userId,
           { $pull: { ratings: { movie: movieId } } },
-          { session }
+          { session },
         );
 
         const movie = await Movie.findByIdAndUpdate(
           movieId,
           { $inc: { ratingCount: -1, ratingSum: -existingRating.rating } },
-          { new: true, session }
+          { new: true, session },
         );
 
         if (!movie) {

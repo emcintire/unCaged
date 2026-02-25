@@ -9,6 +9,7 @@ import * as SecureStore from 'expo-secure-store';
 
 import { env } from '@/config';
 import { STORAGE_KEYS } from '@/constants';
+import { clearCache } from '@/utils';
 import { logger } from '@/utils';
 
 export type UnwrapApiEnvelope<T> = T extends { data: infer D } ? D : T;
@@ -40,29 +41,14 @@ let onUnauthorizedCallback: (() => void) | null = null;
 
 export const setOnUnauthorized = (callback: (() => void) | null) => {
   onUnauthorizedCallback = callback;
-}
-
-const getAccessToken = async () => {
-  return SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKEN);
-}
-
-const getRefreshToken = async () => {
-  return SecureStore.getItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
-}
+};
 
 const setTokens = async (accessToken: string, refreshToken?: string) => {
   await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, accessToken);
   if (refreshToken) {
     await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN, refreshToken);
   }
-}
-
-const clearTokens = async () => {
-  await Promise.all([
-    SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN),
-    SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN),
-  ]);
-}
+};
 
 const setAuthorizationHeader = (
   config: { headers?: InternalAxiosRequestConfig['headers']},
@@ -83,7 +69,7 @@ export const AXIOS_INSTANCE = Axios.create({
 AXIOS_INSTANCE.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const cfg = config as AuthRequestConfig;
 
-  const token = await getAccessToken();
+  const token = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKEN);
   if (token) {
     setAuthorizationHeader(cfg, token);
   }
@@ -98,7 +84,7 @@ type RefreshResponse = { accessToken: string; refreshToken: string; };
 let refreshPromise: Promise<RefreshResponse> | null = null;
 
 const refreshTokens = async (): Promise<RefreshResponse> => {
-  const refreshToken = await getRefreshToken();
+  const refreshToken = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
   if (!refreshToken) throw new Error('Missing refresh token');
 
   const res = await AXIOS_INSTANCE.post<RefreshResponse>(
@@ -112,7 +98,7 @@ const refreshTokens = async (): Promise<RefreshResponse> => {
 
   await setTokens(accessToken, newRefreshToken);
   return res.data;
-}
+};
 
 /**
  * Response interceptor:
@@ -168,7 +154,7 @@ AXIOS_INSTANCE.interceptors.response.use(
 
         return AXIOS_INSTANCE.request(cfg);
       } catch (refreshErr) {
-        await clearTokens();
+        await clearCache();
         onUnauthorizedCallback?.();
         return Promise.reject(refreshErr);
       }
@@ -176,7 +162,7 @@ AXIOS_INSTANCE.interceptors.response.use(
 
     // If we got a 401 and didn't refresh (auth endpoints or skipRefresh), treat as signed out
     if (status === 401 && !isSkipRefreshEndpoint(cfg.url)) {
-      await clearTokens();
+      await clearCache();
       onUnauthorizedCallback?.();
     }
 
@@ -188,7 +174,7 @@ const isApiEnvelope = (value: unknown): value is { data: unknown; status?: numbe
   if (typeof value !== 'object' || value === null) return false;
   if (!('data' in value)) return false;
   return true;
-}
+};
 
 const axiosRequest = <T>(config: AxiosRequestConfig): Promise<UnwrapApiEnvelope<T>> => {
   const source = Axios.CancelToken.source();
@@ -216,7 +202,7 @@ const headersToObject = (headers?: RequestInit['headers']): Record<string, strin
   if (headers instanceof Headers) return Object.fromEntries(headers.entries());
   if (Array.isArray(headers)) return Object.fromEntries(headers);
   return headers as Record<string, string>;
-}
+};
 
 const tryParseJson = (input: string) => {
   try {
@@ -224,7 +210,7 @@ const tryParseJson = (input: string) => {
   } catch {
     return input;
   }
-}
+};
 
 export const axiosInstance = <T>(url: string, options?: RequestInit): Promise<UnwrapApiEnvelope<T>> => {
   const method = (options?.method ?? 'GET').toLowerCase() as Method;

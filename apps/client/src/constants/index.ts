@@ -25,8 +25,7 @@ export const PROFILE_PICS = [
 ] as const;
 
 /** Returns the local asset for a 1-based profile picture index. Defaults to pic 1. */
-export const getProfilePic = (image?: number | null) =>
-  PROFILE_PICS[((image ?? 1) >= 1 && (image ?? 1) <= 6 ? (image ?? 1) : 1) - 1];
+export const getProfilePic = (image?: number | null) => PROFILE_PICS[(image ?? 1) - 1];
 
 export const genres = [
   'Action',

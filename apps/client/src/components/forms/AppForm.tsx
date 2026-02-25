@@ -20,7 +20,7 @@ const isHandledRequestError = (error: unknown): boolean => {
 
   return typeof maybeError?.response?.status === 'number';
 };
-  
+
 export default function AppForm<Values extends FormikValues>({
   initialValues,
   onSubmit,

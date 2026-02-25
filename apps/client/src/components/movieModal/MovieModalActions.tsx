@@ -7,8 +7,8 @@ import { colors, fontFamily, fontSize } from '@/config';
 import { useAuth } from '@/hooks';
 import {
 getGetCurrentUserQueryKey,
-type Movie, useAddToFavorites,   useAddToSeen, useAddToWatchlist,
-useGetCurrentUser, useRemoveFromFavorites, useRemoveFromSeen,   useRemoveFromWatchlist, } from '@/services';
+type Movie, useAddToFavorites, useAddToSeen, useAddToWatchlist,
+useGetCurrentUser, useRemoveFromFavorites, useRemoveFromSeen, useRemoveFromWatchlist } from '@/services';
 
 import Icon from '../Icon';
 import MovieModalRating from './MovieModalRating';

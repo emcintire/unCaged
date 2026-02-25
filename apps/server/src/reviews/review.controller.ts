@@ -46,7 +46,7 @@ export class ReviewController {
   createReview = async (
     req: AuthenticatedRequest<CreateReviewDto>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const review = await this.reviewService.createReview(req.user!.sub, req.body);
@@ -59,7 +59,7 @@ export class ReviewController {
   updateReview = async (
     req: AuthenticatedRequest<UpdateReviewDto, { reviewId: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const updated = await this.reviewService.updateReview(
@@ -76,7 +76,7 @@ export class ReviewController {
   deleteReview = async (
     req: AuthenticatedRequest<unknown, { reviewId: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);
@@ -89,7 +89,7 @@ export class ReviewController {
   toggleLike = async (
     req: AuthenticatedRequest<unknown, { reviewId: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const result = await this.reviewService.toggleLike(req.params.reviewId, req.user!.sub);
@@ -102,7 +102,7 @@ export class ReviewController {
   flagReview = async (
     req: AuthenticatedRequest<unknown, { reviewId: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.reviewService.flagReview(req.params.reviewId, req.user!.sub);
@@ -115,7 +115,7 @@ export class ReviewController {
   unflagReview = async (
     req: AuthenticatedRequest<unknown, { reviewId: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.reviewService.unflagReview(req.params.reviewId);
@@ -149,7 +149,7 @@ export class ReviewController {
   deleteReviewAdmin = async (
     req: AuthenticatedRequest<unknown, { reviewId: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.reviewService.deleteReview(req.params.reviewId, req.user!.sub, req.user!.isAdmin);

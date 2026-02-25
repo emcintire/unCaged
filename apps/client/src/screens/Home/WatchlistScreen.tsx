@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { Text } from 'react-native';
 
-import AdBanner from '@/components/AdBanner';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
 import Screen from '@/components/Screen';
@@ -13,7 +12,6 @@ export default function WatchlistScreen() {
   const { data: movies = [], isLoading: isMoviesLoading, refetch: refetchMovies } = useGetAllMovies();
 
   const isLoading = isUserLoading || isMoviesLoading;
-  const isAdmin = user?.isAdmin ?? false;
 
   const watchlistMovies = useMemo(() => {
     if (!user) { return []; }
@@ -24,7 +22,6 @@ export default function WatchlistScreen() {
 
   return (
     <Screen isLoading={isLoading} skeleton={<MovieGridSkeleton />}>
-      {!isAdmin && <AdBanner />}
       <MovieGrid
         movies={watchlistMovies}
         onRefresh={refreshAll}

@@ -20,7 +20,7 @@ export class QuoteService {
     const firstDate = new Date(2021, 10, 14);
     const secondDate = new Date();
     const diffWeek = Math.floor(
-      Math.abs((firstDate.getTime() - secondDate.getTime()) / oneWeek)
+      Math.abs((firstDate.getTime() - secondDate.getTime()) / oneWeek),
     );
 
     const index = diffWeek % quotes.length;

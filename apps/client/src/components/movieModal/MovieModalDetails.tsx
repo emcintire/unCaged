@@ -29,7 +29,7 @@ export default memo(function MovieModalDetails({ movie }: Props) {
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.label}>Description:</Text>
-        <Text style={styles.details}></Text>
+        <Text style={styles.details} />
       </View>
       <Text style={styles.description}>{movie.description}</Text>
     </View>

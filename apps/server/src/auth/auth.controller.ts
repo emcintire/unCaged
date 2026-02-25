@@ -24,7 +24,7 @@ export class AuthController {
   logout = async (
     req: AuthenticatedRequest<{ refreshToken: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.authService.logout(req.body.refreshToken);
@@ -37,7 +37,7 @@ export class AuthController {
   refresh = async (
     req: Request<unknown, unknown, { refreshToken: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const tokenData = await this.authService.refresh(req.body.refreshToken);
@@ -50,7 +50,7 @@ export class AuthController {
   forgotPassword = async (
     req: Request<unknown, unknown, { email: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.authService.forgotPassword(req.body.email);
@@ -63,7 +63,7 @@ export class AuthController {
   checkResetCode = async (
     req: Request<unknown, unknown, { email: string; code: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.authService.checkResetCode(req.body.email, req.body.code);
@@ -72,11 +72,11 @@ export class AuthController {
       next(error);
     }
   };
-  
+
   resetPassword = async (
     req: Request<unknown, unknown, { code: string; email: string; newPassword: string }>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       await this.authService.resetPassword(req.body.email, req.body.code, req.body.newPassword);

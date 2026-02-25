@@ -41,4 +41,4 @@ export const useAnimatedValue = (initial: number) => {
   );
 
   return { value, timeTo, springTo, reset } as const;
-}
+};

@@ -9,7 +9,7 @@ import { getIdFromToken, getTokenFromRequest } from '@/utils';
  */
 export const getUserIdFromRequest = (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): string | null => {
   const token = getTokenFromRequest(req);
   if (!token) {
@@ -17,4 +17,4 @@ export const getUserIdFromRequest = (
     return null;
   }
   return getIdFromToken(token);
-}
+};

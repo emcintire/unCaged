@@ -15,7 +15,7 @@ type Props = {
 const parseRuntime = (runtime: string): number => {
   const match = runtime.match(/(\d+)/);
   return match?.[1] ? parseInt(match[1], 10) : 0;
-}
+};
 
 const formatWatchTime = (totalMinutes: number): string => {
   if (totalMinutes === 0) return '0m';
@@ -25,7 +25,7 @@ const formatWatchTime = (totalMinutes: number): string => {
   if (days > 0) return `${days}d ${hours}h ${minutes}m`;
   if (hours > 0) return `${hours}h ${minutes}m`;
   return `${minutes}m`;
-}
+};
 
 const getTopGenre = (movies: Array<Movie>): string => {
   const genreCounts: Record<string, number> = {};
@@ -43,7 +43,7 @@ const getTopGenre = (movies: Array<Movie>): string => {
     }
   }
   return topGenre;
-}
+};
 
 type StatItemProps = {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;

@@ -45,7 +45,7 @@ const movieMongooseSchema = new Schema<MovieDocument>({
     type: String,
     minlength: 1,
     maxLength: 100,
-    required: true
+    required: true,
   },
   img: {
     type: String,

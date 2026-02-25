@@ -1,10 +1,10 @@
-import { useQueryClient } from '@tanstack/react-query';
 import * as SecureStore from 'expo-secure-store';
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { STORAGE_KEYS } from '@/constants';
 import { setOnUnauthorized, useLogout } from '@/services';
+import { clearCache } from '@/utils';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -13,32 +13,23 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
-const clearStoredTokens = () => Promise.all([
-  SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN),
-  SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN),
-]);
-
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const queryClient = useQueryClient();
+
   const logoutMutation = useLogout();
 
   const signOut = useCallback(async () => {
-    // Read the refresh token BEFORE clearing storage — otherwise the delete
-    // races the get and the server-side revocation never fires.
     const refreshToken = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
-
     setIsAuthenticated(false);
-    queryClient.clear();
-    await clearStoredTokens();
+    void clearCache();
 
     if (refreshToken) {
       logoutMutation.mutate({ data: { refreshToken } });
     }
-  }, [logoutMutation, queryClient]);
+  }, [logoutMutation]);
 
   const signIn = useCallback(async (accessToken: string, refreshToken: string) => {
     await Promise.all([
@@ -55,7 +46,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setIsAuthenticated(token != null);
       } catch {
         setIsAuthenticated(false);
-        void clearStoredTokens();
+        void clearCache();
       } finally {
         setIsLoading(false);
         setOnUnauthorized(signOut);
@@ -67,7 +58,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const value = useMemo(
     () => ({ isAuthenticated, isLoading, signIn, signOut }),
-    [isAuthenticated, isLoading, signIn, signOut]
+    [isAuthenticated, isLoading, signIn, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

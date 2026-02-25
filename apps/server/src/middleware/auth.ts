@@ -7,7 +7,7 @@ import { getRequiredEnv, getTokenFromRequest } from '@/utils';
 export const auth = (
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   const token = getTokenFromRequest(req);
   if (!token) {
@@ -26,4 +26,4 @@ export const auth = (
   } catch {
     res.status(401).json({ message: 'Unauthorized', code: 'AUTH_TOKEN_INVALID' });
   }
-}
+};

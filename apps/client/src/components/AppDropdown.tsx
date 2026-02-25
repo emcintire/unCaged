@@ -1,8 +1,8 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { useRef, useState } from 'react'
-import { Modal, ScrollView, StyleSheet, Text, type TextStyle, TouchableOpacity, View, type ViewStyle } from 'react-native'
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRef, useState } from 'react';
+import { Modal, ScrollView, StyleSheet, Text, type TextStyle, TouchableOpacity, View, type ViewStyle } from 'react-native';
 
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config'
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 
 type Props = {
   accessibilityLabel?: string;
@@ -35,38 +35,38 @@ export default function AppDropdown({
   overlayDropdown = false,
   selectedValue,
 }: Props) {
-  const [open, setOpen] = useState(false)
-  const [dropdownTop, setDropdownTop] = useState(0)
-  const [dropdownLeft, setDropdownLeft] = useState(0)
-  const [dropdownWidth, setDropdownWidth] = useState(0)
-  const buttonRef = useRef<View>(null)
+  const [open, setOpen] = useState(false);
+  const [dropdownTop, setDropdownTop] = useState(0);
+  const [dropdownLeft, setDropdownLeft] = useState(0);
+  const [dropdownWidth, setDropdownWidth] = useState(0);
+  const buttonRef = useRef<View>(null);
 
   const toggle = () => {
     if (!open && overlayDropdown) {
       buttonRef.current?.measureInWindow((x, y, width, height) => {
-        setDropdownTop(y + height)
-        setDropdownLeft(x)
-        setDropdownWidth(width)
-        setOpen(true)
-        onOpenChange?.(true)
-      })
+        setDropdownTop(y + height);
+        setDropdownLeft(x);
+        setDropdownWidth(width);
+        setOpen(true);
+        onOpenChange?.(true);
+      });
     } else {
-      const next = !open
-      setOpen(next)
-      onOpenChange?.(next)
+      const next = !open;
+      setOpen(next);
+      onOpenChange?.(next);
     }
-  }
+  };
 
   const close = () => {
-    setOpen(false)
-    onOpenChange?.(false)
-  }
+    setOpen(false);
+    onOpenChange?.(false);
+  };
 
   const listItems = items.map((item) => (
     <TouchableOpacity
       key={item}
       style={[styles.item, itemStyle, item === selectedValue && styles.itemSelected]}
-      onPress={() => { onSelect(item); close() }}
+      onPress={() => { onSelect(item); close(); }}
       accessibilityRole="button"
       accessibilityLabel={item}
     >
@@ -74,7 +74,7 @@ export default function AppDropdown({
         {item}
       </Text>
     </TouchableOpacity>
-  ))
+  ));
 
   return (
     <View ref={buttonRef}>
@@ -120,7 +120,7 @@ export default function AppDropdown({
         )
       )}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -165,4 +165,4 @@ const styles = StyleSheet.create({
   itemTextSelected: {
     color: colors.white,
   },
-})
+});
