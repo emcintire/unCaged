@@ -16,17 +16,11 @@ export const TOAST_DURATION = {
 // Profile pictures stored as local assets (assets/imgs/1.png through 6.png).
 // The index stored in user.image is 1-based; PROFILE_PICS is 0-based.
 export const PROFILE_PICS = [
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('@/assets/imgs/1.png'),
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('@/assets/imgs/2.png'),
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('@/assets/imgs/3.png'),
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('@/assets/imgs/4.png'),
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('@/assets/imgs/5.png'),
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('@/assets/imgs/6.png'),
 ] as const;
 

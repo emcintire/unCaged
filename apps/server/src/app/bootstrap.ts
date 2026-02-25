@@ -1,6 +1,7 @@
 import type { Express } from 'express';
-import mongoose from 'mongoose';
 import type { Server } from 'http';
+import mongoose from 'mongoose';
+
 import { getRequiredEnv, logger } from '@/utils';
 
 const connectToDatabase = async (): Promise<void> => {

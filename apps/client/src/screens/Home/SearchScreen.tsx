@@ -1,13 +1,14 @@
-import { useState, useMemo } from 'react';
-import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Movie, useGetCurrentUser, useGetAllMovies, getGetCurrentUserQueryKey } from '@/services';
-import { useAuth, useDebounce } from '@/hooks';
-import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/config';
+import { useMemo,useState } from 'react';
+import { StyleSheet, TextInput,TouchableOpacity, View } from 'react-native';
+
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
 import Screen from '@/components/Screen';
 import SearchFilters from '@/components/SearchFilters';
+import { borderRadius, colors, fontFamily,fontSize, spacing } from '@/config';
+import { useAuth, useDebounce } from '@/hooks';
+import { getGetCurrentUserQueryKey,type Movie, useGetAllMovies, useGetCurrentUser } from '@/services';
 
 const styles = StyleSheet.create({
   inputContainer: {
@@ -117,8 +118,8 @@ export default function SearchScreen() {
       )}
       <MovieGrid
         movies={displayMovies}
-        favoriteIds={user?.favorites ?? []}
-        seenIds={user?.seen ?? []}
+        favoriteIds={user?.favorites}
+        seenIds={user?.seen}
         onRefresh={refetch}
       />
     </Screen>

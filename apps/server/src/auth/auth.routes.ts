@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { AuthController } from '@/auth';
 import { createAuthLimiter } from '@/utils';
 

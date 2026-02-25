@@ -1,5 +1,6 @@
 import { quotes } from '@/utils';
 import { validateSchema } from '@/utils';
+
 import { Quote } from './quote.model';
 import { quoteSchema } from './quote.schema';
 import type { CreateQuoteDto } from './schemas';

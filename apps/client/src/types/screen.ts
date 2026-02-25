@@ -3,6 +3,7 @@ import type { ComponentType } from 'react';
 
 export type Screen<StackParamList> = {
   name: keyof StackParamList;
-  component: ComponentType<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
+  component: ComponentType<any>;
   options?: NativeStackNavigationOptions;
 };

@@ -1,4 +1,5 @@
 import z from 'zod';
+
 import { HttpError } from './httpError';
 
 export const validateSchema = <T>(schema: z.ZodSchema<T>, data: unknown): void => {

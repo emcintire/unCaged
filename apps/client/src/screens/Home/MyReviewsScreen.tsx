@@ -1,16 +1,17 @@
-import { memo, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import type { UserReview } from '@/services';
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
-import Screen from '@/components/Screen';
-import { useDeleteReview, useGetMyReviews, getGetMyReviewsQueryKey } from '@/services';
+import { Image } from 'expo-image';
+import { memo, useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import WriteReviewForm from '@/components/movieModal/reviews/WriteReviewForm';
 import PullToRefresh from '@/components/PullToRefresh';
+import Screen from '@/components/Screen';
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import type { UserReview } from '@/services';
+import { getGetMyReviewsQueryKey,useDeleteReview, useGetMyReviews } from '@/services';
 
-const ReviewListItem = memo(function ReviewListItem({ item }: { item: UserReview }) {
+const ReviewListItem = memo(({ item }: { item: UserReview }) => {
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
   const deleteMutation = useDeleteReview();

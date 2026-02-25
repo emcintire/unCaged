@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { Review } from '@/services';
-import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike, getGetCurrentUserQueryKey, getGetReviewsByMovieQueryKey } from '@/services';
-import { useAuth } from '@/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
+import { memo, useMemo, useState } from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import { getProfilePic } from '@/constants';
+import { useAuth } from '@/hooks';
+import type { Review } from '@/services';
+import { getGetCurrentUserQueryKey, getGetReviewsByMovieQueryKey,useDeleteReview, useFlagReview, useGetCurrentUser, useToggleReviewLike } from '@/services';
+
 import StarRating from '../../StarRating';
 import WriteReviewForm from './WriteReviewForm';
 
@@ -17,7 +19,7 @@ type Props = {
   review: Review;
 };
 
-export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
+export default memo(function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   const [spoilerRevealed, setSpoilerRevealed] = useState(false);
   const [flagged, setFlagged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -101,11 +103,11 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
     onSuccess();
   };
 
-  const formattedDate = new Date(review.createdOn).toLocaleDateString('en-US', {
+  const formattedDate = useMemo(() => new Date(review.createdOn).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  });
+  }), [review.createdOn]);
 
   const isSpoilerHidden = review.isSpoiler && !spoilerRevealed;
 
@@ -196,7 +198,7 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

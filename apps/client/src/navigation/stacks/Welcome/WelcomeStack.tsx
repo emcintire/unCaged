@@ -1,9 +1,11 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   MaterialCommunityIcons, type MaterialCommunityIcons as MaterialCommunityIconsType,
 } from '@expo/vector-icons';
-import type { WelcomeStackParamList, Screen } from '@/types';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import { colors } from '@/config';
+import type { Screen,WelcomeStackParamList } from '@/types';
+
 import AuthTab from './AuthTab';
 import WelcomeHomeTab from './WelcomeHomeTab';
 import WelcomeSearchTab from './WelcomeSearchTab';

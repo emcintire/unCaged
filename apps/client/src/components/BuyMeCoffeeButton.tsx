@@ -1,6 +1,8 @@
 import { memo } from 'react';
-import { Linking, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { Linking, type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
+
 import { logger } from '@/utils';
+
 import AppButton from './AppButton';
 
 type Props = {

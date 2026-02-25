@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+
 import { User } from '@/users';
 import {
   createRefreshTokenValue,
@@ -11,6 +12,7 @@ import {
   signAccessToken,
   validateSchema,
 } from '@/utils';
+
 import { RefreshToken } from './refreshToken.model';
 import { type LoginDto, loginDtoSchema } from './schemas';
 

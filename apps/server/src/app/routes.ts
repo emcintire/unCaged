@@ -1,9 +1,10 @@
 import type { Express } from 'express';
+
+import { authRouter } from '@/auth';
 import { movieRouter } from '@/movies';
 import { quoteRouter } from '@/quotes';
 import { reviewRouter } from '@/reviews';
 import { userRouter } from '@/users';
-import { authRouter } from '@/auth';
 
 export const setupRoutes = (app: Express) => {
   app.get('/health', (_req, res) => {

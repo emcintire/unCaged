@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StyleSheet, Text, View } from 'react-native';
+
 import { colors } from './colors';
-import { borderRadius, spacing, fontSize, fontFamily } from './theme';
+import { borderRadius, fontFamily,fontSize, spacing } from './theme';
 
 type ToastConfigProps = {
   text1?: string;

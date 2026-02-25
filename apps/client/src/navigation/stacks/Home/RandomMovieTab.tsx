@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import type { RandomTabParamList, Screen } from '@/types';
-import { screenOptions } from '@/navigation/stacks/screenOptions';
 import AccountButton from '@/components/AccountButton';
 import AppLogo from '@/components/AppLogo';
+import { screenOptions } from '@/navigation/stacks/screenOptions';
 import RandomMovieScreen from '@/screens/Home/RandomMovieScreen';
+import type { RandomTabParamList, Screen } from '@/types';
 
 const Random_Movie_Tab = createNativeStackNavigator<RandomTabParamList>();
 

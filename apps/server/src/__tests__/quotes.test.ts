@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
-import app from '../app/app';
+
 import { Quote } from '@/quotes';
 import { User } from '@/users';
 import { signAccessToken } from '@/utils';
+
+import app from '../app/app';
 
 describe('Quotes API', () => {
   let adminToken: string;

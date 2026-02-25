@@ -1,4 +1,5 @@
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions,View } from 'react-native';
+
 import Skeleton from '@/components/Skeleton';
 import { modal, spacing } from '@/config';
 

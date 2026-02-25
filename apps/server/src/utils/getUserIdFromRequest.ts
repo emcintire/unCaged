@@ -1,4 +1,5 @@
 import type { Response } from 'express';
+
 import type { AuthenticatedRequest } from '@/types';
 import { getIdFromToken, getTokenFromRequest } from '@/utils';
 

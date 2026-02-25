@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import type { Screen, WatchlistTabParamList } from '@/types';
-import { screenOptions } from '@/navigation/stacks/screenOptions';
 import AccountButton from '@/components/AccountButton';
 import AppLogo from '@/components/AppLogo';
+import { screenOptions } from '@/navigation/stacks/screenOptions';
 import WatchlistScreen from '@/screens/Home/WatchlistScreen';
+import type { Screen, WatchlistTabParamList } from '@/types';
 
 const Watchlist_Tab = createNativeStackNavigator<WatchlistTabParamList>();
 

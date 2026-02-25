@@ -1,5 +1,7 @@
 import express from 'express';
-import { auth, admin } from '@/middleware';
+
+import { admin,auth } from '@/middleware';
+
 import { QuoteController } from './quote.controller';
 
 export const quoteRouter = express.Router();

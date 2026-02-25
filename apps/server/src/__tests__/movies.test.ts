@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
-import app from '../app/app';
+
 import { Movie } from '@/movies';
 import { User } from '@/users';
 import { signAccessToken } from '@/utils';
+
+import app from '../app/app';
 
 describe('Movies API', () => {
   let adminToken: string;

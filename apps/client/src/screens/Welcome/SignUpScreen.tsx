@@ -1,13 +1,14 @@
+import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
 import { View } from 'react-native';
 import { z } from 'zod';
-import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
-import { useAuth } from '@/hooks';
-import { form, screen } from '@/config';
-import { showErrorToast, toFormikValidator } from '@/utils';
-import Screen from '@/components/Screen';
+
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import PasswordInput from '@/components/forms/PasswordInput';
+import Screen from '@/components/Screen';
+import { form, screen } from '@/config';
+import { useAuth } from '@/hooks';
 import { useCreateUser } from '@/services';
+import { showErrorToast, toFormikValidator } from '@/utils';
 
 const schema = z.object({
   name: z.string().optional(),

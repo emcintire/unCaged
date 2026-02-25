@@ -1,9 +1,10 @@
-import { useCallback, type ReactNode } from 'react';
-import { TextInput, StyleSheet, Animated } from 'react-native';
-import type { TextInputProps, DimensionValue } from 'react-native';
 import {
   MaterialCommunityIcons, type MaterialCommunityIcons as MaterialCommunityIconsType,
 } from '@expo/vector-icons';
+import { type ReactNode,useCallback } from 'react';
+import type { DimensionValue,TextInputProps } from 'react-native';
+import { Animated,StyleSheet, TextInput } from 'react-native';
+
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import { useAnimatedValue } from '@/hooks';
 

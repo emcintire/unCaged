@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+
 import { ACCESS_TTL_SECONDS, getRequiredEnv, REFRESH_TTL_DAYS } from '@/utils';
 
 export const signAccessToken = (payload: { sub: string; isAdmin: boolean }) => {

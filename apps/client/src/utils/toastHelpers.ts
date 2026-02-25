@@ -1,4 +1,5 @@
-import Toast, { ToastType } from 'react-native-toast-message';
+import Toast, { type ToastType } from 'react-native-toast-message';
+
 import { TOAST_DURATION } from '@/constants';
 
 const showToast = (

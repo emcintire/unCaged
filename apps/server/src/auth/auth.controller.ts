@@ -1,6 +1,8 @@
-import { AuthService } from './auth.service';
 import type { NextFunction, Request, Response } from 'express';
+
 import type { AuthenticatedRequest } from '@/types';
+
+import { AuthService } from './auth.service';
 import type { LoginDto } from './schemas';
 
 export class AuthController {

@@ -1,9 +1,11 @@
+import type { Express } from 'express';
 import express from 'express';
 import helmet from 'helmet';
-import type { Express } from 'express';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+
 import { error, requestId, requestLogger } from '@/middleware';
+
 import { setupRoutes } from './routes';
 
 const swaggerOptions: swaggerJSDoc.Options = {

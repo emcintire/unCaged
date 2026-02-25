@@ -1,6 +1,8 @@
 import express from 'express';
+
 import { auth } from '@/middleware';
 import { createAuthLimiter } from '@/utils';
+
 import { UserController } from './user.controller';
 
 const registerLimiter = createAuthLimiter({ max: 10 });

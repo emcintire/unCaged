@@ -15,9 +15,6 @@ export const changeResolution = (transform: string, movie: Movie): Movie => {
   const idx = src.indexOf(UPLOAD_SEGMENT);
   if (idx === -1) return movie;
   const newImage =
-    src.slice(0, idx + UPLOAD_SEGMENT.length) +
-    transform +
-    '/' +
-    src.slice(idx + UPLOAD_SEGMENT.length);
+    `${src.slice(0, idx + UPLOAD_SEGMENT.length)}${transform}/${src.slice(idx + UPLOAD_SEGMENT.length)}`;
   return { ...movie, image: newImage };
 };

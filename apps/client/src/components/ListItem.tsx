@@ -1,12 +1,14 @@
-import { memo } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import type { StyleProp, ViewStyle } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { ImageSource } from 'expo-image';
 import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AppText from './AppText';
+import { memo } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet,TouchableOpacity, View } from 'react-native';
+
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+
+import AppText from './AppText';
 
 type Props = {
   IconComponent?: ReactNode;

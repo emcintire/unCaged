@@ -1,17 +1,18 @@
-import { View, Text } from 'react-native';
-import { z } from 'zod';
-import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
-import { useResetPassword } from '@/services';
-import { useAuth } from '@/hooks';
-import { form, screen, typography, utils } from '@/config';
-import { showSuccessToast, toFormikValidator } from '@/utils';
+import * as SecureStore from 'expo-secure-store';
+import { Text,View } from 'react-native';
+import { z } from 'zod';
+
+import { AppForm, SubmitButton } from '@/components/forms';
 import PasswordInput from '@/components/forms/PasswordInput';
 import Screen from '@/components/Screen';
-import { AppForm, SubmitButton } from '@/components/forms';
+import { form, screen, typography, utils } from '@/config';
+import { useAuth } from '@/hooks';
+import { useResetPassword } from '@/services';
 import type { WelcomeAuthTabParamList } from '@/types';
+import { showSuccessToast, toFormikValidator } from '@/utils';
 
 const schema = z.object({
   newPassword: z.string().min(1, 'Password is required').regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),

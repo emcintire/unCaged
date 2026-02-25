@@ -1,13 +1,14 @@
-import { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useMemo } from 'react';
+import { StyleSheet,Text, View } from 'react-native';
+
+import { borderRadius, colors, fontFamily, fontSize,spacing } from '@/config';
 import type { Movie, User } from '@/services';
-import { colors, borderRadius, spacing, fontFamily, fontSize } from '@/config';
 
 type Props = {
-  seenMovies: Array<Movie>;
+  seenMovies: Array<Movie> | undefined;
   totalMovies: number;
-  userRatings: User['ratings'];
+  userRatings: User['ratings'] | undefined;
   reviewCount: number;
 };
 
@@ -60,7 +61,7 @@ function StatItem({ icon, label, value }: StatItemProps) {
   );
 }
 
-export default function CollectionStats({ seenMovies, totalMovies, userRatings, reviewCount }: Props) {
+export default function CollectionStats({ seenMovies = [], totalMovies, userRatings = [], reviewCount }: Props) {
   const stats = useMemo(() => {
     const seenCount = seenMovies.length;
     const percentage = totalMovies > 0 ? Math.round((seenCount / totalMovies) * 100) : 0;

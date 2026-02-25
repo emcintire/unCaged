@@ -1,5 +1,5 @@
-import z from 'zod';
 import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
+import z from 'zod';
 
 export const changePasswordDtoSchema = z.object({
   currentPassword: z.string().min(1),

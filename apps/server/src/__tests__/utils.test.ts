@@ -1,5 +1,6 @@
 import type { Response } from 'express';
-import { getRequiredEnv, getTokenFromRequest, signAccessToken, getUserIdFromRequest } from '@/utils';
+
+import { getRequiredEnv, getTokenFromRequest, getUserIdFromRequest,signAccessToken } from '@/utils';
 
 describe('Utility helpers', () => {
   it('getTokenFromRequest returns bearer token and null for missing header', () => {

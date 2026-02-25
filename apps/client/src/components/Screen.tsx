@@ -1,9 +1,11 @@
-import { View, StyleSheet, KeyboardAvoidingView } from 'react-native';
-import type { StyleProp, ViewStyle } from 'react-native';
 import type { PropsWithChildren, ReactNode } from 'react';
-import Loading from './Loading';
-import ErrorBoundary from './ErrorBoundary';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { KeyboardAvoidingView,StyleSheet, View } from 'react-native';
+
 import { colors } from '@/config';
+
+import ErrorBoundary from './ErrorBoundary';
+import Loading from './Loading';
 
 type Props = PropsWithChildren & {
   isLoading?: boolean;

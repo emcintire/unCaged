@@ -1,11 +1,12 @@
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
-import { useGetCurrentUser } from '@/services';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { HomeStackParamList } from '@/types';
+import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Image } from 'expo-image';
+import { StyleSheet,TouchableOpacity } from 'react-native';
+
 import { borderRadius } from '@/config';
 import { getProfilePic } from '@/constants';
+import { useGetCurrentUser } from '@/services';
+import { type HomeStackParamList } from '@/types';
 
 export default function AccountButton() {
   const { data: user, refetch } = useGetCurrentUser();

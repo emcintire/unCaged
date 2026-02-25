@@ -1,8 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useQueryClient } from '@tanstack/react-query';
-import { useCreateReview, useRateMovie, useUpdateReview, getGetCurrentUserQueryKey, getGetAverageRatingQueryKey } from '@/services';
+
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { getGetAverageRatingQueryKey,getGetCurrentUserQueryKey, useCreateReview, useRateMovie, useUpdateReview } from '@/services';
+
 import StarRating from '../../StarRating';
 
 type Props = {

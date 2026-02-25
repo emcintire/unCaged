@@ -1,5 +1,6 @@
-import { Animated, StyleSheet, type DimensionValue, type StyleProp, type ViewStyle } from 'react-native';
-import { colors, borderRadius } from '@/config';
+import { Animated, type DimensionValue, type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
+
+import { borderRadius,colors } from '@/config';
 import { usePulse } from '@/hooks';
 
 type Props = {

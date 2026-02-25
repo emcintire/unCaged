@@ -1,8 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { WelcomeAuthTabParamList } from '@/types';
+import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, Text, View } from 'react-native';
+
 import { colors, fontFamily, fontSize, spacing } from '@/config';
+import type { WelcomeAuthTabParamList } from '@/types';
+
 import AppButton from '../AppButton';
 
 type Props = {

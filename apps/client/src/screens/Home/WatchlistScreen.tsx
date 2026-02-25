@@ -1,11 +1,12 @@
+import { useMemo } from 'react';
 import { Text } from 'react-native';
-import { useGetCurrentUser, useGetAllMovies } from '@/services';
-import { colors } from '@/config';
-import Screen from '@/components/Screen';
+
+import AdBanner from '@/components/AdBanner';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
-import AdBanner from '@/components/AdBanner';
-import { useMemo } from 'react';
+import Screen from '@/components/Screen';
+import { colors } from '@/config';
+import { useGetAllMovies,useGetCurrentUser } from '@/services';
 
 export default function WatchlistScreen() {
   const { data: user, isLoading: isUserLoading, refetch: refetchUser } = useGetCurrentUser();
@@ -19,12 +20,14 @@ export default function WatchlistScreen() {
     return movies.filter((movie) => user.watchlist.includes(movie._id));
   }, [movies, user]);
 
+  const refreshAll = () => Promise.all([refetchUser(), refetchMovies()]);
+
   return (
     <Screen isLoading={isLoading} skeleton={<MovieGridSkeleton />}>
       {!isAdmin && <AdBanner />}
       <MovieGrid
         movies={watchlistMovies}
-        onRefresh={() => Promise.all([refetchUser(), refetchMovies()])}
+        onRefresh={refreshAll}
         emptyMessage={(
           <Text>
             Either you are a national treasure who has seen all&nbsp;

@@ -1,6 +1,7 @@
-import { StyleSheet, Text, ScrollView } from 'react-native';
+import { ScrollView,StyleSheet, Text } from 'react-native';
+
 import Screen from '@/components/Screen';
-import { colors, spacing, fontSize, fontFamily, screen } from '@/config';
+import { colors, fontFamily, fontSize, screen,spacing } from '@/config';
 
 export default function AboutScreen() {
   return (

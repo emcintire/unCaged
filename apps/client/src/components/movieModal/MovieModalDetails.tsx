@@ -1,7 +1,8 @@
 import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
+import { colors, fontFamily,fontSize, spacing } from '@/config';
 import type { Movie } from '@/services';
-import { colors, spacing, fontSize, fontFamily } from '@/config';
 
 type Props = {
   movie: Movie;

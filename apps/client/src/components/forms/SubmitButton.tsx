@@ -1,8 +1,10 @@
-import { useFormikContext } from 'formik';
 import type { FormikValues } from 'formik';
-import AppButton from '../AppButton';
-import type { ColorKey } from '@/config';
+import { useFormikContext } from 'formik';
 import type { StyleProp, ViewStyle } from 'react-native';
+
+import type { ColorKey } from '@/config';
+
+import AppButton from '../AppButton';
 
 type Props = {
   color?: ColorKey;

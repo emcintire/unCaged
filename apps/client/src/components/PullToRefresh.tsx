@@ -1,6 +1,7 @@
-import { useState, useCallback, forwardRef } from 'react';
-import { RefreshControl, type StyleProp, type ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
+import { forwardRef,useCallback, useState } from 'react';
+import { RefreshControl, type StyleProp, type ViewStyle } from 'react-native';
+
 import { colors } from '@/config';
 
 type Props = {
@@ -9,10 +10,7 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-const PullToRefresh = forwardRef<RefreshControl, Props>(function PullToRefresh(
-  { onRefresh, children, style },
-  ref,
-) {
+const PullToRefresh = forwardRef<RefreshControl, Props>(({ onRefresh, children, style }, ref) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = useCallback(async () => {

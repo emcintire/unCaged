@@ -1,15 +1,16 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { StyleSheet, View, Modal, TouchableOpacity, Text, Animated } from 'react-native';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { type Movie, useGetCurrentUser, useGetAllMovies } from '@/services';
-import { borderRadius, colors, fontFamily, fontSize, shadow, spacing } from '@/config';
-import { useAnimatedValue } from '@/hooks';
-import { changeResolution } from '@/utils';
+import { Image } from 'expo-image';
+import { useCallback, useEffect, useRef,useState } from 'react';
+import { Animated,Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import AdBanner from '@/components/AdBanner';
 import MovieModal from '@/components/movieModal/MovieModal';
 import RandomMovieFilters from '@/components/RandomMovieFilters';
 import Screen from '@/components/Screen';
+import { borderRadius, colors, fontFamily, fontSize, shadow, spacing } from '@/config';
+import { useAnimatedValue } from '@/hooks';
+import { type Movie, useGetAllMovies,useGetCurrentUser } from '@/services';
+import { changeResolution } from '@/utils';
 
 export default function RandomMovieScreen() {
   const [filtersModalVisible, setFiltersModalVisible] = useState(false);

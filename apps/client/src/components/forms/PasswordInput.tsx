@@ -1,11 +1,13 @@
-import { useState } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { useFormikContext } from 'formik';
-import type { FormikValues } from 'formik';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import ErrorMessage from './ErrorMessage';
-import AppTextInput from '../AppTextInput';
+import type { FormikValues } from 'formik';
+import { useFormikContext } from 'formik';
+import { useState } from 'react';
+import { StyleSheet,TouchableOpacity } from 'react-native';
+
 import { colors, spacing } from '@/config';
+
+import AppTextInput from '../AppTextInput';
+import ErrorMessage from './ErrorMessage';
 
 type Props<Values> = {
   autoComplete?: 'password' | 'new-password' | 'current-password';

@@ -1,15 +1,17 @@
-import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
-import { useAuth } from '@/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { colors, fontFamily, fontSize } from '@/config';
+import { useAuth } from '@/hooks';
 import {
-  useAddToSeen, useRemoveFromSeen, useAddToFavorites, useRemoveFromFavorites, useAddToWatchlist,
-  useRemoveFromWatchlist, type Movie, useGetCurrentUser, getGetCurrentUserQueryKey,
-} from '@/services';
-import MovieModalRating from './MovieModalRating';
+getGetCurrentUserQueryKey,
+type Movie, useAddToFavorites,   useAddToSeen, useAddToWatchlist,
+useGetCurrentUser, useRemoveFromFavorites, useRemoveFromSeen,   useRemoveFromWatchlist, } from '@/services';
+
 import Icon from '../Icon';
+import MovieModalRating from './MovieModalRating';
 
 type Props = {
   movie: Movie;

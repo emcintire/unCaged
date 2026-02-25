@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import request from 'supertest';
-import app from '../app/app';
+
 import { RefreshToken } from '@/auth';
 import { User } from '@/users';
 import { hashRefreshToken } from '@/utils';
+
+import app from '../app/app';
 
 jest.mock('nodemailer', () => ({
   createTransport: jest.fn().mockReturnValue({

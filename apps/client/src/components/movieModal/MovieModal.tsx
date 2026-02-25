@@ -1,17 +1,19 @@
-import { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { Image } from 'expo-image';
-import { ScrollView } from 'react-native-gesture-handler';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useGetAverageRating, type Movie } from '@/services';
-import { useAuth } from '@/hooks';
-import { colors, fontFamily, fontSize, modal, movieCard, shadow, spacing } from '@/config';
-import { changeResolution } from '@/utils';
-import Icon from '../Icon';
-import MovieModalDetails from './MovieModalDetails';
-import MovieModalActions from './MovieModalActions';
-import MovieModalSignIn from './MovieModalSignIn';
+import { Image } from 'expo-image';
+import { useMemo,useState } from 'react';
+import { Modal,StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+
 import MovieModalSkeleton from '@/components/movieModal/MovieModalSkeleton';
+import { colors, fontFamily, fontSize, modal, movieCard, shadow, spacing } from '@/config';
+import { useAuth } from '@/hooks';
+import { type Movie,useGetAverageRating } from '@/services';
+import { changeResolution } from '@/utils';
+
+import Icon from '../Icon';
+import MovieModalActions from './MovieModalActions';
+import MovieModalDetails from './MovieModalDetails';
+import MovieModalSignIn from './MovieModalSignIn';
 import MovieReviews from './reviews/MovieReviews';
 
 type Props = {

@@ -1,11 +1,13 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey, getGetAverageRatingQueryKey } from '@/services';
+import { useEffect, useRef, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import { borderRadius, colors, spacing } from '@/config';
 import { useAuth } from '@/hooks';
-import { getStarIcon } from '../StarRating';
+import { getGetAverageRatingQueryKey,getGetCurrentUserQueryKey, type Movie, useAddToSeen, useDeleteRating, useGetCurrentUser, useRateMovie } from '@/services';
+
 import Icon from '../Icon';
+import { getStarIcon } from '../StarRating';
 
 const styles = StyleSheet.create({
   stars: {

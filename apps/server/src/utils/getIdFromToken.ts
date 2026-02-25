@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+
 import { getRequiredEnv } from '@/utils';
 
 export const getIdFromToken = (token: string): string => {

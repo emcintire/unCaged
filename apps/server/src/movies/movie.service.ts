@@ -1,5 +1,6 @@
 import { User } from '@/users';
 import { HttpError, validateSchema } from '@/utils';
+
 import { Movie } from './movie.model';
 import { movieSchema } from './movie.schema';
 import type { CreateMovieDto } from './schemas';

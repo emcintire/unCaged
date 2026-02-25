@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { DEFAULT_USER_IMG } from '@/utils';
 
 export const userSchema = z.object({

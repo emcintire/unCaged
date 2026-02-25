@@ -1,5 +1,5 @@
-export { changePasswordDtoSchema, type ChangePasswordDto } from './changePasswordDto.schema';
-export { createUserDtoSchema, type CreateUserDto } from './createUserDto.schema';
-export { rateMovieDtoSchema, type RateMovieDto } from './rateMovieDto.schema';
-export { updateUserDtoSchema, type UpdateUserDto } from './updateUserDto.schema';
-export { userSchema, type UserData } from '../user.schema';
+export { type UserData,userSchema } from '../user.schema';
+export { type ChangePasswordDto,changePasswordDtoSchema } from './changePasswordDto.schema';
+export { type CreateUserDto,createUserDtoSchema } from './createUserDto.schema';
+export { type RateMovieDto,rateMovieDtoSchema } from './rateMovieDto.schema';
+export { type UpdateUserDto,updateUserDtoSchema } from './updateUserDto.schema';

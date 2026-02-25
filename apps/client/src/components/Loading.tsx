@@ -1,6 +1,7 @@
 import { memo } from 'react';
-import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
-import { colors, fontSize, fontFamily, spacing } from '@/config';
+import { ActivityIndicator, StyleSheet,Text, View } from 'react-native';
+
+import { colors, fontFamily, fontSize, spacing } from '@/config';
 
 type Props = {
   visible?: boolean;

@@ -1,14 +1,15 @@
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { z } from 'zod';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { SettingsTabParamList } from '@/types';
-import { type AddQuoteBody, type CreateMovieBody, useAddQuote, useCreateMovie } from '@/services';
-import { showSuccessToast, toFormikValidator } from '@/utils';
-import { borderRadius, colors, spacing, fontSize, fontFamily } from '@/config';
-import Screen from '@/components/Screen';
+import { ScrollView, StyleSheet, Text, TouchableOpacity,View } from 'react-native';
+import { z } from 'zod';
+
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
+import Screen from '@/components/Screen';
+import { borderRadius, colors, fontFamily,fontSize, spacing } from '@/config';
+import { type AddQuoteBody, type CreateMovieBody, useAddQuote, useCreateMovie } from '@/services';
+import type { SettingsTabParamList } from '@/types';
+import { showSuccessToast, toFormikValidator } from '@/utils';
 
 type MovieFormValues = Omit<CreateMovieBody, 'genres' | 'description' | 'img'> & {
   genres: string;

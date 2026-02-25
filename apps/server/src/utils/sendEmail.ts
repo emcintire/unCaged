@@ -1,4 +1,5 @@
 import nodemailer, { type Transporter } from 'nodemailer';
+
 import { getRequiredEnv } from './getRequiredEnv';
 import { logger } from './logger';
 

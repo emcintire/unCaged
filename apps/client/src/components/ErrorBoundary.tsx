@@ -1,8 +1,10 @@
-import { Component } from 'react';
 import type { ErrorInfo, PropsWithChildren } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Component } from 'react';
+import { StyleSheet,Text, View } from 'react-native';
+
 import { colors, fontFamily, fontSize, spacing } from '@/config';
 import { logger } from '@/utils';
+
 import AppButton from './AppButton';
 
 type State = {

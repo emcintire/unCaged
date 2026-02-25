@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
-import { createApp } from './createApp';
+
 import { bootstrap } from './bootstrap';
+import { createApp } from './createApp';
 
 export const app = createApp();
 

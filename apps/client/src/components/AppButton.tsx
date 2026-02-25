@@ -3,12 +3,13 @@ import {
   ActivityIndicator,
   Animated,
   Pressable,
+  type StyleProp,
   StyleSheet,
   Text,
   type TextStyle,
-  type StyleProp,
   type ViewStyle,
 } from 'react-native';
+
 import { borderRadius, type ColorKey, colors, fontFamily, fontSize, spacing } from '@/config';
 import { useAnimatedValue } from '@/hooks';
 

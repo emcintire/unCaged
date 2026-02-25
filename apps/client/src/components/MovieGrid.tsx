@@ -1,19 +1,21 @@
-import { ReactNode, useCallback, useState, type ReactElement } from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { Movie } from '@/services';
+import { type ReactElement,type ReactNode, useCallback, useState } from 'react';
+import { FlatList, StyleSheet, Text,View } from 'react-native';
+
 import { colors, fontFamily, fontSize, movieCard, spacing } from '@/config';
+import type { Movie } from '@/services';
+
+import BuyMeCoffeeButton from './BuyMeCoffeeButton';
 import MovieCard from './MovieCard';
 import MovieModal from './movieModal/MovieModal';
-import BuyMeCoffeeButton from './BuyMeCoffeeButton';
 import PullToRefresh from './PullToRefresh';
 
 const NUM_COLUMNS = 2;
 
 type Props = {
   movies: Array<Movie>;
-  favoriteIds?: Array<string>;
-  seenIds?: Array<string>;
+  favoriteIds?: Array<string> | undefined;
+  seenIds?: Array<string> | undefined;
   ListHeaderComponent?: ReactElement | null;
   ListHeaderComponentStyle?: object;
   emptyMessage?: ReactNode;

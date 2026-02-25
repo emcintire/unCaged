@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native'
-import Separator from './Separator'
-import AppDropdown from './AppDropdown'
 
-import { SetState } from '@/types'
-import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/config'
+import { borderRadius, colors, fontFamily,fontSize, spacing } from '@/config'
 import { genres } from '@/constants'
+import { type SetState } from '@/types'
+
+import AppDropdown from './AppDropdown'
+import Separator from './Separator'
 
 type Props = {
   genreFilter: string;

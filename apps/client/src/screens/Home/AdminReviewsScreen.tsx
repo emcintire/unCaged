@@ -1,16 +1,17 @@
-import { memo, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import type { AdminReview, GetAdminReviewsParams } from '@/services';
-import { useDeleteReview, useGetAdminReviews, useUnflagReview, getGetAdminReviewsQueryKey } from '@/services';
-import { useDebounce } from '@/hooks';
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { memo, useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
 import Screen from '@/components/Screen';
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { useDebounce } from '@/hooks';
+import type { AdminReview, GetAdminReviewsParams } from '@/services';
+import { getGetAdminReviewsQueryKey,useDeleteReview, useGetAdminReviews, useUnflagReview } from '@/services';
 
 type FilterMode = 'all' | 'flagged';
 
-const AdminReviewItem = memo(function AdminReviewItem({ item }: { item: AdminReview }) {
+const AdminReviewItem = memo(({ item }: { item: AdminReview }) => {
   const queryClient = useQueryClient();
   const unflagMutation = useUnflagReview();
   const deleteMutation = useDeleteReview();

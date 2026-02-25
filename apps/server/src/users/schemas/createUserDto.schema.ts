@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
+import { z } from 'zod';
 
 export const createUserDtoSchema = z.object({
   name: z.string().max(100).optional(),

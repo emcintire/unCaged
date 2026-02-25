@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { Animated, StyleSheet } from 'react-native';
-import AppText from '../AppText';
+
 import { typography } from '@/config';
 import { useAnimatedValue } from '@/hooks';
+
+import AppText from '../AppText';
 
 type Props = {
   error?: string | string[];

@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import type { ClientSession } from 'mongoose';
+
 import { RefreshToken } from '@/auth';
+import { Movie } from '@/movies';
 import {
   createRefreshTokenValue,
   hashInput,
@@ -10,8 +12,7 @@ import {
   signAccessToken,
   validateSchema,
 } from '@/utils';
-import { Movie } from '@/movies';
-import { User } from './user.model';
+
 import {
   type ChangePasswordDto,
   changePasswordDtoSchema,
@@ -22,6 +23,7 @@ import {
   type UpdateUserDto,
   updateUserDtoSchema,
 } from './schemas';
+import { User } from './user.model';
 
 type UserCollectionField = 'favorites' | 'seen' | 'watchlist';
 type MovieCounterField = 'favoriteCount' | 'seenCount';

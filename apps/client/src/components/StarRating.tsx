@@ -1,5 +1,6 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import { colors } from '@/config';
 
 type Props = {

@@ -1,5 +1,7 @@
 import express from 'express';
-import { auth, admin } from '@/middleware';
+
+import { admin,auth } from '@/middleware';
+
 import { ReviewController } from './review.controller';
 
 export const reviewRouter = express.Router();

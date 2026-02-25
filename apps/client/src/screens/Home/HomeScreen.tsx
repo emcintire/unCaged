@@ -1,23 +1,24 @@
-import { useState, useCallback, useMemo } from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { useCallback, useMemo,useState } from 'react';
+import { ScrollView, StyleSheet, Text,View } from 'react-native';
 import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
-import {
-  type Movie,
-  getGetCurrentUserQueryKey,
-  useGetCurrentUser,
-  useGetAllMovies,
-  useGetPopularMovies,
-  useGetStaffPicks,
-  useGetQuote,
-} from '@/services';
-import { useAuth } from '@/hooks';
-import { spacing, fontSize, fontFamily, borderRadius } from '@/config';
-import Screen from '@/components/Screen';
+
+import BuyMeCoffeeButton from '@/components/BuyMeCoffeeButton';
 import MovieCard from '@/components/MovieCard';
 import MovieModal from '@/components/movieModal/MovieModal';
-import BuyMeCoffeeButton from '@/components/BuyMeCoffeeButton';
-import Skeleton from '@/components/Skeleton';
 import PullToRefresh from '@/components/PullToRefresh';
+import Screen from '@/components/Screen';
+import Skeleton from '@/components/Skeleton';
+import { borderRadius,fontFamily, fontSize, spacing } from '@/config';
+import { useAuth } from '@/hooks';
+import {
+  getGetCurrentUserQueryKey,
+  type Movie,
+  useGetAllMovies,
+  useGetCurrentUser,
+  useGetPopularMovies,
+  useGetQuote,
+  useGetStaffPicks,
+} from '@/services';
 
 const styles = StyleSheet.create({
   quote: {
@@ -99,7 +100,6 @@ const genres = [
 
 const ROWS = Array.from({ length: 4 }, (_, i) => i);
 const CARDS_PER_ROW = Array.from({ length: 4 }, (_, i) => i);
-
 const CARD_WIDTH = 135;
 const CARD_HEIGHT = 200;
 

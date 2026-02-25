@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { useAuth } from '@/hooks';
 import type { Review } from '@/services';
 import { getGetCurrentUserQueryKey, getGetReviewsByMovieQueryKey, useGetCurrentUser, useGetReviewsByMovie } from '@/services';
-import { useAuth } from '@/hooks';
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
-import WriteReviewForm from './WriteReviewForm';
+
 import ReviewCard from './ReviewCard';
+import WriteReviewForm from './WriteReviewForm';
 
 type Props = {
   movieId: string;
@@ -66,11 +68,15 @@ export default function MovieReviews({ movieId }: Props) {
     setPage((p) => p + 1);
   };
 
-  const ownReviews = isAuthenticated
-    ? accumulatedReviews.filter((r) => r.userId === userId)
-    : [];
+  const ownReviews = useMemo(
+    () => isAuthenticated ? accumulatedReviews.filter((r) => r.userId === userId) : [],
+    [isAuthenticated, accumulatedReviews, userId],
+  );
 
-  const otherReviews = accumulatedReviews.filter((r) => r.userId !== userId);
+  const otherReviews = useMemo(
+    () => accumulatedReviews.filter((r) => r.userId !== userId),
+    [accumulatedReviews, userId],
+  );
   const hasMore = reviews?.hasMore ?? false;
   const total = reviews?.total ?? 0;
 

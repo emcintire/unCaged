@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
+import { useEffect,useState } from 'react';
+import { StyleSheet, TouchableOpacity,View } from 'react-native';
+
 import { borderRadius, colors, spacing } from '@/config';
 import { PROFILE_PICS } from '@/constants';
+import { getGetCurrentUserQueryKey,useGetCurrentUser, useUpdateUser } from '@/services';
+
 import AppButton from './AppButton';
 import Icon from './Icon';
-import { useGetCurrentUser, useUpdateUser, getGetCurrentUserQueryKey } from '@/services';
 
 type Props = {
   modalVisible: boolean;

@@ -1,9 +1,11 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   MaterialCommunityIcons, type MaterialCommunityIcons as MaterialCommunityIconsType,
 } from '@expo/vector-icons';
-import type { HomeStackParamList, Screen } from '@/types';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 import { colors } from '@/config';
+import type { HomeStackParamList, Screen } from '@/types';
+
 import HomeTab from './HomeTab';
 import RandomMovieTab from './RandomMovieTab';
 import SearchTab from './SearchTab';

@@ -1,13 +1,14 @@
+import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
+import { type FormikHelpers } from 'formik';
 import { StyleSheet, View } from 'react-native';
 import { z } from 'zod';
-import { PASSWORD_ERROR_MESSAGE, PASSWORD_REGEX } from '@uncaged/shared';
-import { form, spacing } from '@/config';
-import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
-import { useChangePassword } from '@/services';
+
 import { AppForm, SubmitButton } from '@/components/forms';
-import Screen from '@/components/Screen';
 import PasswordInput from '@/components/forms/PasswordInput';
-import { FormikHelpers } from 'formik';
+import Screen from '@/components/Screen';
+import { form, spacing } from '@/config';
+import { useChangePassword } from '@/services';
+import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
 
 const styles = StyleSheet.create({
   container: {

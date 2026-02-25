@@ -1,5 +1,7 @@
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet,View } from 'react-native';
+
 import { borderRadius, movieCard, spacing } from '@/config';
+
 import Skeleton from './Skeleton';
 
 const ITEMS = Array.from({ length: 6 }, (_, i) => i);

@@ -1,10 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { AuthenticatedRequest } from '@/types';
-import { Review } from '@/reviews';
+
 import { Movie } from '@/movies';
+import { Review } from '@/reviews';
+import type { AuthenticatedRequest } from '@/types';
+
+import type { ChangePasswordDto, CreateUserDto, RateMovieDto, UpdateUserDto } from './schemas';
 import { User } from './user.model';
 import { UserService } from './user.service';
-import type { ChangePasswordDto, CreateUserDto, RateMovieDto, UpdateUserDto } from './schemas';
 
 export class UserController {
   private readonly userService = new UserService();

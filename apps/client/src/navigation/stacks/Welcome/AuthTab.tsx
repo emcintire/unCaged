@@ -1,12 +1,13 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { Screen, WelcomeAuthTabParamList } from '@/types';
+
 import { screenOptions } from '@/navigation/stacks/screenOptions';
-import WelcomeScreen from '@/screens/Welcome/WelcomeScreen';
+import EmailCodeScreen from '@/screens/Welcome/EmailCodeScreen';
+import ForgotPasswordScreen from '@/screens/Welcome/ForgotPasswordScreen';
+import PasswordResetScreen from '@/screens/Welcome/PasswordResetScreen';
 import SignInScreen from '@/screens/Welcome/SignInScreen';
 import SignUpScreen from '@/screens/Welcome/SignUpScreen';
-import ForgotPasswordScreen from '@/screens/Welcome/ForgotPasswordScreen';
-import EmailCodeScreen from '@/screens/Welcome/EmailCodeScreen';
-import PasswordResetScreen from '@/screens/Welcome/PasswordResetScreen';
+import WelcomeScreen from '@/screens/Welcome/WelcomeScreen';
+import type { Screen, WelcomeAuthTabParamList } from '@/types';
 
 const Auth_Tab = createNativeStackNavigator<WelcomeAuthTabParamList>();
 

@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Modal } from 'react-native';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQueryClient } from '@tanstack/react-query';
+import { Image } from 'expo-image';
+import { useState } from 'react';
+import { Modal,StyleSheet, TouchableOpacity, View } from 'react-native';
 import { z } from 'zod';
 
-import type { HomeStackParamList } from '@/types';
-import { useGetCurrentUser, useUpdateUser, getGetCurrentUserQueryKey } from '@/services';
-import { spacing } from '@/config';
-import { showSuccessToast, toFormikValidator } from '@/utils';
-import { getProfilePic } from '@/constants';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
-import Screen from '@/components/Screen';
 import PicturePicker from '@/components/PicturePicker';
+import Screen from '@/components/Screen';
+import { spacing } from '@/config';
+import { getProfilePic } from '@/constants';
+import { getGetCurrentUserQueryKey,useGetCurrentUser, useUpdateUser } from '@/services';
+import type { HomeStackParamList } from '@/types';
+import { showSuccessToast, toFormikValidator } from '@/utils';
 
 type FormValues = {
   name: string;

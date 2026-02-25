@@ -1,5 +1,7 @@
-import type { NextFunction, Response, Request } from 'express';
+import type { NextFunction, Request,Response } from 'express';
+
 import type { AuthenticatedRequest } from '@/types';
+
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './schemas';
 

@@ -1,5 +1,7 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
+
 import { DEFAULT_USER_IMG } from '@/utils';
+
 import type { UserData } from './user.schema';
 
 export type UserDocument = Document & UserData & {

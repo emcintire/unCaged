@@ -1,8 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { Screen, SearchTabParamList } from '@/types';
-import { screenOptions } from '@/navigation/stacks/screenOptions';
+
 import AppLogo from '@/components/AppLogo';
+import { screenOptions } from '@/navigation/stacks/screenOptions';
 import SearchScreen from '@/screens/Home/SearchScreen';
+import type { Screen, SearchTabParamList } from '@/types';
 
 const Search_Tab = createNativeStackNavigator<SearchTabParamList>();
 

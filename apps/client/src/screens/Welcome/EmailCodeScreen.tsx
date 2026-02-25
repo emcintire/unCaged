@@ -1,15 +1,16 @@
-import { View, Text } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as SecureStore from 'expo-secure-store';
+import { Text,View } from 'react-native';
 import { z } from 'zod';
-import type { WelcomeAuthTabParamList } from '@/types';
-import { useCheckCode } from '@/services';
-import { STORAGE_KEYS } from '@/constants';
-import { form, typography, utils, screen } from '@/config';
-import { toFormikValidator } from '@/utils';
+
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
+import { form, screen,typography, utils } from '@/config';
+import { STORAGE_KEYS } from '@/constants';
+import { useCheckCode } from '@/services';
+import type { WelcomeAuthTabParamList } from '@/types';
+import { toFormikValidator } from '@/utils';
 
 const schema = z.object({
   code: z.string().min(1, 'Code is required'),

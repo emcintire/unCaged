@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react'
-import { Modal, ScrollView, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useRef, useState } from 'react'
+import { Modal, ScrollView, StyleSheet, Text, type TextStyle, TouchableOpacity, View, type ViewStyle } from 'react-native'
 
-import { colors, borderRadius, fontSize, fontFamily, spacing } from '@/config'
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config'
 
 type Props = {
   accessibilityLabel?: string;

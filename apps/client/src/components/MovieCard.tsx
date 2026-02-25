@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
-import { View, TouchableOpacity, StyleSheet, type ViewStyle } from 'react-native';
-import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { Movie } from '@/services';
+import { Image } from 'expo-image';
+import { memo, useMemo } from 'react';
+import { StyleSheet, TouchableOpacity, View, type ViewStyle } from 'react-native';
+
 import { colors, movieCard } from '@/config';
+import type { Movie } from '@/services';
 import { changeResolution } from '@/utils';
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
   buttonStyle?: ViewStyle;
 };
 
-export default function MovieCard({ movie, onPress, isFavorite = false, isSeen, buttonStyle }: Props) {
+export default memo(function MovieCard({ movie, onPress, isFavorite = false, isSeen, buttonStyle }: Props) {
   const image = useMemo(() => changeResolution('w_405,f_auto,q_90', movie).image, [movie]);
 
   return (
@@ -32,14 +33,14 @@ export default function MovieCard({ movie, onPress, isFavorite = false, isSeen, 
       )}
     </TouchableOpacity>
   );
-}
+});
 
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: colors.black + 'CC',
+    backgroundColor: `${colors.black}CC`,
     borderRadius: 12,
     width: 24,
     height: 24,

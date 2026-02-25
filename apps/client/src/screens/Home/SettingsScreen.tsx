@@ -1,19 +1,20 @@
-import { Fragment, ReactNode, useCallback, useMemo } from 'react';
-import { StyleSheet, View, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { SettingsTabParamList } from '@/types';
-import { colors, spacing } from '@/config';
-import { useGetCurrentUser, useDeleteUser } from '@/services';
-import { getProfilePic } from '@/constants';
-import { showErrorToast, showSuccessToast } from '@/utils';
-import { useAuth } from '@/hooks';
-import Screen from '@/components/Screen';
-import ListItem from '@/components/ListItem';
-import Separator from '@/components/Separator';
-import Icon from '@/components/Icon';
+import { Fragment, type ReactNode, useCallback, useMemo } from 'react';
+import { Alert,ScrollView, StyleSheet, View } from 'react-native';
+
 import BuyMeCoffeeButton from '@/components/BuyMeCoffeeButton';
+import Icon from '@/components/Icon';
+import ListItem from '@/components/ListItem';
+import Screen from '@/components/Screen';
+import Separator from '@/components/Separator';
+import { colors, spacing } from '@/config';
+import { getProfilePic } from '@/constants';
+import { useAuth } from '@/hooks';
+import { useDeleteUser,useGetCurrentUser } from '@/services';
+import type { SettingsTabParamList } from '@/types';
+import { showErrorToast, showSuccessToast } from '@/utils';
 
 const styles = StyleSheet.create({
   container: {

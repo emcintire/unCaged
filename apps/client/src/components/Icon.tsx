@@ -1,9 +1,10 @@
-import { memo } from 'react';
-import { View, TouchableOpacity } from 'react-native';
 import {
   MaterialCommunityIcons, type MaterialCommunityIcons as MaterialCommunityIconsType,
 } from '@expo/vector-icons';
+import { memo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
+import { TouchableOpacity,View } from 'react-native';
+
 import { colors } from '@/config';
 
 type Props = {
