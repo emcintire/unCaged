@@ -1,32 +1,18 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 import { User } from '@/users';
 import {
   createRefreshTokenValue,
-  getRequiredEnv,
   hashInput,
   hashRefreshToken,
   HttpError,
-  logger,
   refreshExpiryDate,
+  sendEmail,
   signAccessToken,
   validateSchema,
 } from '@/utils';
 import { RefreshToken } from './refreshToken.model';
 import { type LoginDto, loginDtoSchema } from './schemas';
-
-const getMailConfig = () => {
-  const user = getRequiredEnv('EMAIL_USERNAME');
-  const pass = getRequiredEnv('EMAIL_PASSWORD');
-
-  const host = process.env.SMTP_HOST ?? 'smtp.zoho.com';
-  const port = Number(process.env.SMTP_PORT ?? 465);
-  const secure = (process.env.SMTP_SECURE ?? String(port === 465)) === 'true';
-  const from = process.env.EMAIL_FROM ?? user;
-
-  return { user, pass, host, port, secure, from };
-}
 
 export class AuthService {
   async login(dto: LoginDto) {
@@ -132,40 +118,16 @@ export class AuthService {
     user.resetCodeExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
     await user.save();
 
-    const mailConfig = getMailConfig();
-
-    const transporter = nodemailer.createTransport({
-      host: mailConfig.host,
-      port: mailConfig.port,
-      secure: mailConfig.secure,
-      auth: {
-        user: mailConfig.user,
-        pass: mailConfig.pass,
-      },
-    });
-
-    const mailOptions = {
-      from: mailConfig.from,
+    await sendEmail({
       to: email,
       subject: 'Forgot Password',
       text: `You are receiving this email because a password reset was requested for your unCaged account.
 
-    Your password reset code is: ${randomNum}
+Your password reset code is: ${randomNum}
 
-    This code will expire in 15 minutes.
-    If you did not request a password reset, you can safely ignore this email.`,
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown mail error';
-      logger.error('Failed to send password reset email', {
-        userId: user._id.toString(),
-        email,
-        reason: message,
-      });
-    }
+This code will expire in 15 minutes.
+If you did not request a password reset, you can safely ignore this email.`,
+    });
   }
 
   async checkResetCode(email: string, code: string) {

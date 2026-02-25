@@ -1,5 +1,5 @@
 import type { PipelineStage } from 'mongoose';
-import { HttpError, validateSchema } from '@/utils';
+import { getRequiredEnv, HttpError, sendEmail, validateSchema } from '@/utils';
 import { Review } from './review.model';
 import { User } from '@/users';
 import { Movie } from '@/movies';
@@ -155,6 +155,31 @@ export class ReviewService {
     await Review.findByIdAndUpdate(reviewId, {
       $addToSet: { flaggedBy: userId },
       $set: { isFlagged: true },
+    });
+
+    const [reporter, author, movie] = await Promise.all([
+      User.findById(userId).select('name email').lean(),
+      User.findById(review.userId).select('name email').lean(),
+      Movie.findById(review.movieId).select('title').lean(),
+    ]);
+
+    const adminEmail = getRequiredEnv('EMAIL_USERNAME');
+    const totalFlags = review.flaggedBy.length + 1;
+
+    void sendEmail({
+      to: adminEmail,
+      subject: `[unCaged] Review Flagged (${totalFlags} report${totalFlags !== 1 ? 's' : ''})`,
+      text: `A review has been flagged on unCaged.
+
+Movie:    ${movie?.title ?? review.movieId}
+Author:   ${author?.name ?? 'Unknown'} <${author?.email ?? review.userId}>
+Flagged by: ${reporter?.name ?? 'Unknown'} <${reporter?.email ?? userId}>
+Total flags: ${totalFlags}
+Review ID: ${reviewId}
+
+Review:
+${review.rating != null ? `Rating: ${review.rating}/5\n` : ''}${review.isSpoiler ? '[SPOILER] ' : ''}${review.text}
+`,
     });
   }
 

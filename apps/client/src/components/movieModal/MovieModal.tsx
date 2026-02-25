@@ -49,12 +49,12 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
         ) : (
           <>
             <ScrollView
-              horizontal={false}
-              showsVerticalScrollIndicator={false}
-              scrollEventThrottle={200}
               decelerationRate="fast"
-              style={styles.container}
+              horizontal={false}
               pointerEvents={imageLoaded ? 'auto' : 'none'}
+              scrollEventThrottle={200}
+              showsVerticalScrollIndicator={false}
+              style={styles.container}
             >
               <View style={styles.btnContainer}>
                 <TouchableOpacity onPress={onClose} accessibilityRole="button" accessibilityLabel="Close movie details">
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.white,
     fontFamily: fontFamily.bold,
-    fontSize: fontSize.xxl + 4,
+    fontSize: fontSize.xxl,
     textAlign: 'center',
   },
   subtitle: {

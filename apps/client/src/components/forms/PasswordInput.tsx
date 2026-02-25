@@ -14,7 +14,7 @@ type Props<Values> = {
 };
 
 export default function PasswordInput<Values extends FormikValues>({ autoComplete, name, placeholder }: Props<Values>) {
-  const { setFieldTouched, handleChange, errors, touched } = useFormikContext<Values>();
+  const { setFieldTouched, handleChange, errors, touched, values } = useFormikContext<Values>();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -22,6 +22,7 @@ export default function PasswordInput<Values extends FormikValues>({ autoComplet
       <AppTextInput
         icon="lock"
         placeholder={placeholder}
+        value={values[name] as string}
         onBlur={() => setFieldTouched(name)}
         onChangeText={handleChange(name)}
         secureTextEntry={!showPassword}

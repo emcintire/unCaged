@@ -1,8 +1,9 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { type Movie, type User, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey, getGetAverageRatingQueryKey } from '@/services';
+import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey, getGetAverageRatingQueryKey } from '@/services';
 import { borderRadius, colors, spacing } from '@/config';
-import { useAuth, useOptimisticUpdate } from '@/hooks';
+import { useAuth } from '@/hooks';
 import { getStarIcon } from '../StarRating';
 import Icon from '../Icon';
 
@@ -29,7 +30,24 @@ type Props = {
   rating: number;
 };
 
-export default function MovieModalRating({ movie, rating }: Props) {
+export default function MovieModalRating({ movie, rating: ratingProp }: Props) {
+  const [rating, setRating] = useState(ratingProp);
+  const committedRatingRef = useRef(ratingProp);
+  const commitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync from prop when parent updates (after server refetch)
+  useEffect(() => {
+    setRating(ratingProp);
+    committedRatingRef.current = ratingProp;
+  }, [ratingProp]);
+
+  // Clear pending commit on unmount
+  useEffect(() => {
+    return () => {
+      if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
+    };
+  }, []);
+
   const rateMovieMutation = useRateMovie();
   const deleteRatingMutation = useDeleteRating();
   const addToSeenMutation = useAddToSeen();
@@ -37,49 +55,54 @@ export default function MovieModalRating({ movie, rating }: Props) {
   const isPending = rateMovieMutation.isPending || deleteRatingMutation.isPending || addToSeenMutation.isPending;
 
   const { isAuthenticated } = useAuth();
-  const optimistic = useOptimisticUpdate();
   const queryClient = useQueryClient();
   const userQueryKey = getGetCurrentUserQueryKey();
   const avgRatingQueryKey = getGetAverageRatingQueryKey(movie._id);
 
-  const { data: user } = useGetCurrentUser({
+  const { data: isSeen } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
       queryKey: userQueryKey,
+      select: (data) => data.seen.includes(movie._id),
     },
   });
 
-  const submitRating = (newRating: number) =>
-    optimistic<User>(
-      userQueryKey,
-      (old) => ({
-        ...old,
-        ratings: old.ratings.some((r) => r.movie === movie._id)
-          ? old.ratings.map((r) => r.movie === movie._id ? { ...r, rating: newRating } : r)
-          : [...old.ratings, { _id: 'temp', movie: movie._id, rating: newRating }],
-        seen: old.seen.includes(movie._id) ? old.seen : [...old.seen, movie._id],
-      }),
-      async () => {
-        await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
-        if (!user?.seen.includes(movie._id)) {
-          await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
-        }
-      },
-    );
+  // Keep isSeen in a ref so the setTimeout closure always reads the latest value
+  const isSeenRef = useRef(isSeen);
+  useEffect(() => { isSeenRef.current = isSeen; }, [isSeen]);
 
-  const handleRating = (star: number) => async () => {
-    if (rating === star) {
-      await submitRating(star - 0.5);
-    } else if (rating === star - 0.5) {
-      await optimistic<User>(
-        userQueryKey,
-        (old) => ({ ...old, ratings: old.ratings.filter((r) => r.movie !== movie._id) }),
-        () => deleteRatingMutation.mutateAsync({ data: { id: movie._id } }),
-      );
-    } else {
-      await submitRating(star);
-    }
-    void queryClient.invalidateQueries({ queryKey: avgRatingQueryKey });
+  const handleRating = (star: number) => () => {
+    const newRating =
+      rating === star ? star - 0.5 :
+      rating === star - 0.5 ? 0 :
+      star;
+
+    setRating(newRating);
+
+    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
+
+    const prev = committedRatingRef.current;
+
+    commitTimerRef.current = setTimeout(async () => {
+      if (newRating === committedRatingRef.current) return;
+      committedRatingRef.current = newRating;
+      try {
+        if (newRating === 0) {
+          await deleteRatingMutation.mutateAsync({ data: { id: movie._id } });
+        } else {
+          await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
+          if (!isSeenRef.current) {
+            await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
+          }
+        }
+      } catch {
+        setRating(prev);
+        committedRatingRef.current = prev;
+      } finally {
+        void queryClient.invalidateQueries({ queryKey: userQueryKey });
+        void queryClient.invalidateQueries({ queryKey: avgRatingQueryKey });
+      }
+    }, 400);
   };
 
   return (

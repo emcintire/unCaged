@@ -27,15 +27,21 @@ export default function RandomMovieScreen() {
   const isAdmin = user?.isAdmin ?? false;
   const isLoading = isUserLoading || isMoviesLoading;
 
+  // Keep user in a ref so getFilteredMovies can read it without becoming a
+  // new function reference every time a favorite/seen/watchlist action re-fetches user
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
+
   const getFilteredMovies = useCallback(() => {
+    const u = userRef.current;
     const predicates = [
       (m: Movie) => genreFilter === 'All' || m.genres.includes(genreFilter),
       (m: Movie) => !mandyFilter || m.title.toLowerCase().includes('mandy'),
-      (m: Movie) => !unseenFilter || !user?.seen.includes(m._id),
-      (m: Movie) => !watchlistFilter || user?.watchlist.includes(m._id),
+      (m: Movie) => !unseenFilter || !u?.seen.includes(m._id),
+      (m: Movie) => !watchlistFilter || u?.watchlist.includes(m._id),
     ];
     return allMovies.filter(m => predicates.every(p => p(m)));
-  }, [allMovies, genreFilter, mandyFilter, unseenFilter, watchlistFilter, user]);
+  }, [allMovies, genreFilter, mandyFilter, unseenFilter, watchlistFilter]);
 
   const pickRandom = useCallback((from: Array<Movie>) => {
     if (!from.length) { setMovie(null); return []; }

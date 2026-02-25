@@ -40,7 +40,7 @@ export default function PicturePicker({ modalVisible, setModalVisible }: Props) 
       <View style={styles.container}>
         <View style={styles.closeButton}>
           <TouchableOpacity onPress={() => setModalVisible(false)} accessibilityRole="button" accessibilityLabel="Close picture picker">
-            <Icon name="close" size={30} backgroundColor={colors.black} iconColor={colors.red} />
+            <Icon name="close" size={50} backgroundColor="transparent" iconColor={colors.white} />
           </TouchableOpacity>
         </View>
         <View style={styles.imagesContainer}>
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    right: spacing.sm,
-    top: spacing.sm,
+    right: -5,
+    top: -5,
   },
   imagesContainer: {
     width: '100%',

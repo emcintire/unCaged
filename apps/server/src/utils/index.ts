@@ -9,4 +9,5 @@ export { getUserIdFromRequest } from './getUserIdFromRequest';
 export { hashInput } from './hashInput';
 export { HttpError, isHttpError } from './httpError';
 export { logger } from './logger';
+export { sendEmail } from './sendEmail';
 export { validateSchema } from './validateSchema';

@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Review } from '@/services';
-import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike, getGetCurrentUserQueryKey } from '@/services';
+import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike, getGetCurrentUserQueryKey, getGetReviewsByMovieQueryKey } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import { getProfilePic } from '@/constants';
@@ -20,20 +21,24 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
   const [spoilerRevealed, setSpoilerRevealed] = useState(false);
   const [flagged, setFlagged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLiked, setIsLiked] = useState(review.isLikedByUser ?? false);
+  const [likeCount, setLikeCount] = useState(review.likeCount);
 
   const { isAuthenticated } = useAuth();
-  const { data: user } = useGetCurrentUser({
+  const { data: isAdmin } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
       queryKey: getGetCurrentUserQueryKey(),
+      select: (data) => data.isAdmin,
     },
   });
 
+  const queryClient = useQueryClient();
   const deleteMutation = useDeleteReview();
   const toggleLikeMutation = useToggleReviewLike();
   const flagMutation = useFlagReview();
 
-  const canDelete = isAuthenticated && (isOwnReview || user?.isAdmin);
+  const canDelete = isAuthenticated && (isOwnReview || isAdmin);
   const canEdit = isAuthenticated && isOwnReview;
   const canReport = isAuthenticated && !isOwnReview && !flagged;
 
@@ -50,7 +55,32 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
 
   const handleLike = () => {
     if (!isAuthenticated) return;
-    toggleLikeMutation.mutate({ reviewId: review._id }, { onSuccess });
+    const prevLiked = isLiked;
+    const prevCount = likeCount;
+    const newLiked = !prevLiked;
+    const newCount = prevCount + (prevLiked ? -1 : 1);
+    setIsLiked(newLiked);
+    setLikeCount(newCount);
+    toggleLikeMutation.mutate(
+      { reviewId: review._id },
+      {
+        onSuccess: () => {
+          queryClient.setQueriesData<{ reviews: Array<Review>; hasMore: boolean; total: number }>(
+            { queryKey: getGetReviewsByMovieQueryKey() },
+            (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                reviews: old.reviews.map((r) =>
+                  r._id === review._id ? { ...r, isLikedByUser: newLiked, likeCount: newCount } : r,
+                ),
+              };
+            },
+          );
+        },
+        onError: () => { setIsLiked(prevLiked); setLikeCount(prevCount); },
+      },
+    );
   };
 
   const handleFlag = () => {
@@ -146,12 +176,12 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
           disabled={!isAuthenticated || toggleLikeMutation.isPending}
         >
           <MaterialCommunityIcons
-            name={review.isLikedByUser ? 'heart' : 'heart-outline'}
+            name={isLiked ? 'heart' : 'heart-outline'}
             size={18}
-            color={review.isLikedByUser ? colors.red : isAuthenticated ? colors.white : colors.medium}
+            color={isLiked ? colors.red : isAuthenticated ? colors.white : colors.medium}
           />
           <Text style={[styles.likeCount, !isAuthenticated && styles.disabledText]}>
-            {review.likeCount}
+            {likeCount}
           </Text>
         </TouchableOpacity>
 

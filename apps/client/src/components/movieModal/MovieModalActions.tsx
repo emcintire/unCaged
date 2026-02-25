@@ -1,11 +1,12 @@
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
-import { useAuth, useOptimisticUpdate } from '@/hooks';
+import { useAuth } from '@/hooks';
 import { colors, fontFamily, fontSize } from '@/config';
 import {
   useAddToSeen, useRemoveFromSeen, useAddToFavorites, useRemoveFromFavorites, useAddToWatchlist,
-  useRemoveFromWatchlist, type Movie, type User, useGetCurrentUser, getGetCurrentUserQueryKey,
+  useRemoveFromWatchlist, type Movie, useGetCurrentUser, getGetCurrentUserQueryKey,
 } from '@/services';
 import MovieModalRating from './MovieModalRating';
 import Icon from '../Icon';
@@ -16,6 +17,10 @@ type Props = {
 
 export default function MovieModalActions({ movie }: Props) {
   const [showStars, setShowStars] = useState(false);
+  const [favorite, setFavorite] = useState(false);
+  const [seen, setSeen] = useState(false);
+  const [watchlist, setWatchlist] = useState(false);
+  const [rating, setRating] = useState(0);
 
   const addToSeenMutation = useAddToSeen();
   const removeFromSeenMutation = useRemoveFromSeen();
@@ -25,7 +30,7 @@ export default function MovieModalActions({ movie }: Props) {
   const removeFromWatchlistMutation = useRemoveFromWatchlist();
 
   const { isAuthenticated } = useAuth();
-  const optimistic = useOptimisticUpdate();
+  const queryClient = useQueryClient();
   const userQueryKey = getGetCurrentUserQueryKey();
 
   const { data: user } = useGetCurrentUser({
@@ -35,64 +40,64 @@ export default function MovieModalActions({ movie }: Props) {
     },
   });
 
-  const favorite = user?.favorites.includes(movie._id) ?? false;
-  const seen = user?.seen.includes(movie._id) ?? false;
-  const watchlist = user?.watchlist.includes(movie._id) ?? false;
-  const rating = user?.ratings.find((r) => r.movie === movie._id)?.rating ?? 0;
+  useEffect(() => {
+    if (!user) return;
+    setFavorite(user.favorites.includes(movie._id));
+    setSeen(user.seen.includes(movie._id));
+    setWatchlist(user.watchlist.includes(movie._id));
+    setRating(user.ratings.find((r) => r.movie === movie._id)?.rating ?? 0);
+  }, [user, movie._id]);
 
-  const toggleFavorite = useCallback(() =>
-    optimistic<User>(
-      userQueryKey,
-      (old) => ({
-        ...old,
-        favorites: favorite
-          ? old.favorites.filter((id) => id !== movie._id)
-          : [...old.favorites, movie._id],
-      }),
-      () => favorite
-        ? removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id } })
-        : addToFavoritesMutation.mutateAsync({ data: { id: movie._id } }),
-    ),
-  [favorite, movie._id, userQueryKey, addToFavoritesMutation, removeFromFavoritesMutation, optimistic]);
+  const toggleFavorite = useCallback(() => {
+    const prev = favorite;
+    setFavorite(!prev);
+    (prev
+      ? removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id } })
+      : addToFavoritesMutation.mutateAsync({ data: { id: movie._id } })
+    )
+      .catch(() => setFavorite(prev))
+      .finally(() => void queryClient.invalidateQueries({ queryKey: userQueryKey }));
+  }, [favorite, movie._id, addToFavoritesMutation, removeFromFavoritesMutation, queryClient, userQueryKey]);
 
-  const toggleWatchlist = useCallback(() =>
-    optimistic<User>(
-      userQueryKey,
-      (old) => ({
-        ...old,
-        watchlist: watchlist
-          ? old.watchlist.filter((id) => id !== movie._id)
-          : [...old.watchlist, movie._id],
-      }),
-      () => watchlist
-        ? removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } })
-        : addToWatchlistMutation.mutateAsync({ data: { id: movie._id } }),
-    ),
-  [watchlist, movie._id, userQueryKey, addToWatchlistMutation, removeFromWatchlistMutation, optimistic]);
+  const toggleWatchlist = useCallback(() => {
+    const prev = watchlist;
+    setWatchlist(!prev);
+    (prev
+      ? removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } })
+      : addToWatchlistMutation.mutateAsync({ data: { id: movie._id } })
+    )
+      .catch(() => setWatchlist(prev))
+      .finally(() => void queryClient.invalidateQueries({ queryKey: userQueryKey }));
+  }, [watchlist, movie._id, addToWatchlistMutation, removeFromWatchlistMutation, queryClient, userQueryKey]);
 
   const toggleSeen = useCallback(async () => {
-    if (seen) {
-      await optimistic<User>(
-        userQueryKey,
-        (old) => ({ ...old, seen: old.seen.filter((id) => id !== movie._id) }),
-        () => removeFromSeenMutation.mutateAsync({ data: { id: movie._id } }),
-      );
+    const prevSeen = seen;
+    const prevWatchlist = watchlist;
+    const isFirstSeen = !prevSeen && (user?.seen.length === 0);
+
+    if (prevSeen) {
+      setSeen(false);
+      try {
+        await removeFromSeenMutation.mutateAsync({ data: { id: movie._id } });
+      } catch {
+        setSeen(true);
+      } finally {
+        void queryClient.invalidateQueries({ queryKey: userQueryKey });
+      }
     } else {
-      const isFirstSeen = user?.seen.length === 0;
-      await optimistic<User>(
-        userQueryKey,
-        (old) => ({
-          ...old,
-          seen: [...old.seen, movie._id],
-          watchlist: watchlist ? old.watchlist.filter((id) => id !== movie._id) : old.watchlist,
-        }),
-        async () => {
-          await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
-          if (watchlist) {
-            await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } });
-          }
-        },
-      );
+      setSeen(true);
+      if (prevWatchlist) setWatchlist(false);
+      try {
+        await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
+        if (prevWatchlist) {
+          await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } });
+        }
+      } catch {
+        setSeen(false);
+        if (prevWatchlist) setWatchlist(true);
+      } finally {
+        void queryClient.invalidateQueries({ queryKey: userQueryKey });
+      }
 
       if (isFirstSeen) {
         Alert.alert(
@@ -113,7 +118,7 @@ export default function MovieModalActions({ movie }: Props) {
   }, [
     addToSeenMutation,
     movie._id,
-    optimistic,
+    queryClient,
     removeFromSeenMutation,
     removeFromWatchlistMutation,
     seen,

@@ -20,10 +20,11 @@ export default function MovieReviews({ movieId }: Props) {
   const [showWriteForm, setShowWriteForm] = useState(false);
 
   const { isAuthenticated } = useAuth();
-  const { data: user } = useGetCurrentUser({
+  const { data: userId } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
       queryKey: getGetCurrentUserQueryKey(),
+      select: (data) => data._id,
     },
   });
   const queryClient = useQueryClient();
@@ -66,10 +67,10 @@ export default function MovieReviews({ movieId }: Props) {
   };
 
   const ownReviews = isAuthenticated
-    ? accumulatedReviews.filter((r) => r.userId === user?._id)
+    ? accumulatedReviews.filter((r) => r.userId === userId)
     : [];
 
-  const otherReviews = accumulatedReviews.filter((r) => r.userId !== user?._id);
+  const otherReviews = accumulatedReviews.filter((r) => r.userId !== userId);
   const hasMore = reviews?.hasMore ?? false;
   const total = reviews?.total ?? 0;
 

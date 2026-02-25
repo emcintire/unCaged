@@ -178,7 +178,7 @@ export const movieCard = StyleSheet.create({
 
 export const screen = StyleSheet.create({
   withPadding: {
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   centered: {
     alignItems: 'center',
