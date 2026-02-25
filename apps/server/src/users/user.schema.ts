@@ -5,6 +5,7 @@ export const userSchema = z.object({
   createdOn: z.date().default(() => new Date()),
   email: z.email().min(1).max(255),
   favorites: z.array(z.string()).default([]),
+  image: z.number().int().min(1).max(6).default(1),
   img: z.string().max(100).default(DEFAULT_USER_IMG),
   isAdmin: z.boolean().default(false),
   name: z.string().max(100).optional(),

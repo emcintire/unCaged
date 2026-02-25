@@ -2,45 +2,35 @@ import { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { borderRadius, colors, spacing } from '@/config';
+import { PROFILE_PICS } from '@/constants';
 import AppButton from './AppButton';
 import Icon from './Icon';
-import { useGetCurrentUser, useUpdateUser } from '@/services';
+import { useGetCurrentUser, useUpdateUser, getGetCurrentUserQueryKey } from '@/services';
 
 type Props = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
 };
 
-const imgs = [
-  'https://i.imgur.com/9NYgErPm.png',
-  'https://i.imgur.com/Upkz8OFm.png',
-  'https://i.imgur.com/29gBEEPm.png',
-  'https://i.imgur.com/iigQEaqm.png',
-  'https://i.imgur.com/J2pJMGlm.png',
-  'https://i.imgur.com/EpKnEsOm.png',
-] as const;
-
 export default function PicturePicker({ modalVisible, setModalVisible }: Props) {
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState(0); // 0-based index
 
-  const { data: user, refetch } = useGetCurrentUser();
+  const { data: user } = useGetCurrentUser();
   const updateUserMutation = useUpdateUser();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    const index = imgs.findIndex((link) => link === user?.img);
-    if (index !== -1) {
-      setSelected(index);
+    if (user?.image != null) {
+      setSelected(user.image - 1); // 1-based → 0-based
     }
   }, [user]);
 
   const handleSubmit = async () => {
-    const selectedImg = imgs[selected];
-    if (!selectedImg) return;
-
-    await updateUserMutation.mutateAsync({ data: { img: selectedImg } });
+    await updateUserMutation.mutateAsync({ data: { image: selected + 1 } }); // 0-based → 1-based
     setModalVisible(false);
-    refetch();
+    void queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
   };
 
   if (!modalVisible) { return null; }
@@ -54,13 +44,13 @@ export default function PicturePicker({ modalVisible, setModalVisible }: Props) 
           </TouchableOpacity>
         </View>
         <View style={styles.imagesContainer}>
-          {imgs.map((image, index) => (
-            <View style={styles.imgContainer} key={image}>
+          {PROFILE_PICS.map((pic, index) => (
+            <View style={styles.imgContainer} key={index}>
               <View style={selected === index ? styles.selected : styles.notSelected}>
                 <MaterialCommunityIcons name="check" size={40} color={colors.white} />
               </View>
               <TouchableOpacity style={styles.imgBtn} onPress={() => setSelected(index)} accessibilityRole="button" accessibilityLabel={`Profile picture ${index + 1}${selected === index ? ', selected' : ''}`}>
-                <Image source={image} style={styles.img} accessibilityLabel={`Profile picture option ${index + 1}`} />
+                <Image source={pic} style={styles.img} accessibilityLabel={`Profile picture option ${index + 1}`} />
               </TouchableOpacity>
             </View>
           ))}

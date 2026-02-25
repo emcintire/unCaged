@@ -41,6 +41,12 @@ const userSchema = new Schema<UserDocument>({
     type: Date,
     maxLength: 100,
   },
+  image: {
+    type: Number,
+    min: 1,
+    max: 6,
+    default: 1,
+  },
   img: {
     type: String,
     default: DEFAULT_USER_IMG,

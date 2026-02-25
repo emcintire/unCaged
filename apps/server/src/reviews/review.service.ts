@@ -48,7 +48,7 @@ export class ReviewService {
     const reviews = await Review.aggregate([...pipeline, { $skip: skip }, { $limit: limit }]);
 
     const userIds = [...new Set(reviews.map((r) => r.userId))];
-    const users = await User.find({ _id: { $in: userIds } }).select('name img');
+    const users = await User.find({ _id: { $in: userIds } }).select('name image');
     const userMap = new Map(users.map((u) => [u._id.toString(), u]));
 
     const enriched = reviews.map((review) => {
@@ -66,7 +66,7 @@ export class ReviewService {
         isLikedByUser: currentUserId ? (review.likes ?? []).includes(currentUserId) : false,
         createdOn: review.createdOn,
         userName: user?.name || '',
-        userImg: user?.img || '',
+        userImage: user?.image ?? 1,
       };
     });
 
@@ -173,7 +173,7 @@ export class ReviewService {
     const reviews = await Review.find({ userId }).sort({ createdOn: -1 });
 
     const movieIds = [...new Set(reviews.map((r) => r.movieId))];
-    const movies = await Movie.find({ _id: { $in: movieIds } }).select('title img');
+    const movies = await Movie.find({ _id: { $in: movieIds } }).select('title image');
     const movieMap = new Map(movies.map((m) => [m._id.toString(), m]));
 
     return reviews.map((review) => {
@@ -190,7 +190,7 @@ export class ReviewService {
         isFlagged: review.isFlagged,
         createdOn: review.createdOn,
         movieTitle: movie?.title || '',
-        movieImg: movie?.img || '',
+        movieImage: movie?.image || '',
       };
     });
   }
@@ -219,8 +219,8 @@ export class ReviewService {
     const movieIds = [...new Set(reviews.map((r) => r.movieId))];
 
     const [users, movies] = await Promise.all([
-      User.find({ _id: { $in: userIds } }).select('name email img'),
-      Movie.find({ _id: { $in: movieIds } }).select('title img'),
+      User.find({ _id: { $in: userIds } }).select('name email image'),
+      Movie.find({ _id: { $in: movieIds } }).select('title image'),
     ]);
 
     const userMap = new Map(users.map((u) => [u._id.toString(), u]));
@@ -243,9 +243,9 @@ export class ReviewService {
         createdOn: review.createdOn,
         userName: user?.name || '',
         userEmail: user?.email || '',
-        userImg: user?.img || '',
+        userImage: user?.image ?? 1,
         movieTitle: movie?.title || '',
-        movieImg: movie?.img || '',
+        movieImage: movie?.image || '',
       };
     });
 

@@ -8,6 +8,7 @@ export const movieSchema = z.object({
   favoriteCount: z.number().default(0),
   genres: z.array(z.string()).default([]),
   img: z.string().max(100),
+  image: z.string().max(500).optional().default(''),
   rating: z.string().min(1).max(20),
   ratingCount: z.number().default(0),
   ratingSum: z.number().default(0),

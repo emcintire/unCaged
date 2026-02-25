@@ -57,7 +57,7 @@ export default function SearchScreen() {
       queryKey: getGetCurrentUserQueryKey(),
     },
   });
-  const { data: movies = [], isLoading: loading } = useGetAllMovies();
+  const { data: movies = [], isLoading: loading, refetch } = useGetAllMovies();
 
   const displayMovies = useMemo(() => {
     const predicates = [
@@ -119,6 +119,7 @@ export default function SearchScreen() {
         movies={displayMovies}
         favoriteIds={user?.favorites ?? []}
         seenIds={user?.seen ?? []}
+        onRefresh={refetch}
       />
     </Screen>
   );

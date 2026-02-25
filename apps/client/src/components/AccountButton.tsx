@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '@/types';
 import { borderRadius } from '@/config';
+import { getProfilePic } from '@/constants';
 
 export default function AccountButton() {
   const { data: user, refetch } = useGetCurrentUser();
@@ -17,7 +18,7 @@ export default function AccountButton() {
 
   return (
     <TouchableOpacity onPress={handleNavigate} accessibilityRole="button" accessibilityLabel="Account settings">
-      <Image source={user?.img || ''} style={styles.image} />
+      <Image source={getProfilePic(user?.image)} style={styles.image} />
     </TouchableOpacity>
   );
 }

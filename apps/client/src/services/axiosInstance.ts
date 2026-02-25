@@ -29,6 +29,7 @@ type ExtendedAxiosRequestConfig = AxiosRequestConfig & {
 const SKIP_REFRESH_ENDPOINTS: Array<string> = [
   '/api/auth/login',
   '/api/auth/register',
+  '/api/users/changePassword',
 ];
 
 const isSkipRefreshEndpoint = (url: string | undefined): boolean =>

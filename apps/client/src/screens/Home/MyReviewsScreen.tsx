@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import type { UserReview } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import Screen from '@/components/Screen';
-import { useDeleteReview, useGetMyReviews } from '@/services';
+import { useDeleteReview, useGetMyReviews, getGetMyReviewsQueryKey } from '@/services';
+import WriteReviewForm from '@/components/movieModal/reviews/WriteReviewForm';
+import PullToRefresh from '@/components/PullToRefresh';
 
-function ReviewListItem({ item }: { item: UserReview }) {
+const ReviewListItem = memo(function ReviewListItem({ item }: { item: UserReview }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const queryClient = useQueryClient();
   const deleteMutation = useDeleteReview();
+
+  const invalidate = () => void queryClient.invalidateQueries({ queryKey: getGetMyReviewsQueryKey() });
 
   const handleDelete = () => {
     Alert.alert('Delete Review', 'Delete this review?', [
@@ -16,7 +23,10 @@ function ReviewListItem({ item }: { item: UserReview }) {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteMutation.mutate({ reviewId: item._id }),
+        onPress: () => deleteMutation.mutate(
+          { reviewId: item._id },
+          { onSuccess: invalidate },
+        ),
       },
     ]);
   };
@@ -27,10 +37,24 @@ function ReviewListItem({ item }: { item: UserReview }) {
     day: 'numeric',
   });
 
+  if (isEditing) {
+    return (
+      <WriteReviewForm
+        movieId={item.movieId}
+        editReviewId={item._id}
+        initialText={item.text}
+        initialRating={item.rating ?? null}
+        initialIsSpoiler={item.isSpoiler ?? false}
+        onSuccess={() => { setIsEditing(false); invalidate(); }}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  }
+
   return (
     <View style={styles.item}>
       {/* Movie Poster */}
-      <Image source={{ uri: item.movieImg }} style={styles.poster} contentFit="cover" />
+      <Image source={{ uri: item.movieImage }} style={styles.poster} contentFit="cover" />
 
       {/* Content */}
       <View style={styles.content}>
@@ -55,23 +79,28 @@ function ReviewListItem({ item }: { item: UserReview }) {
         {/* Review Snippet */}
         <Text style={styles.reviewSnippet} numberOfLines={2}>{item.text}</Text>
 
-        {/* Date + Delete */}
+        {/* Date + Edit + Delete */}
         <View style={styles.footerRow}>
           <Text style={styles.dateText}>{formattedDate}</Text>
-          <TouchableOpacity onPress={handleDelete} hitSlop={8} disabled={deleteMutation.isPending}>
-            <MaterialCommunityIcons name="trash-can-outline" size={18} color={colors.danger} />
-          </TouchableOpacity>
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={() => setIsEditing(true)} hitSlop={8}>
+              <MaterialCommunityIcons name="pencil-outline" size={18} color={colors.medium} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleDelete} hitSlop={8} disabled={deleteMutation.isPending}>
+              <MaterialCommunityIcons name="trash-can-outline" size={18} color={colors.danger} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
   );
-}
+});
 
 type SortMode = 'recent' | 'popular';
 
 export default function MyReviewsScreen() {
   const [sort, setSort] = useState<SortMode>('recent');
-  const { data: reviews = [], isLoading } = useGetMyReviews();
+  const { data: reviews = [], isLoading, refetch } = useGetMyReviews();
   
   const sorted = [...reviews].sort((a, b) =>
     sort === 'popular'
@@ -85,6 +114,7 @@ export default function MyReviewsScreen() {
         data={sorted}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => <ReviewListItem item={item} />}
+        refreshControl={<PullToRefresh onRefresh={refetch} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
@@ -190,6 +220,11 @@ const styles = StyleSheet.create({
     color: colors.medium,
     fontFamily: fontFamily.light,
     fontSize: fontSize.xs,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    alignItems: 'center',
   },
   emptyState: {
     alignItems: 'center',

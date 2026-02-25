@@ -6,6 +6,7 @@ import { colors, fontFamily, fontSize, movieCard, spacing } from '@/config';
 import MovieCard from './MovieCard';
 import MovieModal from './movieModal/MovieModal';
 import BuyMeCoffeeButton from './BuyMeCoffeeButton';
+import PullToRefresh from './PullToRefresh';
 
 const NUM_COLUMNS = 2;
 
@@ -16,6 +17,7 @@ type Props = {
   ListHeaderComponent?: ReactElement | null;
   ListHeaderComponentStyle?: object;
   emptyMessage?: ReactNode;
+  onRefresh?: () => Promise<unknown>;
 };
 
 export default function MovieGrid({
@@ -25,6 +27,7 @@ export default function MovieGrid({
   ListHeaderComponent,
   ListHeaderComponentStyle,
   emptyMessage = 'No results :(',
+  onRefresh,
 }: Props) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
@@ -59,6 +62,7 @@ export default function MovieGrid({
         ListHeaderComponent={ListHeaderComponent}
         ListHeaderComponentStyle={ListHeaderComponentStyle}
         ListFooterComponent={<BuyMeCoffeeButton />}
+        refreshControl={onRefresh ? <PullToRefresh onRefresh={onRefresh} /> : undefined}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="movie-open-off-outline" size={48} color={colors.medium} />

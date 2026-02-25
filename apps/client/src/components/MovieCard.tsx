@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 import { View, TouchableOpacity, StyleSheet, type ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,11 +15,11 @@ type Props = {
 };
 
 export default function MovieCard({ movie, onPress, isFavorite = false, isSeen, buttonStyle }: Props) {
-  const getImg = useCallback(() => changeResolution('l', movie).img, [movie]);
+  const image = useMemo(() => changeResolution('w_405,f_auto,q_90', movie).image, [movie]);
 
   return (
     <TouchableOpacity style={[movieCard.button, buttonStyle]} onPress={onPress}>
-      <Image source={getImg()} style={movieCard.image} />
+      <Image source={image} style={movieCard.image} />
       {isFavorite && (
         <View style={styles.badge}>
           <MaterialCommunityIcons name="heart" size={14} color={colors.orange} />

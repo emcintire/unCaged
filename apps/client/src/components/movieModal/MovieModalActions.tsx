@@ -1,11 +1,11 @@
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useCallback, useMemo, useState } from 'react';
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
-import { useAuth } from '@/hooks';
+import { useAuth, useOptimisticUpdate } from '@/hooks';
 import { colors, fontFamily, fontSize } from '@/config';
 import {
   useAddToSeen, useRemoveFromSeen, useAddToFavorites, useRemoveFromFavorites, useAddToWatchlist,
-  useRemoveFromWatchlist, type Movie, useGetCurrentUser, getGetCurrentUserQueryKey,
+  useRemoveFromWatchlist, type Movie, type User, useGetCurrentUser, getGetCurrentUserQueryKey,
 } from '@/services';
 import MovieModalRating from './MovieModalRating';
 import Icon from '../Icon';
@@ -25,11 +25,13 @@ export default function MovieModalActions({ movie }: Props) {
   const removeFromWatchlistMutation = useRemoveFromWatchlist();
 
   const { isAuthenticated } = useAuth();
+  const optimistic = useOptimisticUpdate();
+  const userQueryKey = getGetCurrentUserQueryKey();
 
-  const { data: user, refetch } = useGetCurrentUser({
+  const { data: user } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
-      queryKey: getGetCurrentUserQueryKey(),
+      queryKey: userQueryKey,
     },
   });
 
@@ -38,41 +40,66 @@ export default function MovieModalActions({ movie }: Props) {
   const watchlist = user?.watchlist.includes(movie._id) ?? false;
   const rating = user?.ratings.find((r) => r.movie === movie._id)?.rating ?? 0;
 
-  const toggleFavorite = useCallback(async () => {
-    if (favorite) {
-      await removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id }});
-    } else {
-      await addToFavoritesMutation.mutateAsync({ data: { id: movie._id }});
-    }
-    refetch();
-  }, [favorite, movie._id, addToFavoritesMutation, removeFromFavoritesMutation, refetch]);
+  const toggleFavorite = useCallback(() =>
+    optimistic<User>(
+      userQueryKey,
+      (old) => ({
+        ...old,
+        favorites: favorite
+          ? old.favorites.filter((id) => id !== movie._id)
+          : [...old.favorites, movie._id],
+      }),
+      () => favorite
+        ? removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id } })
+        : addToFavoritesMutation.mutateAsync({ data: { id: movie._id } }),
+    ),
+  [favorite, movie._id, userQueryKey, addToFavoritesMutation, removeFromFavoritesMutation, optimistic]);
 
-  const toggleWatchlist = useCallback(async () => {
-    if (watchlist) {
-      await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id }});
-    } else {
-      await addToWatchlistMutation.mutateAsync({ data: { id: movie._id }});
-    }
-    refetch();
-  }, [watchlist, movie._id, addToWatchlistMutation, removeFromWatchlistMutation, refetch]);
+  const toggleWatchlist = useCallback(() =>
+    optimistic<User>(
+      userQueryKey,
+      (old) => ({
+        ...old,
+        watchlist: watchlist
+          ? old.watchlist.filter((id) => id !== movie._id)
+          : [...old.watchlist, movie._id],
+      }),
+      () => watchlist
+        ? removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } })
+        : addToWatchlistMutation.mutateAsync({ data: { id: movie._id } }),
+    ),
+  [watchlist, movie._id, userQueryKey, addToWatchlistMutation, removeFromWatchlistMutation, optimistic]);
 
   const toggleSeen = useCallback(async () => {
     if (seen) {
-      await removeFromSeenMutation.mutateAsync({ data: { id: movie._id }});
-      refetch();
+      await optimistic<User>(
+        userQueryKey,
+        (old) => ({ ...old, seen: old.seen.filter((id) => id !== movie._id) }),
+        () => removeFromSeenMutation.mutateAsync({ data: { id: movie._id } }),
+      );
     } else {
       const isFirstSeen = user?.seen.length === 0;
-      await addToSeenMutation.mutateAsync({ data: { id: movie._id }});
-
-      if (watchlist) {
-        await toggleWatchlist();
-      }
-      refetch();
+      await optimistic<User>(
+        userQueryKey,
+        (old) => ({
+          ...old,
+          seen: [...old.seen, movie._id],
+          watchlist: watchlist ? old.watchlist.filter((id) => id !== movie._id) : old.watchlist,
+        }),
+        async () => {
+          await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
+          if (watchlist) {
+            await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } });
+          }
+        },
+      );
 
       if (isFirstSeen) {
         Alert.alert(
           'Hello traveler',
-          'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. Nay, I do it for the people. Consider helping me in my holy mission.',
+          'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, ' +
+          'and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. ' +
+          'Nay, I do it for the people. Consider helping me in my holy mission.',
           [
             { text: 'Later', style: 'cancel' },
             {
@@ -83,7 +110,17 @@ export default function MovieModalActions({ movie }: Props) {
         );
       }
     }
-  }, [seen, movie, addToSeenMutation, removeFromSeenMutation, refetch, user, watchlist, toggleWatchlist]);
+  }, [
+    addToSeenMutation,
+    movie._id,
+    optimistic,
+    removeFromSeenMutation,
+    removeFromWatchlistMutation,
+    seen,
+    user?.seen.length,
+    userQueryKey,
+    watchlist,
+  ]);
 
   const actions: Array<{
     active: boolean;
@@ -134,7 +171,7 @@ export default function MovieModalActions({ movie }: Props) {
           </View>
         ))}
       </View>
-      {showStars && <MovieModalRating rating={rating} setRating={() => {}} movie={movie} onSeenAdded={() => {}} />}
+      {showStars && <MovieModalRating rating={rating} movie={movie} />}
     </>
   );
 }

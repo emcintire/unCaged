@@ -1,5 +1,4 @@
 import express from 'express';
-import { auth } from '@/middleware';
 import { AuthController } from '@/auth';
 import { createAuthLimiter } from '@/utils';
 
@@ -81,7 +80,7 @@ authRouter.post('/login', loginLimiter, controller.login);
  *       '200':
  *         description: Successfully logged out
  */
-authRouter.post('/logout', auth, controller.logout);
+authRouter.post('/logout', controller.logout);
 
 /**
  * @swagger

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useCreateReview, useRateMovie, useUpdateReview } from '@/services';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCreateReview, useRateMovie, useUpdateReview, getGetCurrentUserQueryKey, getGetAverageRatingQueryKey } from '@/services';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import StarRating from '../../StarRating';
 
@@ -29,6 +30,7 @@ export default function WriteReviewForm({
 
   const isEditMode = editReviewId != null;
 
+  const queryClient = useQueryClient();
   const createReviewMutation = useCreateReview();
   const updateReviewMutation = useUpdateReview();
   const rateMovieMutation = useRateMovie();
@@ -67,6 +69,8 @@ export default function WriteReviewForm({
 
       if (rating != null) {
         await rateMovieMutation.mutateAsync({ data: { id: movieId, rating } });
+        void queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
+        void queryClient.invalidateQueries({ queryKey: getGetAverageRatingQueryKey(movieId) });
       }
     }
 

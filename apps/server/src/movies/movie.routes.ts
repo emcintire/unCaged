@@ -11,7 +11,7 @@ const controller = new MovieController();
  *   schemas:
  *     Movie:
  *       type: object
- *       required: [_id, date, director, genres, img, rating, runtime, title]
+ *       required: [_id, date, director, genres, image, rating, runtime, title]
  *       properties:
  *         _id:
  *           type: string
@@ -29,7 +29,7 @@ const controller = new MovieController();
  *           type: array
  *           items:
  *             type: string
- *         img:
+ *         image:
  *           type: string
  *         rating:
  *           type: string

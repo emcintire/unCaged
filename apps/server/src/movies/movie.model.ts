@@ -50,6 +50,10 @@ const movieMongooseSchema = new Schema<MovieDocument>({
     type: String,
     default: '',
   },
+  image: {
+    type: String,
+    default: '',
+  },
   avgRating: {
     type: Number,
     max: 5,

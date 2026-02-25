@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,7 +29,11 @@ export default function MovieReviews({ movieId }: Props) {
   const queryClient = useQueryClient();
   const { data: reviews, isLoading, isFetching } = useGetReviewsByMovie({ movieId, page, sort });
 
-  const invalidateReviews = () => queryClient.invalidateQueries({ queryKey: getGetReviewsByMovieQueryKey() });
+  const invalidateReviews = useCallback(() => {
+    setPage(1);
+    setAccumulatedReviews([]);
+    void queryClient.invalidateQueries({ queryKey: getGetReviewsByMovieQueryKey() });
+  }, [queryClient]);
 
   const prevSortRef = useRef(sort);
 

@@ -1,17 +1,21 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import type { AdminReview, GetAdminReviewsParams } from '@/services';
-import { useDeleteReview, useGetAdminReviews, useUnflagReview } from '@/services';
+import { useDeleteReview, useGetAdminReviews, useUnflagReview, getGetAdminReviewsQueryKey } from '@/services';
 import { useDebounce } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import Screen from '@/components/Screen';
 
 type FilterMode = 'all' | 'flagged';
 
-function AdminReviewItem({ item }: { item: AdminReview }) {
+const AdminReviewItem = memo(function AdminReviewItem({ item }: { item: AdminReview }) {
+  const queryClient = useQueryClient();
   const unflagMutation = useUnflagReview();
   const deleteMutation = useDeleteReview();
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: getGetAdminReviewsQueryKey() });
 
   const handleDelete = () => {
     Alert.alert('Delete Review', `Delete this review by ${item.userName}?`, [
@@ -19,13 +23,13 @@ function AdminReviewItem({ item }: { item: AdminReview }) {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteMutation.mutate({ reviewId: item._id }),
+        onPress: () => deleteMutation.mutate({ reviewId: item._id }, { onSuccess: invalidate }),
       },
     ]);
   };
 
   const handleUnflag = () => {
-    unflagMutation.mutate({ reviewId: item._id });
+    unflagMutation.mutate({ reviewId: item._id }, { onSuccess: invalidate });
   };
 
   const formattedDate = new Date(item.createdOn).toLocaleDateString('en-US', {
@@ -106,7 +110,7 @@ function AdminReviewItem({ item }: { item: AdminReview }) {
       </View>
     </View>
   );
-}
+});
 
 export default function AdminReviewsScreen() {
   const [filterMode, setFilterMode] = useState<FilterMode>('all');

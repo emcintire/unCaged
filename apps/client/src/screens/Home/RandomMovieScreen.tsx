@@ -43,11 +43,7 @@ export default function RandomMovieScreen() {
     const picked = from[idx];
     if (!picked) return from;
     setMovieKey(k => k + 1);
-    if (!picked.img) {
-      setMovie(picked);
-    } else {
-      setMovie(picked.img.length === 32 ? changeResolution('', picked) : picked);
-    }
+    setMovie(changeResolution('w_900,f_auto,q_90', picked));
     return from.filter((_, i) => i !== idx);
   }, [setMovieKey]);
 
@@ -82,7 +78,7 @@ export default function RandomMovieScreen() {
   }, [fade, getRandomMovie]);
 
   useEffect(() => {
-    if (waitingForImage.current && (movie === null || !movie.img)) {
+    if (waitingForImage.current && (movie === null || !movie.image)) {
       waitingForImage.current = false;
       fadeIn();
     }
@@ -125,7 +121,7 @@ export default function RandomMovieScreen() {
             >
               <Image
                 key={movieKey}
-                source={movie.img}
+                source={movie.image}
                 style={styles.movieImage}
                 contentFit="cover"
                 onLoadEnd={() => {

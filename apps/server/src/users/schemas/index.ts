@@ -1,3 +1,4 @@
+export { changePasswordDtoSchema, type ChangePasswordDto } from './changePasswordDto.schema';
 export { createUserDtoSchema, type CreateUserDto } from './createUserDto.schema';
 export { rateMovieDtoSchema, type RateMovieDto } from './rateMovieDto.schema';
 export { updateUserDtoSchema, type UpdateUserDto } from './updateUserDto.schema';

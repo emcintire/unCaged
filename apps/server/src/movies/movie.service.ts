@@ -40,17 +40,22 @@ export class MovieService {
   }
 
   async getPopularMovies() {
-    const movies = await Movie.find();
-
-    const scored = movies.map((movie) => {
-      const score = (movie.seenCount || 0)
-        + ((movie.favoriteCount || 0) * 2)
-        + ((movie.avgRating || 0) * (movie.ratingCount || 0));
-      return { movie, score };
-    });
-
-    scored.sort((a, b) => b.score - a.score);
-    return scored.slice(0, 10).map((s) => s.movie);
+    return await Movie.aggregate([
+      {
+        $addFields: {
+          score: {
+            $add: [
+              { $ifNull: ['$seenCount', 0] },
+              { $multiply: [{ $ifNull: ['$favoriteCount', 0] }, 2] },
+              { $multiply: [{ $ifNull: ['$avgRating', 0] }, { $ifNull: ['$ratingCount', 0] }] },
+            ],
+          },
+        },
+      },
+      { $sort: { score: -1 } },
+      { $limit: 10 },
+      { $project: { score: 0 } },
+    ]);
   }
 
   async getStaffPicks() {
@@ -63,6 +68,6 @@ export class MovieService {
 
   async getAverageRating(id: string) {
     const movie = await this.findMovieById(id);
-    return JSON.stringify(movie.avgRating || 0);
+    return movie.avgRating ?? 0;
   }
 }

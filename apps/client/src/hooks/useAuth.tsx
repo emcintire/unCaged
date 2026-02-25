@@ -12,10 +12,10 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
-const deleteKeys = () => {
-  void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
-  void SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
-};
+const clearStoredTokens = () => Promise.all([
+  SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN),
+  SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN),
+]);
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -26,39 +26,40 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const logoutMutation = useLogout();
 
   const signOut = useCallback(async () => {
+    // Read the refresh token BEFORE clearing storage — otherwise the delete
+    // races the get and the server-side revocation never fires.
+    const refreshToken = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
+
     setIsAuthenticated(false);
     queryClient.clear();
-    deleteKeys();
-    const refreshToken = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
-    if (!refreshToken) { return; }
+    await clearStoredTokens();
 
-    logoutMutation.mutate({ data: { refreshToken } });
+    if (refreshToken) {
+      logoutMutation.mutate({ data: { refreshToken } });
+    }
   }, [logoutMutation, queryClient]);
 
   const signIn = useCallback(async (accessToken: string, refreshToken: string) => {
-    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, accessToken);
-    await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN, refreshToken);
+    await Promise.all([
+      SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKEN, accessToken),
+      SecureStore.setItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN, refreshToken),
+    ]);
     setIsAuthenticated(true);
   }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
-      setOnUnauthorized(null);
       try {
         const token = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKEN);
-        if (!token) {
-          setIsAuthenticated(false);
-          return;
-        }
-        setIsAuthenticated(true);
+        setIsAuthenticated(token != null);
       } catch {
         setIsAuthenticated(false);
-        deleteKeys();
+        void clearStoredTokens();
       } finally {
         setIsLoading(false);
         setOnUnauthorized(signOut);
       }
-    }
+    };
 
     checkAuth();
   }, [signOut]);

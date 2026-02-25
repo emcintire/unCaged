@@ -8,8 +8,8 @@ import AdBanner from '@/components/AdBanner';
 import { useMemo } from 'react';
 
 export default function WatchlistScreen() {
-  const { data: user, isLoading: isUserLoading } = useGetCurrentUser();
-  const { data: movies = [], isLoading: isMoviesLoading } = useGetAllMovies();
+  const { data: user, isLoading: isUserLoading, refetch: refetchUser } = useGetCurrentUser();
+  const { data: movies = [], isLoading: isMoviesLoading, refetch: refetchMovies } = useGetAllMovies();
 
   const isLoading = isUserLoading || isMoviesLoading;
   const isAdmin = user?.isAdmin ?? false;
@@ -24,6 +24,7 @@ export default function WatchlistScreen() {
       {!isAdmin && <AdBanner />}
       <MovieGrid
         movies={watchlistMovies}
+        onRefresh={() => Promise.all([refetchUser(), refetchMovies()])}
         emptyMessage={(
           <Text>
             Either you are a national treasure who has seen all&nbsp;

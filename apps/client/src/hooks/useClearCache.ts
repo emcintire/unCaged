@@ -7,6 +7,9 @@ export const useClearCache = () => {
   const queryClient = useQueryClient();
   return useCallback(async () => {
     queryClient.clear();
-    await SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN);
+    await Promise.all([
+      SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKEN),
+      SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_REFRESH_TOKEN),
+    ]);
   }, [queryClient]);
 };

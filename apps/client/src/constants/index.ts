@@ -13,6 +13,27 @@ export const TOAST_DURATION = {
   LONG: 4000,
 } as const;
 
+// Profile pictures stored as local assets (assets/imgs/1.png through 6.png).
+// The index stored in user.image is 1-based; PROFILE_PICS is 0-based.
+export const PROFILE_PICS = [
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/assets/imgs/1.png'),
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/assets/imgs/2.png'),
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/assets/imgs/3.png'),
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/assets/imgs/4.png'),
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/assets/imgs/5.png'),
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@/assets/imgs/6.png'),
+] as const;
+
+/** Returns the local asset for a 1-based profile picture index. Defaults to pic 1. */
+export const getProfilePic = (image?: number | null) =>
+  PROFILE_PICS[((image ?? 1) >= 1 && (image ?? 1) <= 6 ? (image ?? 1) : 1) - 1];
+
 export const genres = [
   'Action',
   'Adventure',

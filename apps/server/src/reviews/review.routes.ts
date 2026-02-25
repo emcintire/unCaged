@@ -11,7 +11,7 @@ const controller = new ReviewController();
  *   schemas:
  *     Review:
  *       type: object
- *       required: [_id, userId, movieId, text, likes, likeCount, createdOn, userName, userImg]
+ *       required: [_id, userId, movieId, text, likes, likeCount, createdOn, userName, userImage]
  *       properties:
  *         _id:
  *           type: string
@@ -39,8 +39,8 @@ const controller = new ReviewController();
  *           type: string
  *         userName:
  *           type: string
- *         userImg:
- *           type: string
+ *         userImage:
+ *           type: number
  *     ReviewsPage:
  *       type: object
  *       required: [reviews, total, hasMore]
@@ -57,7 +57,7 @@ const controller = new ReviewController();
  *       allOf:
  *         - $ref: '#/components/schemas/Review'
  *         - type: object
- *           required: [userEmail, flaggedBy, movieTitle, movieImg]
+ *           required: [userEmail, flaggedBy, movieTitle, movieImage]
  *           properties:
  *             userEmail:
  *               type: string
@@ -67,7 +67,7 @@ const controller = new ReviewController();
  *                 type: string
  *             movieTitle:
  *               type: string
- *             movieImg:
+ *             movieImage:
  *               type: string
  *     AdminReviewsPage:
  *       type: object

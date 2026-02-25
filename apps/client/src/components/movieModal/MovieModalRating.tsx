@@ -1,8 +1,8 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import type { SetState } from '@/types';
-import { type Movie, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey } from '@/services';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
+import { type Movie, type User, useDeleteRating, useRateMovie, useAddToSeen, useGetCurrentUser, getGetCurrentUserQueryKey, getGetAverageRatingQueryKey } from '@/services';
 import { borderRadius, colors, spacing } from '@/config';
-import { useAuth } from '@/hooks';
+import { useAuth, useOptimisticUpdate } from '@/hooks';
 import { getStarIcon } from '../StarRating';
 import Icon from '../Icon';
 
@@ -26,45 +26,60 @@ const getStarColor = (star: number, rating: number): string => {
 
 type Props = {
   movie: Movie;
-  onSeenAdded: () => void;
   rating: number;
-  setRating: SetState<number>;
 };
 
-export default function MovieModalRating({ movie, onSeenAdded, rating, setRating }: Props) {
+export default function MovieModalRating({ movie, rating }: Props) {
   const rateMovieMutation = useRateMovie();
   const deleteRatingMutation = useDeleteRating();
   const addToSeenMutation = useAddToSeen();
 
+  const isPending = rateMovieMutation.isPending || deleteRatingMutation.isPending || addToSeenMutation.isPending;
+
   const { isAuthenticated } = useAuth();
-  const { data: user, refetch } = useGetCurrentUser({
+  const optimistic = useOptimisticUpdate();
+  const queryClient = useQueryClient();
+  const userQueryKey = getGetCurrentUserQueryKey();
+  const avgRatingQueryKey = getGetAverageRatingQueryKey(movie._id);
+
+  const { data: user } = useGetCurrentUser({
     query: {
       enabled: isAuthenticated,
-      queryKey: getGetCurrentUserQueryKey(),
+      queryKey: userQueryKey,
     },
   });
 
-  const submitRating = async (newRating: number) => {
-    await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
-    setRating(newRating);
-
-    const isMovieSeen = user && user.seen.includes(movie._id);
-    if (!isMovieSeen) {
-      await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
-      onSeenAdded();
-    }
-  };
+  const submitRating = (newRating: number) =>
+    optimistic<User>(
+      userQueryKey,
+      (old) => ({
+        ...old,
+        ratings: old.ratings.some((r) => r.movie === movie._id)
+          ? old.ratings.map((r) => r.movie === movie._id ? { ...r, rating: newRating } : r)
+          : [...old.ratings, { _id: 'temp', movie: movie._id, rating: newRating }],
+        seen: old.seen.includes(movie._id) ? old.seen : [...old.seen, movie._id],
+      }),
+      async () => {
+        await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
+        if (!user?.seen.includes(movie._id)) {
+          await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
+        }
+      },
+    );
 
   const handleRating = (star: number) => async () => {
     if (rating === star) {
       await submitRating(star - 0.5);
     } else if (rating === star - 0.5) {
-      await deleteRatingMutation.mutateAsync({ data: { id: movie._id } });
-      setRating(0);
+      await optimistic<User>(
+        userQueryKey,
+        (old) => ({ ...old, ratings: old.ratings.filter((r) => r.movie !== movie._id) }),
+        () => deleteRatingMutation.mutateAsync({ data: { id: movie._id } }),
+      );
     } else {
       await submitRating(star);
     }
-    refetch();
+    void queryClient.invalidateQueries({ queryKey: avgRatingQueryKey });
   };
 
   return (
@@ -73,6 +88,7 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
         <TouchableOpacity
           key={star}
           onPress={handleRating(star)}
+          disabled={isPending}
           accessibilityRole="button"
           accessibilityLabel={`Rate ${star} star${star > 1 ? 's' : ''}`}
         >
@@ -85,5 +101,5 @@ export default function MovieModalRating({ movie, onSeenAdded, rating, setRating
         </TouchableOpacity>
       ))}
     </View>
-  )
+  );
 }

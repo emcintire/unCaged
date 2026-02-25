@@ -6,6 +6,7 @@ import type { Review } from '@/services';
 import { useGetCurrentUser, useDeleteReview, useFlagReview, useToggleReviewLike, getGetCurrentUserQueryKey } from '@/services';
 import { useAuth } from '@/hooks';
 import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { getProfilePic } from '@/constants';
 import StarRating from '../../StarRating';
 import WriteReviewForm from './WriteReviewForm';
 
@@ -49,7 +50,7 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
 
   const handleLike = () => {
     if (!isAuthenticated) return;
-    toggleLikeMutation.mutate({ reviewId: review._id });
+    toggleLikeMutation.mutate({ reviewId: review._id }, { onSuccess });
   };
 
   const handleFlag = () => {
@@ -94,16 +95,9 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
 
   return (
     <View style={styles.card}>
-      {/* Header: Avatar + Name + Date */}
       <View style={styles.header}>
         <View style={styles.avatarRow}>
-          {review.userImg ? (
-            <Image source={{ uri: review.userImg }} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarFallback]}>
-              <MaterialCommunityIcons name="account" size={18} color={colors.medium} />
-            </View>
-          )}
+          <Image source={getProfilePic(review.userImage)} style={styles.avatar} />
           <View>
             <Text style={styles.userName}>{review.userName || 'Anonymous'}</Text>
             <Text style={styles.date}>{formattedDate}</Text>
@@ -123,14 +117,12 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
         </View>
       </View>
 
-      {/* Star Rating */}
       {review.rating != null && (
         <View style={styles.ratingRow}>
           <StarRating rating={review.rating} size={16} />
         </View>
       )}
 
-      {/* Review Text */}
       {isSpoilerHidden ? (
         <TouchableOpacity style={styles.spoilerBox} onPress={() => setSpoilerRevealed(true)}>
           <MaterialCommunityIcons name="eye-off" size={16} color={colors.medium} />
@@ -147,7 +139,6 @@ export default function ReviewCard({ isOwnReview, onSuccess, review }: Props) {
         </>
       )}
 
-      {/* Footer: Like + Report */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.likeBtn}
@@ -201,12 +192,7 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 17,
   },
-  avatarFallback: {
-    backgroundColor: colors.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userName: {
+userName: {
     color: colors.white,
     fontFamily: fontFamily.medium,
     fontSize: fontSize.sm,

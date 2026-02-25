@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { User } from '@/users';
 import {
@@ -31,7 +32,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     validateSchema(loginDtoSchema, dto);
 
-    const user = await User.findOne({ email: dto.email });
+    const user = await User.findOne({ email: dto.email.toLowerCase().trim() });
     if (!user) {
       throw new HttpError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
     }
@@ -123,7 +124,7 @@ export class AuthService {
       return;
     }
 
-    const randomNum = Math.floor(100000 + Math.random() * 900000).toString();
+    const randomNum = crypto.randomInt(100000, 1000000).toString();
     const salt = await bcrypt.genSalt(10);
     const hashedCode = await bcrypt.hash(randomNum, salt);
 
@@ -203,5 +204,6 @@ export class AuthService {
     user.resetCode = '';
     user.resetCodeExpiry = undefined;
     await user.save();
+    await RefreshToken.deleteMany({ userId: user._id });
   }
 }

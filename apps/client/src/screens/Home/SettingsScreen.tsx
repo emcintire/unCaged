@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { SettingsTabParamList } from '@/types';
 import { colors, spacing } from '@/config';
 import { useGetCurrentUser, useDeleteUser } from '@/services';
+import { getProfilePic } from '@/constants';
 import { showErrorToast, showSuccessToast } from '@/utils';
 import { useAuth } from '@/hooks';
 import Screen from '@/components/Screen';
@@ -140,7 +141,7 @@ export default function SettingsScreen() {
             onPress={() => navigate('My Account')}
             title={user?.name ?? user?.email ?? ''}
             subTitle={user?.email ?? ''}
-            image={{ uri: user?.img ?? '' }}
+            image={getProfilePic(user?.image)}
           />
         </View>
         <Separator modal={false} />

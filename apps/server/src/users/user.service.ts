@@ -13,6 +13,8 @@ import {
 import { Movie } from '@/movies';
 import { User } from './user.model';
 import {
+  type ChangePasswordDto,
+  changePasswordDtoSchema,
   type CreateUserDto,
   createUserDtoSchema,
   type RateMovieDto,
@@ -97,7 +99,7 @@ export class UserService {
   async getUserById(userId: string) {
     const user = await User
       .findById(userId)
-      .select('_id email favorites img isAdmin name ratings seen watchlist')
+      .select('_id email favorites image img isAdmin name ratings seen watchlist')
       .lean();
     if (!user) {
       throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
@@ -108,7 +110,7 @@ export class UserService {
   async registerUser(dto: CreateUserDto) {
     validateSchema(createUserDtoSchema, dto);
 
-    const email = dto.email.trim();
+    const email = dto.email.trim().toLowerCase();
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new HttpError(
@@ -151,28 +153,62 @@ export class UserService {
     }
   }
 
-  async changePassword(userId: string, dto: UpdateUserDto) {
-    validateSchema(updateUserDtoSchema, dto);
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    validateSchema(changePasswordDtoSchema, dto);
 
     const user = await User.findById(userId);
     if (!user) {
       throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
     }
 
-    const validPassword = await bcrypt.compare(dto.currentPassword!, user.password);
+    const validPassword = await bcrypt.compare(dto.currentPassword, user.password);
     if (!validPassword) {
       throw new HttpError(401, 'Invalid password', 'INVALID_PASSWORD');
     }
 
-    const newPassword = await hashInput(dto.password!);
+    const newPassword = await hashInput(dto.password);
     user.password = newPassword;
     await user.save();
+    await RefreshToken.deleteMany({ userId: user._id });
   }
 
   async deleteUser(userId: string) {
     const user = await User.findByIdAndDelete(userId);
     if (!user) {
       throw new HttpError(404, 'The user with the given ID was not found.', 'USER_NOT_FOUND');
+    }
+
+    const cleanupOps: Promise<unknown>[] = [
+      RefreshToken.deleteMany({ userId: user._id }),
+    ];
+
+    if (user.favorites.length > 0) {
+      cleanupOps.push(
+        Movie.updateMany({ _id: { $in: user.favorites } }, { $inc: { favoriteCount: -1 } })
+      );
+    }
+
+    if (user.seen.length > 0) {
+      cleanupOps.push(
+        Movie.updateMany({ _id: { $in: user.seen } }, { $inc: { seenCount: -1 } })
+      );
+    }
+
+    if (user.ratings.length > 0) {
+      const ratingBulkOps = user.ratings.map((r) => ({
+        updateOne: {
+          filter: { _id: r.movie },
+          update: { $inc: { ratingCount: -1, ratingSum: -r.rating } },
+        },
+      }));
+      cleanupOps.push(Movie.bulkWrite(ratingBulkOps));
+    }
+
+    await Promise.all(cleanupOps);
+
+    if (user.ratings.length > 0) {
+      const uniqueMovieIds = [...new Set(user.ratings.map((r) => String(r.movie)))];
+      await Promise.all(uniqueMovieIds.map((id) => this.recalculateMovieAverage(id)));
     }
   }
 

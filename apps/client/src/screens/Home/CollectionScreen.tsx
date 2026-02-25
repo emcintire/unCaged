@@ -8,9 +8,9 @@ import MovieGridSkeleton from '@/components/MovieGridSkeleton';
 import Screen from '@/components/Screen';
 
 export default function CollectionScreen() {
-  const { data: user, isLoading: isUserLoading } = useGetCurrentUser();
-  const { data: allMovies, isLoading: isMoviesLoading } = useGetAllMovies();
-  const { data: myReviews, isLoading: isReviewsLoading } = useGetMyReviews();
+  const { data: user, isLoading: isUserLoading, refetch: refetchUser } = useGetCurrentUser();
+  const { data: allMovies, isLoading: isMoviesLoading, refetch: refetchMovies } = useGetAllMovies();
+  const { data: myReviews, isLoading: isReviewsLoading, refetch: refetchReviews } = useGetMyReviews();
 
   const isLoading = isUserLoading || isMoviesLoading || isReviewsLoading;
 
@@ -25,6 +25,7 @@ export default function CollectionScreen() {
     <Screen isLoading={isLoading} skeleton={<MovieGridSkeleton />}>
       <MovieGrid
         movies={sortedMovies}
+        onRefresh={() => Promise.all([refetchUser(), refetchMovies(), refetchReviews()])}
         favoriteIds={user?.favorites ?? []}
         emptyMessage={(
           <Text>

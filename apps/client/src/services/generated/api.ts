@@ -32,7 +32,7 @@ export interface Movie {
   description?: string;
   director: string;
   genres: string[];
-  img: string;
+  image: string;
   rating: string;
   runtime: string;
 }
@@ -55,7 +55,7 @@ export interface Review {
   isLikedByUser?: boolean;
   createdOn: string;
   userName: string;
-  userImg: string;
+  userImage: number;
 }
 
 export interface ReviewsPage {
@@ -68,7 +68,7 @@ export type AdminReview = Review & {
   userEmail: string;
   flaggedBy: string[];
   movieTitle: string;
-  movieImg: string;
+  movieImage: string;
 };
 
 export interface AdminReviewsPage {
@@ -87,6 +87,13 @@ export interface User {
   _id: string;
   email: string;
   favorites: string[];
+  /**
+   * Profile picture index (1-6), references a local asset in the client
+   * @minimum 1
+   * @maximum 6
+   */
+  image: number;
+  /** Legacy Imgur profile picture URL (kept for old iOS client compatibility) */
   img: string;
   isAdmin: boolean;
   name?: string;
@@ -97,7 +104,7 @@ export interface User {
 
 export type UserReview = Review & {
   movieTitle: string;
-  movieImg: string;
+  movieImage: string;
 };
 
 export type LoginBody = {
@@ -193,6 +200,13 @@ export type CreateUserBody = {
 export type UpdateUserBody = {
   name?: string;
   email?: string;
+  /**
+   * Profile picture index (1-6)
+   * @minimum 1
+   * @maximum 6
+   */
+  image?: number;
+  /** Legacy Imgur URL (old iOS client only) */
   img?: string;
 };
 

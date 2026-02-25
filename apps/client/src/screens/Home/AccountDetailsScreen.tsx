@@ -4,12 +4,14 @@ import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
 import type { HomeStackParamList } from '@/types';
-import { useGetCurrentUser, useUpdateUser } from '@/services';
+import { useGetCurrentUser, useUpdateUser, getGetCurrentUserQueryKey } from '@/services';
 import { spacing } from '@/config';
 import { showSuccessToast, toFormikValidator } from '@/utils';
+import { getProfilePic } from '@/constants';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
 import PicturePicker from '@/components/PicturePicker';
@@ -30,8 +32,9 @@ export default function AccountDetailsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const { navigate } = useNavigation<NativeStackNavigationProp<HomeStackParamList, 'SettingsTab'>>();
 
-  const { data: user, isLoading, refetch } = useGetCurrentUser();
+  const { data: user, isLoading } = useGetCurrentUser();
   const updateUserMutation = useUpdateUser();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (values: FormValues) => {
     if (user == null || (values.name === user.name && values.email === user.email)) { return; }
@@ -40,7 +43,7 @@ export default function AccountDetailsScreen() {
     const name = (values.name ?? '').trim();
     await updateUserMutation.mutateAsync({ data: { email, name }});
     navigate('SettingsTab');
-    refetch();
+    void queryClient.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
     showSuccessToast();
   };
 
@@ -61,7 +64,7 @@ export default function AccountDetailsScreen() {
               <View style={styles.overlay}>
                 <MaterialCommunityIcons name="pencil" size={40} color="white" />
               </View>
-              <Image source={user.img} style={styles.image} accessibilityLabel="Profile picture" />
+              <Image source={getProfilePic(user.image)} style={styles.image} accessibilityLabel="Profile picture" />
             </TouchableOpacity>
           </View>
           <View style={styles.formContainer}>

@@ -24,7 +24,7 @@ const controller = new UserController();
  *           type: number
  *     User:
  *       type: object
- *       required: [_id, email, favorites, img, isAdmin, ratings, seen, watchlist]
+ *       required: [_id, email, favorites, image, img, isAdmin, ratings, seen, watchlist]
  *       properties:
  *         _id:
  *           type: string
@@ -34,8 +34,14 @@ const controller = new UserController();
  *           type: array
  *           items:
  *             type: string
+ *         image:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 6
+ *           description: Profile picture index (1-6), references a local asset in the client
  *         img:
  *           type: string
+ *           description: Legacy Imgur profile picture URL (kept for old iOS client compatibility)
  *         isAdmin:
  *           type: boolean
  *         name:
@@ -56,11 +62,11 @@ const controller = new UserController();
  *       allOf:
  *         - $ref: '#/components/schemas/Review'
  *         - type: object
- *           required: [movieTitle, movieImg]
+ *           required: [movieTitle, movieImage]
  *           properties:
  *             movieTitle:
  *               type: string
- *             movieImg:
+ *             movieImage:
  *               type: string
  */
 
@@ -124,8 +130,14 @@ const controller = new UserController();
  *               email:
  *                 type: string
  *                 format: email
+ *               image:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 6
+ *                 description: Profile picture index (1-6)
  *               img:
  *                 type: string
+ *                 description: Legacy Imgur URL (old iOS client only)
  *     responses:
  *       '200':
  *         description: Updated

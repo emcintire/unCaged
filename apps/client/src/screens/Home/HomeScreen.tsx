@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
 import {
   type Movie,
   getGetCurrentUserQueryKey,
@@ -17,6 +17,7 @@ import MovieCard from '@/components/MovieCard';
 import MovieModal from '@/components/movieModal/MovieModal';
 import BuyMeCoffeeButton from '@/components/BuyMeCoffeeButton';
 import Skeleton from '@/components/Skeleton';
+import PullToRefresh from '@/components/PullToRefresh';
 
 const styles = StyleSheet.create({
   quote: {
@@ -145,10 +146,15 @@ export default function HomeScreen() {
       queryKey: getGetCurrentUserQueryKey(),
     },
   });
-  const { data: movies = [], isLoading: moviesLoading } = useGetAllMovies();
-  const { data: popularMovies = [], isLoading: popularLoading } = useGetPopularMovies();
-  const { data: staffPicks = [], isLoading: staffPicksLoading } = useGetStaffPicks();
-  const { data: quote, isLoading: quoteLoading } = useGetQuote();
+  const { data: movies = [], isLoading: moviesLoading, refetch: refetchMovies } = useGetAllMovies();
+  const { data: popularMovies = [], isLoading: popularLoading, refetch: refetchPopular } = useGetPopularMovies();
+  const { data: staffPicks = [], isLoading: staffPicksLoading, refetch: refetchStaffPicks } = useGetStaffPicks();
+  const { data: quote, isLoading: quoteLoading, refetch: refetchQuote } = useGetQuote();
+
+  const refetchAll = useCallback(
+    () => Promise.all([refetchMovies(), refetchPopular(), refetchStaffPicks(), refetchQuote()]),
+    [refetchMovies, refetchPopular, refetchStaffPicks, refetchQuote],
+  );
 
   const isLoading = moviesLoading || popularLoading || staffPicksLoading || quoteLoading;
 
@@ -160,17 +166,20 @@ export default function HomeScreen() {
     return [...arr].sort(() => { s = (s * 1664525 + 1013904223) & 0xffffffff; return s / 0x100000000 - 0.5 })
   }, [])
 
-  const getMoviesFromGenre = useCallback(
-    (genre: string) => seededShuffle(movies.filter((movie) => movie.genres.includes(genre)), genre),
-    [movies, seededShuffle],
-  );
-
   const customRows = useMemo(
     () => [
       { label: 'Popular', data: seededShuffle(popularMovies, 'Popular') },
       { label: 'Staff Picks', data: seededShuffle(staffPicks, 'Staff Picks') },
     ],
     [popularMovies, staffPicks, seededShuffle],
+  );
+
+  const genreRows = useMemo(
+    () => genres.map((genre) => ({
+      label: genre,
+      data: seededShuffle(movies.filter((movie) => movie.genres.includes(genre)), genre),
+    })),
+    [movies, seededShuffle],
   );
 
   return (
@@ -180,14 +189,18 @@ export default function HomeScreen() {
         movie={selectedMovie}
         onClose={() => setSelectedMovie(null)}
       />
-      <ScrollView showsVerticalScrollIndicator={false} decelerationRate="fast">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        decelerationRate="fast"
+        refreshControl={<PullToRefresh onRefresh={refetchAll} />}
+      >
         <Text style={styles.quote}>{quote?.quote}</Text>
         <Text style={styles.subquote}>{quote?.subquote}</Text>
         <Text style={styles.subsubquote}>Verse of the Week</Text>
         {customRows.map(({ label, data }) => (
           <View key={label}>
             <Text style={styles.header}>{label}</Text>
-            <ScrollView
+            <GHScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               scrollEventThrottle={200}
@@ -205,22 +218,22 @@ export default function HomeScreen() {
                 />
               ))}
               <View style={styles.listSpacer} />
-            </ScrollView>
+            </GHScrollView>
           </View>
         ))}
-        {genres.map((genre) => (
-          <View key={genre}>
-            <Text style={styles.header}>{genre}</Text>
-            <ScrollView
+        {genreRows.map(({ label, data }) => (
+          <View key={label}>
+            <Text style={styles.header}>{label}</Text>
+            <GHScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               scrollEventThrottle={200}
               decelerationRate="fast"
               contentContainerStyle={styles.scrollContent}
             >
-              {getMoviesFromGenre(genre).map((movie) => (
+              {data.map((movie) => (
                 <MovieCard
-                  key={`${genre}-${movie._id}`}
+                  key={`${label}-${movie._id}`}
                   movie={movie}
                   onPress={() => setSelectedMovie(movie)}
                   isFavorite={favoriteIds.has(movie._id)}
@@ -229,7 +242,7 @@ export default function HomeScreen() {
                 />
               ))}
               <View style={styles.listSpacer} />
-            </ScrollView>
+            </GHScrollView>
           </View>
         ))}
         <BuyMeCoffeeButton />

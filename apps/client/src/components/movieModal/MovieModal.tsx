@@ -31,7 +31,7 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
 
   const movie = useMemo(() => {
     if (propsMovie == null) return null;
-    return propsMovie.img.length === 32 ? changeResolution('h', propsMovie) : propsMovie;
+    return changeResolution('w_645,f_auto,q_90', propsMovie);
   }, [propsMovie]);
 
   if (!isOpen) { return null; }
@@ -61,7 +61,7 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
                   <Icon name="close" size={50} backgroundColor="transparent" iconColor={colors.white} />
                 </TouchableOpacity>
               </View>
-              <Image source={movie.img} style={styles.image} accessibilityLabel={`${movie.title} poster`} onLoadEnd={() => setLoadedMovieId(movie._id)} />
+              <Image source={movie.image} style={styles.image} accessibilityLabel={`${movie.title} poster`} onLoadEnd={() => setLoadedMovieId(movie._id)} />
               <View style={styles.titleContainer}>
                 <Text style={styles.title}>{movie.title}</Text>
                 <View style={styles.subtitle}>

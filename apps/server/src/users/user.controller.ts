@@ -4,7 +4,7 @@ import { Review } from '@/reviews';
 import { Movie } from '@/movies';
 import { User } from './user.model';
 import { UserService } from './user.service';
-import type { CreateUserDto, RateMovieDto, UpdateUserDto } from './schemas';
+import type { ChangePasswordDto, CreateUserDto, RateMovieDto, UpdateUserDto } from './schemas';
 
 export class UserController {
   private readonly userService = new UserService();
@@ -49,7 +49,7 @@ export class UserController {
   };
 
   changePassword = async (
-    req: AuthenticatedRequest<UpdateUserDto>,
+    req: AuthenticatedRequest<ChangePasswordDto>,
     res: Response,
     next: NextFunction
   ) => {
@@ -188,11 +188,11 @@ export class UserController {
 
       const [reviews, user] = await Promise.all([
         Review.find({ userId }).sort({ createdOn: -1 }),
-        User.findById(userId).select('name img'),
+        User.findById(userId).select('name image'),
       ]);
 
       const ids = [...new Set(reviews.map((r) => r.movieId))];
-      const movies = await Movie.find({ _id: { $in: ids } }).select('title img');
+      const movies = await Movie.find({ _id: { $in: ids } }).select('title image');
       const movieMap = new Map(movies.map((m) => [m._id.toString(), m]));
 
       const result = reviews.map((review) => {
@@ -209,9 +209,9 @@ export class UserController {
           isFlagged: review.isFlagged,
           createdOn: review.createdOn,
           userName: user?.name ?? '',
-          userImg: user?.img ?? '',
+          userImage: user?.image ?? 1,
           movieTitle: movie?.title ?? '',
-          movieImg: movie?.img ?? '',
+          movieImage: movie?.image ?? '',
         };
       });
 
