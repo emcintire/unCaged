@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import PicturePicker from '@/components/PicturePicker';
 import Screen from '@/components/Screen';
-import { screen, spacing } from '@/config';
+import { colors, screen, spacing } from '@/config';
 import { getProfilePic } from '@/constants';
 import { getGetCurrentUserQueryKey,useGetCurrentUser, useUpdateUser } from '@/services';
 import type { HomeStackParamList } from '@/types';
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150,
     borderRadius: 75,
-    backgroundColor: '#00000060',
+    backgroundColor: colors.overlayLight,
     zIndex: 2,
     alignItems: 'center',
     justifyContent: 'center',

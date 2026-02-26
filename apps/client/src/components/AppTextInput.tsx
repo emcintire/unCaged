@@ -31,7 +31,7 @@ export default function AppTextInput({ icon, rightElement, width = '100%', style
 
   const borderColor = border.value.interpolate({
     inputRange: [0, 1],
-    outputRange: ['transparent', colors.orange],
+    outputRange: [colors.divider, colors.orange],
   });
 
   return (
@@ -40,12 +40,12 @@ export default function AppTextInput({ icon, rightElement, width = '100%', style
         <MaterialCommunityIcons
           name={icon}
           size={20}
-          color={colors.medium}
+          color={colors.placeholder}
           style={styles.icon}
         />
       )}
       <TextInput
-        placeholderTextColor={colors.medium}
+        placeholderTextColor={colors.placeholder}
         style={styles.input}
         accessibilityLabel={otherProps.placeholder}
         {...otherProps}
@@ -60,21 +60,21 @@ export default function AppTextInput({ icon, rightElement, width = '100%', style
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: colors.light,
-    borderRadius: borderRadius.round,
+    backgroundColor: colors.surfaceFaint,
+    borderRadius: borderRadius.lg,
     borderWidth: 1.5,
-    borderColor: 'transparent',
     flexDirection: 'row',
     marginVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.md,
+    minHeight: 44,
   },
   icon: {
     marginRight: spacing.sm,
   },
   input: {
     flex: 1,
-    color: colors.dark,
-    fontSize: fontSize.lg,
+    color: colors.white,
+    fontSize: fontSize.base,
     fontFamily: fontFamily.regular,
   },
 });

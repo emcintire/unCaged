@@ -1,16 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useMemo,useState } from 'react';
-import { Modal,StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import MovieModalSkeleton from '@/components/movieModal/MovieModalSkeleton';
-import { colors, fontFamily, fontSize, modal, movieCard, shadow, spacing } from '@/config';
+import { borderRadius, colors, fontFamily, fontSize, shadow, spacing } from '@/config';
 import { useAuth } from '@/hooks';
-import { type Movie,useGetAverageRating } from '@/services';
+import { type Movie, useGetAverageRating } from '@/services';
 import { changeResolution } from '@/utils';
 
-import Icon from '../Icon';
 import MovieModalActions from './MovieModalActions';
 import MovieModalDetails from './MovieModalDetails';
 import MovieModalSignIn from './MovieModalSignIn';
@@ -39,55 +38,65 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
   if (!isOpen) { return null; }
 
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={isOpen}
-      onRequestClose={onClose}
-    >
-      <View style={styles.background}>
+    <Modal animationType="fade" transparent={true} visible={isOpen} onRequestClose={onClose}>
+      <View style={styles.backdrop}>
         {(isLoading || movie == null) ? (
-          <MovieModalSkeleton />
+          <View style={styles.card}>
+            <MovieModalSkeleton />
+          </View>
         ) : (
-          <>
+          <View style={styles.card}>
             <ScrollView
+              contentContainerStyle={styles.content}
               decelerationRate="fast"
-              horizontal={false}
               pointerEvents={imageLoaded ? 'auto' : 'none'}
               scrollEventThrottle={200}
               showsVerticalScrollIndicator={false}
-              style={styles.container}
             >
-              <View style={styles.btnContainer}>
-                <TouchableOpacity onPress={onClose} accessibilityRole="button" accessibilityLabel="Close movie details">
-                  <Icon name="close" size={50} backgroundColor="transparent" iconColor={colors.white} />
-                </TouchableOpacity>
+              <Image
+                source={movie.image}
+                style={styles.poster}
+                accessibilityLabel={`${movie.title} poster`}
+                onLoadEnd={() => setLoadedMovieId(movie._id)}
+              />
+
+              <Text style={styles.title}>{movie.title}</Text>
+
+              <View style={styles.metaRow}>
+                <MaterialCommunityIcons name="star" size={14} color={colors.orange} />
+                <Text style={styles.metaRating}>{movieRating}</Text>
+                <Text style={styles.metaDot}>·</Text>
+                <Text style={styles.metaYear}>{movie.date?.substring(0, 4)}</Text>
               </View>
-              <Image source={movie.image} style={styles.image} accessibilityLabel={`${movie.title} poster`} onLoadEnd={() => setLoadedMovieId(movie._id)} />
-              <View style={styles.titleContainer}>
-                <Text style={styles.title}>{movie.title}</Text>
-                <View style={styles.subtitle}>
-                  <View style={styles.ratingRow}>
-                    <MaterialCommunityIcons name="star" size={20} color={colors.orange} style={styles.starIcon} />
-                    <Text style={styles.date}>{movieRating}</Text>
-                    <Text style={styles.date}> / 5</Text>
-                  </View>
-                  <View style={styles.ratingRow}>
-                    <MaterialCommunityIcons name="calendar-blank" size={18} color={colors.white} style={styles.starIcon} />
-                    <Text style={styles.date}>{movie.date?.substring(0, 4)}</Text>
-                  </View>
-                </View>
-              </View>
-              {isAuthenticated ? <MovieModalActions movie={movie} /> : <MovieModalSignIn onClose={onClose} />}
+
+              <View style={styles.divider} />
+
+              {isAuthenticated
+                ? <MovieModalActions movie={movie} />
+                : <MovieModalSignIn onClose={onClose} />
+              }
+
+              <View style={styles.divider} />
+
               <MovieModalDetails movie={movie} />
               <MovieReviews movieId={movie._id} />
             </ScrollView>
+
             {!imageLoaded && (
-              <View style={styles.skeletonOverlay}>
+              <View style={[StyleSheet.absoluteFill, styles.skeletonOverlay]}>
                 <MovieModalSkeleton />
               </View>
             )}
-          </>
+
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Close movie details"
+            >
+              <MaterialCommunityIcons name="close" size={18} color={colors.light} />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     </Modal>
@@ -95,54 +104,83 @@ export default function MovieModal({ isOpen, movie: propsMovie, onClose }: Props
 }
 
 const styles = StyleSheet.create({
-  background: modal.background,
-  container: modal.container,
-  btnContainer: {
-    position: 'absolute',
-    right: -15,
-    top: -15,
-    zIndex: 10,
+  backdrop: {
+    flex: 1,
+    backgroundColor: colors.backdropBg,
   },
-  image: {
-    ...movieCard.image,
-    ...shadow.md,
-    alignSelf: 'center',
-    height: 320,
-    marginTop: spacing.lg,
-    width: 215,
-  },
-  titleContainer: {
+  card: {
     width: '90%',
-    alignItems: 'center',
+    flex: 1,
     alignSelf: 'center',
-    marginTop: spacing.sm,
+    backgroundColor: colors.bg,
+    borderRadius: borderRadius.lg,
+    marginVertical: 44,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.surfaceFaint,
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.overlayBtn,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl * 2,
+    paddingHorizontal: spacing.md,
+  },
+  poster: {
+    alignSelf: 'center',
+    width: 200,
+    height: 300,
+    borderRadius: borderRadius.md,
+    overflow: 'hidden',
+    ...shadow.lg,
+    marginBottom: spacing.md,
   },
   title: {
     color: colors.white,
-    fontFamily: fontFamily.bold,
+    fontFamily: fontFamily.extraBold,
     fontSize: fontSize.xxl,
     textAlign: 'center',
+    lineHeight: 32,
+    marginBottom: spacing.xs,
   },
-  subtitle: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: spacing.sm,
-    width: '100%',
-  },
-  ratingRow: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: spacing.sm,
   },
-  starIcon: {
-    marginRight: 4,
+  metaRating: {
+    color: colors.orange,
+    fontFamily: fontFamily.bold,
+    fontSize: fontSize.base,
   },
-  date: {
-    color: colors.white,
-    fontFamily: fontFamily.medium,
-    fontSize: fontSize.lg,
-    textAlign: 'left',
+  metaDot: {
+    color: colors.medium,
+    fontSize: fontSize.base,
+    lineHeight: 18,
+  },
+  metaYear: {
+    color: colors.medium,
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize.base,
+  },
+  divider: {
+    width: '100%',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.divider,
+    marginVertical: spacing.sm,
   },
   skeletonOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.bg,
   },
 });

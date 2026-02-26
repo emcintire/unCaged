@@ -2,7 +2,7 @@ import { colors, fontSize } from '@/config';
 
 export const screenOptions = {
   headerStyle: { backgroundColor: colors.black },
-  headerTintColor: '#fff',
+  headerTintColor: colors.white,
   headerBackTitleVisible: false,
   headerStatusBarHeight: 0,
   headerTitleAlign: 'center' as const,

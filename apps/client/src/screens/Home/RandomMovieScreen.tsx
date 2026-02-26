@@ -275,7 +275,7 @@ const randomMovieScreenFiltersStyles = StyleSheet.create({
   },
   transparentBg: {
     height: '100%',
-    backgroundColor: '#0000007b',
+    backgroundColor: colors.overlayMid,
   },
   filtersModal: {
     position: 'absolute',

@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-    backgroundColor: '#3d1010',
+    backgroundColor: colors.flagBg,
     borderRadius: borderRadius.sm,
     paddingHorizontal: 6,
     paddingVertical: 2,

@@ -1,69 +1,108 @@
 import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, fontFamily,fontSize, spacing } from '@/config';
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import type { Movie } from '@/services';
 
 type Props = {
   movie: Movie;
 };
 
+const getInfoItems = (movie: Movie) => [
+  { label: 'Age Rating', value: movie.rating },
+  { label: 'Runtime', value: movie.runtime },
+  { label: 'Director', value: movie.director },
+];
+
 export default memo(function MovieModalDetails({ movie }: Props) {
   return (
-    <View style={styles.detailsContainer}>
-      <View style={styles.textContainer}>
-        <Text style={styles.label}>Genres:</Text>
-        <Text style={styles.details}>{movie.genres.join(', ')}</Text>
+    <View style={styles.container}>
+      <View style={styles.genreRow}>
+        {movie.genres.map((genre) => (
+          <View key={genre} style={styles.genreChip}>
+            <Text style={styles.genreText}>{genre}</Text>
+          </View>
+        ))}
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.label}>Age rating:</Text>
-        <Text style={styles.details}>{movie.rating}</Text>
+
+      <View style={styles.infoGrid}>
+        {getInfoItems(movie).map(({ label, value }) => (
+          <View key={label} style={styles.infoRow}>
+            <Text style={styles.infoLabel}>{label}</Text>
+            <Text style={styles.infoValue}>{value}</Text>
+          </View>
+        ))}
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.label}>Runtime:</Text>
-        <Text style={styles.details}>{movie.runtime}</Text>
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.label}>Director:</Text>
-        <Text style={styles.details}>{movie.director}</Text>
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.label}>Description:</Text>
-        <Text style={styles.details} />
-      </View>
+
+      <Text style={styles.sectionHeader}>About</Text>
       <Text style={styles.description}>{movie.description}</Text>
     </View>
   );
 });
 
 const styles = StyleSheet.create({
-  detailsContainer: {
-    marginTop: spacing.lg,
+  container: {
+    width: '100%',
+    marginTop: spacing.xs,
     marginBottom: spacing.xxl * 2,
-    alignItems: 'center',
   },
-  label: {
-    color: colors.white,
+  genreRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    paddingBottom: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.surfaceFaint,
+  },
+  genreChip: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: borderRadius.round,
+    borderWidth: 1,
+    borderColor: colors.chipBorder,
+    backgroundColor: colors.chipSurface,
+  },
+  genreText: {
+    color: colors.light,
     fontFamily: fontFamily.medium,
-    fontSize: fontSize.base,
-    marginBottom: spacing.sm,
-    width: '40%',
+    fontSize: fontSize.sm,
   },
-  details: {
+  infoGrid: {
+    width: '100%',
+    marginBottom: spacing.xs,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.xs,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.surfaceFaint,
+  },
+  infoLabel: {
+    color: colors.medium,
+    fontFamily: fontFamily.medium,
+    fontSize: fontSize.sm,
+  },
+  infoValue: {
     color: colors.white,
-    fontFamily: fontFamily.light,
-    fontSize: fontSize.base,
-    width: '60%',
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize.md,
+    textAlign: 'right',
+    flex: 1,
+    marginLeft: spacing.sm,
+  },
+  sectionHeader: {
+    color: colors.medium,
+    fontFamily: fontFamily.medium,
+    fontSize: fontSize.sm,
+    letterSpacing: 1.2,
+    marginBottom: spacing.xs,
   },
   description: {
-    color: colors.white,
+    color: colors.light,
     fontFamily: fontFamily.light,
-    fontSize: fontSize.base,
-    width: '95%',
-  },
-  textContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '95%',
+    fontSize: fontSize.md,
+    lineHeight: 22,
   },
 });

@@ -1,15 +1,14 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
-import { useEffect,useState } from 'react';
-import { StyleSheet, TouchableOpacity,View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { borderRadius, colors, spacing } from '@/config';
 import { PROFILE_PICS } from '@/constants';
-import { getGetCurrentUserQueryKey,useGetCurrentUser, useUpdateUser } from '@/services';
+import { getGetCurrentUserQueryKey, useGetCurrentUser, useUpdateUser } from '@/services';
 
 import AppButton from './AppButton';
-import Icon from './Icon';
 
 type Props = {
   modalVisible: boolean;
@@ -17,7 +16,7 @@ type Props = {
 };
 
 export default function PicturePicker({ modalVisible, setModalVisible }: Props) {
-  const [selected, setSelected] = useState(0); // 0-based index
+  const [selected, setSelected] = useState(0);
 
   const { data: user } = useGetCurrentUser();
   const updateUserMutation = useUpdateUser();
@@ -38,90 +37,98 @@ export default function PicturePicker({ modalVisible, setModalVisible }: Props) 
   if (!modalVisible) { return null; }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.container}>
-        <View style={styles.closeButton}>
-          <TouchableOpacity onPress={() => setModalVisible(false)} accessibilityRole="button" accessibilityLabel="Close picture picker">
-            <Icon name="close" size={50} backgroundColor="transparent" iconColor={colors.white} />
-          </TouchableOpacity>
-        </View>
+    <View style={styles.backdrop}>
+      <View style={styles.card}>
         <View style={styles.imagesContainer}>
           {PROFILE_PICS.map((pic, index) => (
-            <View style={styles.imgContainer} key={index}>
-              <View style={selected === index ? styles.selected : styles.notSelected}>
-                <MaterialCommunityIcons name="check" size={40} color={colors.white} />
+            <View key={index} style={styles.imgContainer}>
+              <View style={[styles.imgRing, selected === index && styles.imgRingSelected]}>
+                <TouchableOpacity
+                  style={styles.imgBtn}
+                  onPress={() => setSelected(index)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Profile picture ${index + 1}${selected === index ? ', selected' : ''}`}
+                >
+                  <Image source={pic} style={styles.img} accessibilityLabel={`Profile picture option ${index + 1}`} />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.imgBtn} onPress={() => setSelected(index)} accessibilityRole="button" accessibilityLabel={`Profile picture ${index + 1}${selected === index ? ', selected' : ''}`}>
-                <Image source={pic} style={styles.img} accessibilityLabel={`Profile picture option ${index + 1}`} />
-              </TouchableOpacity>
             </View>
           ))}
         </View>
-        <AppButton
-          title="Save"
-          onPress={handleSubmit}
-          style={styles.saveButton}
-        />
+        <AppButton title="Save" onPress={handleSubmit} style={styles.saveButton} />
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={() => setModalVisible(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close picture picker"
+        >
+          <MaterialCommunityIcons name="close" size={18} color={colors.light} />
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
-    height: '100%',
-    backgroundColor: `${colors.black}80`,
+    backgroundColor: colors.backdropBg,
   },
-  container: {
-    backgroundColor: colors.bg,
+  card: {
     width: '90%',
-    padding: spacing.md,
-    borderColor: colors.orange,
-    borderWidth: 4,
-    borderRadius: borderRadius.md,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.bg,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.surfaceFaint,
   },
-  closeButton: {
+  closeBtn: {
     position: 'absolute',
-    right: -5,
-    top: -5,
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.overlayBtn,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   imagesContainer: {
-    width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: spacing.md,
   },
   imgContainer: {
     width: '50%',
     alignItems: 'center',
+    paddingVertical: spacing.sm,
   },
-  selected: {
-    backgroundColor: `${colors.black}80`,
-    height: 120,
-    width: 120,
-    zIndex: 1,
-    borderRadius: borderRadius.circle * 2,
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    bottom: spacing.sm,
+  imgRing: {
+    borderRadius: 64,
+    borderWidth: 2.5,
+    borderColor: 'transparent',
+    padding: 3,
   },
-  notSelected: {
-    display: 'none',
+  imgRingSelected: {
+    borderColor: colors.orange,
   },
   imgBtn: {
     width: 120,
     height: 120,
-    marginVertical: spacing.sm,
+    borderRadius: 60,
+    overflow: 'hidden',
   },
   img: {
     width: '100%',
     height: '100%',
-    borderRadius: borderRadius.circle * 2,
   },
   saveButton: {
     width: '50%',

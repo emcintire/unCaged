@@ -48,9 +48,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   buttonContainer: {
-    justifyContent: 'flex-start',
     alignItems: 'center',
+    gap: spacing.md,
     height: '50%',
+    justifyContent: 'flex-start',
     width: '60%',
   },
   logoContainer: {

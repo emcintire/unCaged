@@ -21,7 +21,7 @@ export default function MovieModalSignIn({ onClose }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Sign in to rate, favorite, and track movies!</Text>
+      <Text style={styles.text}>Sign in to rate and track movies!</Text>
       <AppButton title="Sign In" onPress={handleSignIn} style={styles.button} />
     </View>
   );

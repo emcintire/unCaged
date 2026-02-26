@@ -1,18 +1,19 @@
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import CollectionStats from '@/components/CollectionStats';
+import FilterChips from '@/components/FilterChips';
 import MovieGrid from '@/components/MovieGrid';
 import MovieGridSkeleton from '@/components/MovieGridSkeleton';
 import Screen from '@/components/Screen';
-import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
+import { colors, spacing } from '@/config';
 import { useGetAllMovies, useGetCurrentUser, useGetMyReviews } from '@/services';
 
 type FilterMode = 'seen' | 'favorites';
 
-const FILTERS: Array<{ mode: FilterMode; label: string }> = [
-  { mode: 'seen', label: 'Seen' },
-  { mode: 'favorites', label: 'Favorites' },
+const FILTERS: Array<{ value: FilterMode; label: string }> = [
+  { value: 'seen', label: 'Seen' },
+  { value: 'favorites', label: 'Favorites' },
 ];
 
 export default function MyCollectionScreen() {
@@ -59,19 +60,12 @@ export default function MyCollectionScreen() {
                 reviewCount={myReviews.length}
               />
             )}
-            <View style={styles.chipRow}>
-              {FILTERS.map(({ mode, label }) => (
-                <TouchableOpacity
-                  key={mode}
-                  style={[styles.chip, filter === mode && styles.chipActive]}
-                  onPress={() => setFilter(mode)}
-                >
-                  <Text style={[styles.chipText, filter === mode && styles.chipTextActive]}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <FilterChips
+              options={FILTERS}
+              selected={filter}
+              onSelect={setFilter}
+              style={styles.chipRow}
+            />
           </>
         )}
         ListHeaderComponentStyle={styles.headerContainer}
@@ -86,28 +80,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   chipRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
     paddingVertical: spacing.lg,
     paddingHorizontal: spacing.md,
-  },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.round,
-    borderWidth: 1,
-    borderColor: colors.medium,
-  },
-  chipActive: {
-    borderColor: colors.orange,
-    backgroundColor: colors.orangeBg,
-  },
-  chipText: {
-    color: colors.medium,
-    fontFamily: fontFamily.medium,
-    fontSize: fontSize.sm,
-  },
-  chipTextActive: {
-    color: colors.orange,
   },
 });

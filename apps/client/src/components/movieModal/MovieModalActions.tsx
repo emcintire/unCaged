@@ -1,9 +1,9 @@
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { colors, fontFamily, fontSize } from '@/config';
+import { colors, fontFamily, fontSize, spacing } from '@/config';
 import { useAuth, useOptimisticDebounce } from '@/hooks';
 import {
   getGetCurrentUserQueryKey,
@@ -13,20 +13,6 @@ import {
 
 import Icon from '../Icon';
 import MovieModalRating from './MovieModalRating';
-
-const showAlert = () => Alert.alert(
-  'Hello traveler',
-  'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, ' +
-  'and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. ' +
-  'Nay, I do it for the people. Consider helping me in my holy mission.',
-  [
-    { text: 'Later', style: 'cancel' },
-    {
-      text: 'Help the mission',
-      onPress: () => Linking.openURL('https://www.buymeacoffee.com/greasyfingers'),
-    },
-  ],
-);
 
 type Props = {
   movie: Movie;
@@ -63,9 +49,6 @@ export default function MovieModalActions({ movie }: Props) {
         ? addToSeenMutation.mutateAsync({ data: { id: movie._id } })
         : removeFromSeenMutation.mutateAsync({ data: { id: movie._id } })
       );
-      if (newSeen && user?.seen.length === 0) {
-        showAlert();
-      }
     },
     invalidateUser,
   );
@@ -158,13 +141,16 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    width: '100%',
+    paddingBottom: spacing.sm,
   },
   actionItem: {
     alignItems: 'center',
+    gap: 4,
   },
   label: {
     position: 'absolute',
-    top: 45,
+    top: 50,
     fontFamily: fontFamily.medium,
     fontSize: fontSize.xs,
   },

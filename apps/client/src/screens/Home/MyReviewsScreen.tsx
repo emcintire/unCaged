@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { memo, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import FilterChips from '@/components/FilterChips';
 import WriteReviewForm from '@/components/movieModal/reviews/WriteReviewForm';
 import PullToRefresh from '@/components/PullToRefresh';
 import Screen from '@/components/Screen';
@@ -119,19 +120,15 @@ export default function MyReviewsScreen() {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <View style={styles.sortRow}>
-            {(['recent', 'popular'] as Array<SortMode>).map((mode) => (
-              <TouchableOpacity
-                key={mode}
-                style={[styles.chip, sort === mode && styles.chipActive]}
-                onPress={() => setSort(mode)}
-              >
-                <Text style={[styles.chipText, sort === mode && styles.chipTextActive]}>
-                  {mode === 'recent' ? 'Recent' : 'Popular'}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <FilterChips
+            options={[
+              { value: 'recent', label: 'Recent' },
+              { value: 'popular', label: 'Popular' },
+            ]}
+            selected={sort}
+            onSelect={setSort}
+            style={styles.sortRow}
+          />
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -234,30 +231,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   sortRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
-  },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.round,
-    borderWidth: 1,
-    borderColor: colors.medium,
-  },
-  chipActive: {
-    borderColor: colors.orange,
-    backgroundColor: colors.orangeBg,
-  },
-  chipText: {
-    color: colors.medium,
-    fontFamily: fontFamily.medium,
-    fontSize: fontSize.sm,
-  },
-  chipTextActive: {
-    color: colors.orange,
   },
   emptyText: {
     color: colors.medium,

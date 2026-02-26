@@ -10,7 +10,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { borderRadius, type ColorKey, colors, fontFamily, fontSize, spacing } from '@/config';
+import { borderRadius, type ColorKey, colors, fontFamily, fontSize } from '@/config';
 import { useAnimatedValue } from '@/hooks';
 
 type Props = {
@@ -66,13 +66,13 @@ export default memo(function AppButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.orangeBg,
     borderRadius: borderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.sm,
+    paddingVertical: 13,
+    paddingHorizontal: 24,
     width: '100%',
-    marginVertical: spacing.sm,
+    minHeight: 44,
   },
   pressable: {
     width: '100%',
@@ -82,8 +82,9 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.white,
-    fontSize: fontSize.lg,
+    fontSize: fontSize.base,
     textTransform: 'uppercase',
-    fontFamily: fontFamily.extraBold,
+    fontFamily: fontFamily.bold,
+    letterSpacing: 0.8,
   },
 });
