@@ -7,7 +7,7 @@ import AboutScreen from '@/screens/Home/AboutScreen';
 import AccountDetailsScreen from '@/screens/Home/AccountDetailsScreen';
 import AdminReviewsScreen from '@/screens/Home/AdminReviewsScreen';
 import AdminScreen from '@/screens/Home/AdminScreen';
-import CollectionScreen from '@/screens/Home/CollectionScreen';
+import MyCollectionScreen from '@/screens/Home/MyCollectionScreen';
 import MyReviewsScreen from '@/screens/Home/MyReviewsScreen';
 import PrivacyPolicyScreen from '@/screens/Home/PrivacyPolicyScreen';
 import SecurityScreen from '@/screens/Home/SecurityScreen';
@@ -28,7 +28,7 @@ const screens: Array<Screen<SettingsTabParamList>> = [{
   component: AccountDetailsScreen,
 }, {
   name: 'My Collection',
-  component: CollectionScreen,
+  component: MyCollectionScreen,
 }, {
   name: 'My Reviews',
   component: MyReviewsScreen,

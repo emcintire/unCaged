@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.black,
     borderRadius: borderRadius.md,
     padding: spacing.md,
-    marginBottom: spacing.lg,
     gap: spacing.md,
   },
   row: {
