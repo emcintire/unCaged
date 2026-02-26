@@ -1,17 +1,32 @@
 import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { colors, fontFamily, fontSize } from '@/config';
-import { useAuth } from '@/hooks';
+import { useAuth, useOptimisticDebounce } from '@/hooks';
 import {
-getGetCurrentUserQueryKey,
-type Movie, useAddToFavorites, useAddToSeen, useAddToWatchlist,
-useGetCurrentUser, useRemoveFromFavorites, useRemoveFromSeen, useRemoveFromWatchlist } from '@/services';
+  getGetCurrentUserQueryKey,
+  type Movie, useAddToFavorites, useAddToSeen, useAddToWatchlist,
+  useGetCurrentUser, useRemoveFromFavorites, useRemoveFromSeen, useRemoveFromWatchlist,
+} from '@/services';
 
 import Icon from '../Icon';
 import MovieModalRating from './MovieModalRating';
+
+const showAlert = () => Alert.alert(
+  'Hello traveler',
+  'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, ' +
+  'and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. ' +
+  'Nay, I do it for the people. Consider helping me in my holy mission.',
+  [
+    { text: 'Later', style: 'cancel' },
+    {
+      text: 'Help the mission',
+      onPress: () => Linking.openURL('https://www.buymeacoffee.com/greasyfingers'),
+    },
+  ],
+);
 
 type Props = {
   movie: Movie;
@@ -19,9 +34,6 @@ type Props = {
 
 export default function MovieModalActions({ movie }: Props) {
   const [showStars, setShowStars] = useState(false);
-  const [favorite, setFavorite] = useState(false);
-  const [seen, setSeen] = useState(false);
-  const [watchlist, setWatchlist] = useState(false);
   const [rating, setRating] = useState(0);
 
   const addToSeenMutation = useAddToSeen();
@@ -42,92 +54,51 @@ export default function MovieModalActions({ movie }: Props) {
     },
   });
 
+  const invalidateUser = () => void queryClient.invalidateQueries({ queryKey: userQueryKey });
+
+  const seen = useOptimisticDebounce(
+    false,
+    async (newSeen) => {
+      await (newSeen
+        ? addToSeenMutation.mutateAsync({ data: { id: movie._id } })
+        : removeFromSeenMutation.mutateAsync({ data: { id: movie._id } })
+      );
+      if (newSeen && user?.seen.length === 0) {
+        showAlert();
+      }
+    },
+    invalidateUser,
+  );
+
+  const favorite = useOptimisticDebounce(
+    false,
+    async (newFavorite) => {
+      await (newFavorite
+        ? addToFavoritesMutation.mutateAsync({ data: { id: movie._id } })
+        : removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id } })
+      );
+    },
+    invalidateUser,
+  );
+
+  const watchlist = useOptimisticDebounce(
+    false,
+    async (newWatchlist) => {
+      await (newWatchlist
+        ? addToWatchlistMutation.mutateAsync({ data: { id: movie._id } })
+        : removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } })
+      );
+    },
+    invalidateUser,
+  );
+
   useEffect(() => {
     if (!user) return;
-    setFavorite(user.favorites.includes(movie._id));
-    setSeen(user.seen.includes(movie._id));
-    setWatchlist(user.watchlist.includes(movie._id));
+    seen.sync(user.seen.includes(movie._id));
+    favorite.sync(user.favorites.includes(movie._id));
+    watchlist.sync(user.watchlist.includes(movie._id));
     setRating(user.ratings.find((r) => r.movie === movie._id)?.rating ?? 0);
   }, [user, movie._id]);
-
-  const toggleFavorite = useCallback(() => {
-    const prev = favorite;
-    setFavorite(!prev);
-    (prev
-      ? removeFromFavoritesMutation.mutateAsync({ data: { id: movie._id } })
-      : addToFavoritesMutation.mutateAsync({ data: { id: movie._id } })
-    )
-      .catch(() => setFavorite(prev))
-      .finally(() => void queryClient.invalidateQueries({ queryKey: userQueryKey }));
-  }, [favorite, movie._id, addToFavoritesMutation, removeFromFavoritesMutation, queryClient, userQueryKey]);
-
-  const toggleWatchlist = useCallback(() => {
-    const prev = watchlist;
-    setWatchlist(!prev);
-    (prev
-      ? removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } })
-      : addToWatchlistMutation.mutateAsync({ data: { id: movie._id } })
-    )
-      .catch(() => setWatchlist(prev))
-      .finally(() => void queryClient.invalidateQueries({ queryKey: userQueryKey }));
-  }, [watchlist, movie._id, addToWatchlistMutation, removeFromWatchlistMutation, queryClient, userQueryKey]);
-
-  const toggleSeen = useCallback(async () => {
-    const prevSeen = seen;
-    const prevWatchlist = watchlist;
-    const isFirstSeen = !prevSeen && (user?.seen.length === 0);
-
-    if (prevSeen) {
-      setSeen(false);
-      try {
-        await removeFromSeenMutation.mutateAsync({ data: { id: movie._id } });
-      } catch {
-        setSeen(true);
-      } finally {
-        void queryClient.invalidateQueries({ queryKey: userQueryKey });
-      }
-    } else {
-      setSeen(true);
-      if (prevWatchlist) setWatchlist(false);
-      try {
-        await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
-        if (prevWatchlist) {
-          await removeFromWatchlistMutation.mutateAsync({ data: { id: movie._id } });
-        }
-      } catch {
-        setSeen(false);
-        if (prevWatchlist) setWatchlist(true);
-      } finally {
-        void queryClient.invalidateQueries({ queryKey: userQueryKey });
-      }
-
-      if (isFirstSeen) {
-        Alert.alert(
-          'Hello traveler',
-          'I have been paying out of my own pocket to keep the lights on at unCaged since it was released, ' +
-          'and I am proud to keep unCaged Ad-Free. I do this selfless act not for the glory, nor the riches. ' +
-          'Nay, I do it for the people. Consider helping me in my holy mission.',
-          [
-            { text: 'Later', style: 'cancel' },
-            {
-              text: 'Help the mission',
-              onPress: () => Linking.openURL('https://www.buymeacoffee.com/greasyfingers'),
-            },
-          ],
-        );
-      }
-    }
-  }, [
-    addToSeenMutation,
-    movie._id,
-    queryClient,
-    removeFromSeenMutation,
-    removeFromWatchlistMutation,
-    seen,
-    user?.seen.length,
-    userQueryKey,
-    watchlist,
-  ]);
 
   const actions: Array<{
     active: boolean;
@@ -136,11 +107,11 @@ export default function MovieModalActions({ movie }: Props) {
     onPress: () => void;
     labelColor: string;
   }> = useMemo(() => [{
-    active: seen,
+    active: seen.value,
     icon: 'eye',
     label: 'Seen',
-    onPress: toggleSeen,
-    labelColor: seen ? colors.orange : colors.medium,
+    onPress: () => seen.set(!seen.value),
+    labelColor: seen.value ? colors.orange : colors.medium,
   }, {
     active: rating > 0,
     icon: 'star',
@@ -148,18 +119,18 @@ export default function MovieModalActions({ movie }: Props) {
     onPress: () => setShowStars(!showStars),
     labelColor: rating > 0 ? colors.orange : colors.medium,
   }, {
-    active: favorite,
+    active: favorite.value,
     icon: 'heart',
     label: 'Favorite',
-    onPress: toggleFavorite,
-    labelColor: favorite ? colors.orange : colors.medium,
+    onPress: () => favorite.set(!favorite.value),
+    labelColor: favorite.value ? colors.orange : colors.medium,
   }, {
-    active: watchlist,
+    active: watchlist.value,
     icon: 'bookmark',
     label: 'Watchlist',
-    onPress: toggleWatchlist,
-    labelColor: watchlist ? colors.orange : colors.medium,
-  }], [seen, rating, favorite, watchlist, toggleSeen, toggleFavorite, toggleWatchlist, showStars]);
+    onPress: () => watchlist.set(!watchlist.value),
+    labelColor: watchlist.value ? colors.orange : colors.medium,
+  }], [seen, rating, favorite, watchlist, showStars]);
 
   return (
     <>

@@ -20,69 +20,6 @@ import {
   useGetStaffPicks,
 } from '@/services';
 
-const styles = StyleSheet.create({
-  quote: {
-    fontFamily: fontFamily.extraLight,
-    fontSize: fontSize.xxl,
-    color: 'white',
-    textAlign: 'center',
-    marginTop: spacing.xxl,
-    paddingHorizontal: spacing.sm,
-  },
-  subquote: {
-    marginTop: spacing.sm,
-    fontFamily: fontFamily.regular,
-    fontSize: fontSize.base,
-    color: 'white',
-    textAlign: 'center',
-  },
-  subsubquote: {
-    marginTop: spacing.xs,
-    marginBottom: spacing.sm,
-    fontFamily: fontFamily.extraLight,
-    fontSize: fontSize.sm,
-    color: 'white',
-    textAlign: 'center',
-  },
-  header: {
-    fontFamily: fontFamily.extraBold,
-    fontSize: fontSize.xxl,
-    color: 'white',
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-    marginLeft: spacing.md,
-  },
-  button: {
-    marginRight: spacing.sm,
-    width: 135,
-    height: 200,
-  },
-  scrollContent: {
-    marginLeft: 15,
-    paddingVertical: spacing.sm,
-  },
-  listSpacer: {
-    width: 20,
-  },
-    container: {
-    flex: 1,
-  },
-  quoteBlock: {
-    alignItems: 'center',
-    marginTop: spacing.xxl,
-    paddingHorizontal: spacing.sm,
-  },
-  quoteLine: {
-    marginTop: spacing.xs,
-  },
-  row: {
-    marginTop: spacing.lg,
-  },
-  card: {
-    marginRight: spacing.sm,
-  },
-});
-
 const genres = [
   'Action',
   'Drama',
@@ -250,3 +187,66 @@ export default function HomeScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  quote: {
+    fontFamily: fontFamily.extraLight,
+    fontSize: fontSize.xxl,
+    color: 'white',
+    textAlign: 'center',
+    marginTop: spacing.xxl,
+    paddingHorizontal: spacing.sm,
+  },
+  subquote: {
+    marginTop: spacing.sm,
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize.base,
+    color: 'white',
+    textAlign: 'center',
+  },
+  subsubquote: {
+    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
+    fontFamily: fontFamily.extraLight,
+    fontSize: fontSize.sm,
+    color: 'white',
+    textAlign: 'center',
+  },
+  header: {
+    fontFamily: fontFamily.extraBold,
+    fontSize: fontSize.xxl,
+    color: 'white',
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+    marginLeft: spacing.md,
+  },
+  button: {
+    marginRight: spacing.sm,
+    width: 135,
+    height: 200,
+  },
+  scrollContent: {
+    marginLeft: 15,
+    paddingVertical: 8,
+  },
+  listSpacer: {
+    width: 20,
+  },
+  container: {
+    flex: 1,
+  },
+  quoteBlock: {
+    alignItems: 'center',
+    marginTop: spacing.xxl,
+    paddingHorizontal: spacing.sm,
+  },
+  quoteLine: {
+    marginTop: spacing.xs,
+  },
+  row: {
+    marginTop: spacing.lg,
+  },
+  card: {
+    marginRight: spacing.sm,
+  },
+});

@@ -223,7 +223,10 @@ export class UserService {
   }
 
   async markAsSeen(userId: string, movieId: string) {
-    await this.addToUserCollection(userId, 'seen', movieId, 'seenCount');
+    await Promise.all([
+      this.addToUserCollection(userId, 'seen', movieId, 'seenCount'),
+      this.removeFromUserCollection(userId, 'watchlist', movieId),
+    ]);
   }
 
   async removeFromSeen(userId: string, movieId: string) {
@@ -283,6 +286,8 @@ export class UserService {
     } finally {
       await session.endSession();
     }
+
+    await this.addToUserCollection(userId, 'seen', dto.id, 'seenCount');
   }
 
   async deleteRating(userId: string, movieId: string) {

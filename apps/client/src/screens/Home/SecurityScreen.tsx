@@ -10,18 +10,6 @@ import { form, spacing } from '@/config';
 import { useChangePassword } from '@/services';
 import { showErrorToast, showSuccessToast, toFormikValidator } from '@/utils';
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-  },
-  formContainer: form.container,
-  submitButton: form.submitButton,
-  currentPasswordContainer: {
-    marginBottom: 20,
-  },
-});
-
 const schema = z.object({
   currentPassword: z.string().min(1, 'Password is required'),
   newPassword: z.string().min(1, 'New Password is required').regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
@@ -82,3 +70,15 @@ export default function SecurityScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+  },
+  formContainer: form.container,
+  submitButton: form.submitButton,
+  currentPasswordContainer: {
+    marginBottom: 20,
+  },
+});

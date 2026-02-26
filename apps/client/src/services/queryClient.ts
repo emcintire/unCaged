@@ -6,7 +6,8 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-import { logger, showErrorToast } from '@/utils';
+import { logger } from '@/utils/logger';
+import { showErrorToast } from '@/utils/toastHelpers';
 
 const getErrorMessage = (error: unknown): string => {
   if (typeof error === 'string' && error.length > 0) return error;

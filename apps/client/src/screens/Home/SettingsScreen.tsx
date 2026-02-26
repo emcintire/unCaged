@@ -16,25 +16,6 @@ import { useDeleteUser,useGetCurrentUser } from '@/services';
 import type { SettingsTabParamList } from '@/types';
 import { showErrorToast, showSuccessToast } from '@/utils';
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: spacing.lg,
-    backgroundColor: colors.bg,
-    width: '100%',
-  },
-  coffeeButton: {
-    marginBottom: 0,
-  },
-  spacer: {
-    height: 20,
-    backgroundColor: colors.bg,
-  },
-  bottomSpacer: {
-    height: 40,
-    backgroundColor: colors.bg,
-  },
-});
-
 export default function SettingsScreen() {
   const { data: user, isLoading } = useGetCurrentUser();
   const deleteUserMutation = useDeleteUser();
@@ -165,3 +146,22 @@ export default function SettingsScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginVertical: spacing.lg,
+    backgroundColor: colors.bg,
+    width: '100%',
+  },
+  coffeeButton: {
+    marginBottom: 0,
+  },
+  spacer: {
+    height: 20,
+    backgroundColor: colors.bg,
+  },
+  bottomSpacer: {
+    height: 40,
+    backgroundColor: colors.bg,
+  },
+});

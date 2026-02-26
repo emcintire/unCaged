@@ -1,26 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { borderRadius, colors, spacing } from '@/config';
-import { useAuth } from '@/hooks';
-import { getGetAverageRatingQueryKey,getGetCurrentUserQueryKey, type Movie, useAddToSeen, useDeleteRating, useGetCurrentUser, useRateMovie } from '@/services';
+import { useOptimisticDebounce } from '@/hooks';
+import { getGetAverageRatingQueryKey, getGetCurrentUserQueryKey, type Movie, useDeleteRating, useRateMovie } from '@/services';
 
 import Icon from '../Icon';
 import { getStarIcon } from '../StarRating';
-
-const styles = StyleSheet.create({
-  stars: {
-    marginTop: spacing.xs,
-    backgroundColor: colors.black,
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    alignItems: 'center',
-    borderRadius: borderRadius.md,
-  },
-});
 
 const getStarColor = (star: number, rating: number): string => {
   if (rating >= star - 0.5) return colors.orange;
@@ -33,78 +20,39 @@ type Props = {
 };
 
 export default function MovieModalRating({ movie, rating: ratingProp }: Props) {
-  const [rating, setRating] = useState(ratingProp);
-  const committedRatingRef = useRef(ratingProp);
-  const commitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Sync from prop when parent updates (after server refetch)
-  useEffect(() => {
-    setRating(ratingProp);
-    committedRatingRef.current = ratingProp;
-  }, [ratingProp]);
-
-  // Clear pending commit on unmount
-  useEffect(() => {
-    return () => {
-      if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-    };
-  }, []);
-
   const rateMovieMutation = useRateMovie();
   const deleteRatingMutation = useDeleteRating();
-  const addToSeenMutation = useAddToSeen();
 
-  const isPending = rateMovieMutation.isPending || deleteRatingMutation.isPending || addToSeenMutation.isPending;
+  const isPending = rateMovieMutation.isPending || deleteRatingMutation.isPending;
 
-  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const userQueryKey = getGetCurrentUserQueryKey();
   const avgRatingQueryKey = getGetAverageRatingQueryKey(movie._id);
 
-  const { data: isSeen } = useGetCurrentUser({
-    query: {
-      enabled: isAuthenticated,
-      queryKey: userQueryKey,
-      select: (data) => data.seen.includes(movie._id),
+  const rating = useOptimisticDebounce(
+    ratingProp,
+    async (newRating) => {
+      if (newRating === 0) {
+        await deleteRatingMutation.mutateAsync({ data: { id: movie._id } });
+      } else {
+        await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
+      }
     },
-  });
+    () => {
+      void queryClient.invalidateQueries({ queryKey: userQueryKey });
+      void queryClient.invalidateQueries({ queryKey: avgRatingQueryKey });
+    },
+  );
 
-  // Keep isSeen in a ref so the setTimeout closure always reads the latest value
-  const isSeenRef = useRef(isSeen);
-  useEffect(() => { isSeenRef.current = isSeen; }, [isSeen]);
+  // Sync from prop when parent updates (after server refetch)
+  useEffect(() => { rating.sync(ratingProp); }, [ratingProp, rating.sync]);
 
   const handleRating = (star: number) => () => {
     const newRating =
-      rating === star ? star - 0.5 :
-      rating === star - 0.5 ? 0 :
+      rating.value === star ? star - 0.5 :
+      rating.value === star - 0.5 ? 0 :
       star;
-
-    setRating(newRating);
-
-    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-
-    const prev = committedRatingRef.current;
-
-    commitTimerRef.current = setTimeout(async () => {
-      if (newRating === committedRatingRef.current) return;
-      committedRatingRef.current = newRating;
-      try {
-        if (newRating === 0) {
-          await deleteRatingMutation.mutateAsync({ data: { id: movie._id } });
-        } else {
-          await rateMovieMutation.mutateAsync({ data: { id: movie._id, rating: newRating } });
-          if (!isSeenRef.current) {
-            await addToSeenMutation.mutateAsync({ data: { id: movie._id } });
-          }
-        }
-      } catch {
-        setRating(prev);
-        committedRatingRef.current = prev;
-      } finally {
-        void queryClient.invalidateQueries({ queryKey: userQueryKey });
-        void queryClient.invalidateQueries({ queryKey: avgRatingQueryKey });
-      }
-    }, 400);
+    rating.set(newRating);
   };
 
   return (
@@ -118,13 +66,26 @@ export default function MovieModalRating({ movie, rating: ratingProp }: Props) {
           accessibilityLabel={`Rate ${star} star${star > 1 ? 's' : ''}`}
         >
           <Icon
-            name={getStarIcon(star, rating)}
+            name={getStarIcon(star, rating.value)}
             size={60}
             backgroundColor="transparent"
-            iconColor={getStarColor(star, rating)}
+            iconColor={getStarColor(star, rating.value)}
           />
         </TouchableOpacity>
       ))}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  stars: {
+    marginTop: spacing.xs,
+    backgroundColor: colors.black,
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+  },
+});

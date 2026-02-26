@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import PicturePicker from '@/components/PicturePicker';
 import Screen from '@/components/Screen';
-import { spacing } from '@/config';
+import { screen, spacing } from '@/config';
 import { getProfilePic } from '@/constants';
 import { getGetCurrentUserQueryKey,useGetCurrentUser, useUpdateUser } from '@/services';
 import type { HomeStackParamList } from '@/types';
@@ -48,7 +48,7 @@ export default function AccountDetailsScreen() {
   };
 
   return (
-    <Screen isLoading={isLoading} style={styles.screen}>
+    <Screen isLoading={isLoading} style={screen.withPadding}>
       {user && (
         <>
           <Modal
@@ -92,9 +92,6 @@ export default function AccountDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    padding: spacing.md,
-  },
   imageContainer: {
     height: '20%',
     width: '100%',

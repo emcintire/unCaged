@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
 import Screen from '@/components/Screen';
-import { borderRadius, colors, fontFamily,fontSize, spacing } from '@/config';
+import { borderRadius, colors, fontFamily,fontSize, screen, spacing } from '@/config';
 import { type AddQuoteBody, type CreateMovieBody, useAddQuote, useCreateMovie } from '@/services';
 import type { SettingsTabParamList } from '@/types';
 import { showSuccessToast, toFormikValidator } from '@/utils';
@@ -97,7 +97,7 @@ export default function AdminScreen() {
   };
 
   return (
-    <Screen style={styles.container}>
+    <Screen style={screen.withPadding}>
       <ScrollView showsVerticalScrollIndicator={false} decelerationRate="fast">
         {/* Manage Reviews */}
         <TouchableOpacity style={styles.manageBtn} onPress={() => navigate('Admin Reviews')}>
@@ -140,9 +140,6 @@ export default function AdminScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: spacing.md,
-  },
   manageBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -151,6 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     padding: spacing.md,
     marginBottom: spacing.md,
+    marginTop: spacing.md,
   },
   manageBtnText: {
     flex: 1,

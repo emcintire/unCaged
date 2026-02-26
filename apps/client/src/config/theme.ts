@@ -42,13 +42,13 @@ export const fontFamily = {
 
 export const shadow = {
   sm: {
-    boxShadow: '0 2px 8px 0 rgba(0,0,0,0.35)',
+    boxShadow: '0 2px 6px 0 rgba(0,0,0,0.3)',
   },
   md: {
-    boxShadow: '0 3px 14px 0 rgba(0,0,0,0.4)',
+    boxShadow: '0 3px 10px 0 rgba(0,0,0,0.35)',
   },
   lg: {
-    boxShadow: '0 4px 20px 0 rgba(0,0,0,0.45)',
+    boxShadow: '0 4px 16px 0 rgba(0,0,0,0.4)',
   },
 } as const;
 
@@ -185,10 +185,6 @@ export const screen = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-  },
-  noPadding: {
-    paddingTop: 0,
-    paddingBottom: 0,
   },
 });
 
