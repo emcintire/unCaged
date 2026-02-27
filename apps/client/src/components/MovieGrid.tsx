@@ -1,16 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { type ReactElement,type ReactNode, useCallback, useState } from 'react';
+import { type ReactElement,type ReactNode, useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text,View } from 'react-native';
 
-import { colors, fontFamily, fontSize, movieCard, spacing } from '@/config';
+import { colors, fontFamily, fontSize, spacing } from '@/config';
+import { useGridLayout } from '@/hooks';
 import type { Movie } from '@/services';
 
 import BuyMeCoffeeButton from './BuyMeCoffeeButton';
 import MovieCard from './MovieCard';
 import MovieModal from './movieModal/MovieModal';
 import PullToRefresh from './PullToRefresh';
-
-const NUM_COLUMNS = 2;
 
 type Props = {
   movies: Array<Movie>;
@@ -32,17 +31,22 @@ export default function MovieGrid({
   onRefresh,
 }: Props) {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const { numColumns, cardWidth, cardHeight, rowGap } = useGridLayout();
+
+  const cardButtonStyle = useMemo(() => ({ width: cardWidth, height: cardHeight }), [cardWidth, cardHeight]);
+  const cardWrapperStyle = useMemo(() => [styles.cardWrapper, { marginBottom: rowGap }], [rowGap]);
 
   const renderMovie = useCallback(({ item }: { item: Movie }) => (
-    <View style={movieCard.container}>
+    <View style={cardWrapperStyle}>
       <MovieCard
         movie={item}
         onPress={() => setSelectedMovie(item)}
         isFavorite={favoriteIds.includes(item._id)}
         isSeen={seenIds.includes(item._id)}
+        buttonStyle={cardButtonStyle}
       />
     </View>
-  ), [favoriteIds, seenIds]);
+  ), [favoriteIds, seenIds, cardButtonStyle, cardWrapperStyle]);
 
   const keyExtractor = useCallback((item: Movie) => item._id, []);
 
@@ -54,13 +58,14 @@ export default function MovieGrid({
         onClose={() => setSelectedMovie(null)}
       />
       <FlatList
+        key={`grid-${numColumns}`}
         data={movies}
         renderItem={renderMovie}
         keyExtractor={keyExtractor}
-        numColumns={NUM_COLUMNS}
+        numColumns={numColumns}
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={{ paddingTop: rowGap }}
         ListHeaderComponent={ListHeaderComponent}
         ListHeaderComponentStyle={ListHeaderComponentStyle}
         ListFooterComponent={<BuyMeCoffeeButton />}
@@ -77,8 +82,8 @@ export default function MovieGrid({
 }
 
 const styles = StyleSheet.create({
-  listContent: {
-    paddingTop: spacing.lg,
+  cardWrapper: {
+    alignItems: 'center',
   },
   columnWrapper: {
     justifyContent: 'space-evenly' as const,

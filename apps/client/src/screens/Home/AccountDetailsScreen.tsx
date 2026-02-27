@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     height: '20%',
     width: '100%',
     alignItems: 'center',
-    marginTop: spacing.sm,
+    marginTop: spacing.lg,
   },
   image: {
     height: 150,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxl,
   },
   formContainer: {
-    marginTop: spacing.xxl + spacing.lg,
+    marginTop: spacing.xxl,
   },
   overlay: {
     position: 'absolute',

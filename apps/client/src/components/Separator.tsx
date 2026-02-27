@@ -9,7 +9,7 @@ type SeparatorProps = {
 
 export default memo(function Separator({ modal }: SeparatorProps) {
   return (
-    <View style={[styles.separator, { backgroundColor: modal ? colors.light : colors.bg }]} />
+    <View style={[styles.separator, { backgroundColor: modal ? colors.divider : colors.bg }]} />
   );
 });
 

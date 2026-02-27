@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: borderRadius.md,
     overflow: 'hidden',
-    ...shadow.lg,
+    ...shadow.md,
     marginBottom: spacing.md,
   },
   title: {

@@ -1,8 +1,9 @@
-import type { MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
+import { type MaterialCommunityIcons as MaterialCommunityIconsType } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import Icon from '@/components/Icon';
 import { colors, fontFamily, fontSize, spacing } from '@/config';
 import { useAuth, useOptimisticDebounce } from '@/hooks';
 import {
@@ -11,7 +12,6 @@ import {
   useGetCurrentUser, useRemoveFromFavorites, useRemoveFromSeen, useRemoveFromWatchlist,
 } from '@/services';
 
-import Icon from '../Icon';
 import MovieModalRating from './MovieModalRating';
 
 type Props = {
@@ -120,14 +120,15 @@ export default function MovieModalActions({ movie }: Props) {
       <View style={styles.actionsRow}>
         {actions.map((action) => (
           <View key={action.label} style={styles.actionItem}>
-            <TouchableOpacity onPress={action.onPress} accessibilityRole="button" accessibilityLabel={`${action.active ? 'Remove from' : 'Add to'} ${action.label}`}>
-              <Icon
-                name={action.icon}
-                size={60}
-                backgroundColor={colors.bg}
-                iconColor={action.active ? colors.orange : colors.medium}
-              />
-            </TouchableOpacity>
+            <Icon
+              accessibilityLabel={`${action.active ? 'Remove from' : 'Add to'} ${action.label}`}
+              backgroundColor="transparent"
+              iconColor={action.active ? colors.orange : colors.medium}
+              name={action.icon}
+              onPress={action.onPress}
+              size={60}
+              style={styles.icon}
+            />
             <Text style={[styles.label, { color: action.labelColor }]}>{action.label}</Text>
           </View>
         ))}
@@ -138,6 +139,9 @@ export default function MovieModalActions({ movie }: Props) {
 }
 
 const styles = StyleSheet.create({
+  icon: {
+    marginTop: -10,
+  },
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -147,10 +151,12 @@ const styles = StyleSheet.create({
   actionItem: {
     alignItems: 'center',
     gap: 4,
+    paddingTop: 0,
+    marginTop: 0,
   },
   label: {
     position: 'absolute',
-    top: 50,
+    top: 40,
     fontFamily: fontFamily.medium,
     fontSize: fontSize.xs,
   },

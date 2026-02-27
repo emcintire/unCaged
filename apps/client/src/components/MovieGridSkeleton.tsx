@@ -1,17 +1,19 @@
-import { StyleSheet,View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { borderRadius, movieCard, spacing } from '@/config';
+import { borderRadius, spacing } from '@/config';
+import { useGridLayout } from '@/hooks';
 
 import Skeleton from './Skeleton';
 
-const ITEMS = Array.from({ length: 6 }, (_, i) => i);
-
 export default function MovieGridSkeleton() {
+  const { numColumns, cardWidth, cardHeight, rowGap } = useGridLayout();
+  const items = Array.from({ length: numColumns * 3 }, (_, i) => i);
+
   return (
     <View style={styles.container}>
-      {ITEMS.map((i) => (
-        <View key={i} style={styles.item}>
-          <Skeleton width={movieCard.button.width} height={movieCard.button.height} borderRadiusValue={borderRadius.sm} />
+      {items.map((i) => (
+        <View key={i} style={[styles.item, { marginBottom: rowGap }]}>
+          <Skeleton width={cardWidth} height={cardHeight} borderRadiusValue={borderRadius.sm} />
         </View>
       ))}
     </View>
@@ -27,6 +29,5 @@ const styles = StyleSheet.create({
   },
   item: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
   },
 });

@@ -40,20 +40,26 @@ function RandomMovieFilters({
   watchlistFilter,
 }: RandomMovieFiltersProps) {
   return (
-    <View style={randomMovieScreenFiltersStyles.filtersModalContainer}>
+    <View style={fs.filtersModalContainer}>
       <Pressable
-        style={randomMovieScreenFiltersStyles.transparentBg}
+        style={fs.transparentBg}
         onPress={() => setFiltersModalVisible(false)}
         accessibilityRole="button"
         accessibilityLabel="Close filters"
       />
-      <View style={randomMovieScreenFiltersStyles.filtersModal}>
-        <View style={randomMovieScreenFiltersStyles.headerContainer}>
-          <Text style={randomMovieScreenFiltersStyles.headerText}>Filters</Text>
-        </View>
+      <View style={fs.filtersModal}>
+        <Text style={fs.headerText}>Filters</Text>
+        <TouchableOpacity
+          style={fs.closeBtn}
+          onPress={() => setFiltersModalVisible(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close filters"
+        >
+          <MaterialCommunityIcons name="close" size={18} color={colors.light} />
+        </TouchableOpacity>
         <Separator modal />
         <View style={{ width: '75%' }}>
-          <Text style={randomMovieScreenFiltersStyles.label}>Unseen</Text>
+          <Text style={fs.label}>Unseen</Text>
         </View>
         <View style={{ width: '25%' }}>
           <Switch
@@ -66,7 +72,7 @@ function RandomMovieFilters({
         </View>
         <Separator modal />
         <View style={{ width: '75%' }}>
-          <Text style={randomMovieScreenFiltersStyles.label}>On Watchlist</Text>
+          <Text style={fs.label}>On Watchlist</Text>
         </View>
         <View style={{ width: '25%' }}>
           <Switch
@@ -79,7 +85,7 @@ function RandomMovieFilters({
         </View>
         <Separator modal />
         <View style={{ width: '75%' }}>
-          <Text style={randomMovieScreenFiltersStyles.label}>Masterpieces</Text>
+          <Text style={fs.label}>Masterpieces</Text>
         </View>
         <View style={{ width: '25%' }}>
           <Switch
@@ -92,14 +98,14 @@ function RandomMovieFilters({
         </View>
         <Separator modal />
         <View style={{ width: '50%' }}>
-          <Text style={randomMovieScreenFiltersStyles.label}>Genre</Text>
+          <Text style={fs.label}>Genre</Text>
         </View>
         <View style={{ width: '50%' }}>
           <AppDropdown
             items={genreOptions}
             selectedValue={genreFilter}
             onSelect={setGenreFilter}
-            listStyle={randomMovieScreenFiltersStyles.dropdownList}
+            listStyle={fs.dropdownList}
             accessibilityLabel="Select genre filter"
           />
         </View>
@@ -211,19 +217,19 @@ export default function RandomMovieScreen() {
           watchlistFilter={watchlistFilter}
         />
       </Modal>
-      <View style={randomMovieScreenStyles.content}>
-        <Animated.View style={[randomMovieScreenStyles.movieArea, { opacity: fade.value }]}>
+      <View style={ss.content}>
+        <Animated.View style={[ss.movieArea, { opacity: fade.value }]}>
           {movie == null ? (
-            <Text style={randomMovieScreenStyles.emptyText}>No results :(</Text>
+            <Text style={ss.emptyText}>No results :(</Text>
           ) : (
             <TouchableOpacity
-              style={randomMovieScreenStyles.movieButton}
+              style={ss.movieButton}
               onPress={() => setModalVisible(true)}
             >
               <Image
                 key={movieKey}
                 source={movie.image}
-                style={randomMovieScreenStyles.movieImage}
+                style={ss.movieImage}
                 contentFit="cover"
                 onLoadEnd={() => {
                   if (waitingForImage.current) {
@@ -233,25 +239,25 @@ export default function RandomMovieScreen() {
                 }}
               />
               {user?.favorites?.includes(movie._id) && (
-                <View style={randomMovieScreenStyles.badge}>
+                <View style={ss.badge}>
                   <MaterialCommunityIcons name="heart" size={18} color={colors.orange} />
                 </View>
               )}
               {user?.seen?.includes(movie._id) && (
-                <View style={[randomMovieScreenStyles.badge, user?.favorites?.includes(movie._id) ? randomMovieScreenStyles.secondBadge : undefined]}>
+                <View style={[ss.badge, user?.favorites?.includes(movie._id) ? ss.secondBadge : undefined]}>
                   <MaterialCommunityIcons name="eye" size={18} color={colors.orange} />
                 </View>
               )}
             </TouchableOpacity>
           )}
         </Animated.View>
-        <View style={randomMovieScreenStyles.bottomBar}>
-          <TouchableOpacity style={randomMovieScreenStyles.refreshBtn} onPress={handleGetRandomMovie}>
-            <View style={randomMovieScreenStyles.inner}>
-              <Text style={randomMovieScreenStyles.text}>CAGE ME</Text>
+        <View style={ss.bottomBar}>
+          <TouchableOpacity style={ss.refreshBtn} onPress={handleGetRandomMovie}>
+            <View style={ss.inner}>
+              <Text style={ss.text}>CAGE ME</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={randomMovieScreenStyles.filtersBtn} onPress={() => setFiltersModalVisible(true)}>
+          <TouchableOpacity style={ss.filtersBtn} onPress={() => setFiltersModalVisible(true)}>
             <MaterialCommunityIcons name="tune" color={colors.medium} size={35} />
           </TouchableOpacity>
         </View>
@@ -260,14 +266,22 @@ export default function RandomMovieScreen() {
   );
 }
 
-const randomMovieScreenFiltersStyles = StyleSheet.create({
-  headerContainer: {
-    position: 'absolute',
-    top: spacing.sm,
-  },
+const fs = StyleSheet.create({
   headerText: {
     fontFamily: fontFamily.black,
-    fontSize: fontSize.xxl + 1,
+    fontSize: fontSize.xxl,
+    color: colors.orange,
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.overlayBtn,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   filtersModalContainer: {
     height: '100%',
@@ -275,20 +289,21 @@ const randomMovieScreenFiltersStyles = StyleSheet.create({
   },
   transparentBg: {
     height: '100%',
-    backgroundColor: colors.overlayMid,
+    backgroundColor: colors.backdropBg,
   },
   filtersModal: {
     position: 'absolute',
     bottom: 0,
-    borderTopLeftRadius: borderRadius.circle + 15,
-    borderTopRightRadius: borderRadius.circle + 15,
-    borderColor: colors.orange,
-    borderWidth: 4,
+    width: '100%',
+    borderTopLeftRadius: borderRadius.round,
+    borderTopRightRadius: borderRadius.round,
+    borderWidth: 1,
     borderBottomWidth: 0,
-    backgroundColor: colors.white,
+    borderColor: colors.surfaceFaint,
+    backgroundColor: colors.bg,
     height: '50%',
     padding: spacing.lg,
-    paddingTop: borderRadius.circle + 15,
+    paddingTop: 0,
     alignItems: 'center',
     alignContent: 'space-evenly',
     justifyContent: 'center',
@@ -296,7 +311,7 @@ const randomMovieScreenFiltersStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   label: {
-    color: 'black',
+    color: colors.white,
     fontSize: fontSize.base,
     fontFamily: fontFamily.bold,
   },
@@ -309,7 +324,7 @@ const randomMovieScreenFiltersStyles = StyleSheet.create({
   },
 });
 
-const randomMovieScreenStyles = StyleSheet.create({
+const ss = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'space-evenly',

@@ -22,21 +22,22 @@ import {
 
 const genres = [
   'Action',
-  'Drama',
-  'Thriller',
+  'Adventure',
   'Comedy',
+  'Crime',
+  'Drama',
   'Family',
+  'Fantasy',
   'Horror',
+  'Mystery',
   'Romance',
   'Sci-Fi',
-  'Crime',
+  'Thriller',
   'War',
-  'Mystery',
-  'Fantasy',
 ];
 
 const ROWS = Array.from({ length: 4 }, (_, i) => i);
-const CARDS_PER_ROW = Array.from({ length: 4 }, (_, i) => i);
+const CARDS_PER_ROW = Array.from({ length: 6 }, (_, i) => i);
 const CARD_WIDTH = 135;
 const CARD_HEIGHT = 200;
 
@@ -112,7 +113,7 @@ export default function HomeScreen() {
   );
 
   const genreRows = useMemo(
-    () => genres.map((genre) => ({
+    () => seededShuffle(genres, 'genres').map((genre) => ({
       label: genre,
       data: seededShuffle(movies.filter((movie) => movie.genres.includes(genre)), genre),
     })),
@@ -222,8 +223,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginRight: spacing.sm,
+    aspectRatio: 2 / 3,
     width: 135,
-    height: 200,
   },
   scrollContent: {
     marginLeft: 15,
