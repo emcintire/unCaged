@@ -9,7 +9,7 @@ COPY tsconfig.base.json ./
 COPY packages/shared/package.json ./packages/shared/
 COPY apps/server/package.json ./apps/server/
 
-RUN npm ci
+RUN git init && npm ci
 
 # Copy source
 COPY packages/shared/src ./packages/shared/src
