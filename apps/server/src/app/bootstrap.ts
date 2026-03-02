@@ -16,9 +16,9 @@ const startHttpServer = (app: Express): Server => {
 };
 
 export const bootstrap = async (app: Express): Promise<Server> => {
-  await connectToDatabase();
-
   const server = startHttpServer(app);
+
+  await connectToDatabase();
   let isShuttingDown = false;
 
   const gracefulShutdown = (signal: string, exitCode: number): void => {

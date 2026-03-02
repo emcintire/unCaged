@@ -31,6 +31,8 @@ COPY apps/server/package.json ./apps/server/
 
 # Reuse node_modules from builder so native addons (bcrypt) don't need recompiling
 COPY --from=builder /app/node_modules ./node_modules
+# Copy workspace-local node_modules (packages npm didn't hoist to root)
+COPY --from=builder /app/apps/server/node_modules ./apps/server/node_modules
 
 # Copy compiled output
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
