@@ -169,5 +169,18 @@ If you did not request a password reset, you can safely ignore this email.`,
     user.resetCodeExpiry = undefined;
     await user.save();
     await RefreshToken.deleteMany({ userId: user._id });
+
+    const accessToken = signAccessToken({ sub: String(user._id), isAdmin: user.isAdmin });
+    const refreshToken = createRefreshTokenValue();
+    const refreshHash = hashRefreshToken(refreshToken);
+
+    await RefreshToken.create({
+      userId: user._id,
+      tokenHash: refreshHash,
+      expiresAt: refreshExpiryDate(),
+      lastUsedAt: new Date(),
+    });
+
+    return { accessToken, refreshToken };
   }
 }

@@ -38,13 +38,14 @@ export default function PasswordResetScreen() {
     }
 
     const { accessToken, refreshToken } = await resetPasswordMutation.mutateAsync({ data: { code, email, newPassword: values.newPassword } });
+    console.log(accessToken, refreshToken);
     await signIn(accessToken, refreshToken);
     showSuccessToast('Password reset successful!');
   };
 
   return (
     <Screen style={screen.withPadding}>
-      <Text style={[typography.h1, utils.selfCenter]}>New password</Text>
+      <Text style={[typography.h1, utils.selfCenter, utils.mt10]}>New password</Text>
       <View style={form.container}>
         <AppForm<PasswordResetFormValues>
           initialValues={{ newPassword: '' }}

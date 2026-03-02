@@ -79,8 +79,8 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      await this.authService.resetPassword(req.body.email, req.body.code, req.body.newPassword);
-      res.sendStatus(200);
+      const tokens = await this.authService.resetPassword(req.body.email, req.body.code, req.body.newPassword);
+      res.send(tokens);
     } catch (error) {
       next(error);
     }
