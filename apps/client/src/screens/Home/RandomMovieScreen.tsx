@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useCallback, useEffect, useRef,useState } from 'react';
-import { Animated,Modal, Pressable, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Modal, PanResponder, Pressable, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import AppDropdown from '@/components/AppDropdown';
 import MovieModal from '@/components/movieModal/MovieModal';
@@ -39,6 +39,42 @@ function RandomMovieFilters({
   unseenFilter,
   watchlistFilter,
 }: RandomMovieFiltersProps) {
+  const translateY = useRef(new Animated.Value(500)).current;
+
+  useEffect(() => {
+    Animated.spring(translateY, {
+      toValue: 0,
+      useNativeDriver: true,
+      bounciness: 0,
+    }).start();
+  }, [translateY]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, { dy }) => dy > 0,
+      onPanResponderMove: (_, { dy }) => {
+        if (dy > 0) translateY.setValue(dy);
+      },
+      onPanResponderRelease: (_, { dy, vy }) => {
+        if (dy > 80 || vy > 0.8) {
+          Animated.timing(translateY, {
+            toValue: 600,
+            duration: 200,
+            useNativeDriver: true,
+          }).start(() => {
+            setFiltersModalVisible(false);
+          });
+        } else {
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    }),
+  ).current;
+
   return (
     <View style={fs.filtersModalContainer}>
       <Pressable
@@ -47,16 +83,11 @@ function RandomMovieFilters({
         accessibilityRole="button"
         accessibilityLabel="Close filters"
       />
-      <View style={fs.filtersModal}>
+      <Animated.View style={[fs.filtersModal, { transform: [{ translateY }] }]}>
+        <View style={fs.dragHandleArea} {...panResponder.panHandlers}>
+          <View style={fs.dragHandle} />
+        </View>
         <Text style={fs.headerText}>Filters</Text>
-        <TouchableOpacity
-          style={fs.closeBtn}
-          onPress={() => setFiltersModalVisible(false)}
-          accessibilityRole="button"
-          accessibilityLabel="Close filters"
-        >
-          <MaterialCommunityIcons name="close" size={18} color={colors.light} />
-        </TouchableOpacity>
         <Separator modal />
         <View style={{ width: '75%' }}>
           <Text style={fs.label}>Unseen</Text>
@@ -109,7 +140,7 @@ function RandomMovieFilters({
             accessibilityLabel="Select genre filter"
           />
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -200,7 +231,7 @@ export default function RandomMovieScreen() {
         isOpen={modalVisible}
       />
       <Modal
-        animationType="slide"
+        animationType="none"
         transparent={true}
         visible={filtersModalVisible}
         onRequestClose={() => setFiltersModalVisible(false)}
@@ -272,16 +303,16 @@ const fs = StyleSheet.create({
     fontSize: fontSize.xxl,
     color: colors.orange,
   },
-  closeBtn: {
-    position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.overlayBtn,
+  dragHandleArea: {
+    width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+  },
+  dragHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.surfaceFaint,
   },
   filtersModalContainer: {
     height: '100%',

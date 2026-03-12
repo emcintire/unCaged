@@ -78,7 +78,7 @@ const AdminReviewItem = memo(({ item }: { item: AdminReview }) => {
       )}
 
       {/* Text */}
-      <Text style={styles.reviewText} numberOfLines={3}>{item.text}</Text>
+      <Text style={styles.reviewText}>{item.text}</Text>
 
       {/* Stats */}
       <View style={styles.statsRow}>

@@ -4,7 +4,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Modal,StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { z } from 'zod';
 
 import { AppForm, AppFormField, SubmitButton } from '@/components/forms';
@@ -59,32 +59,34 @@ export default function AccountDetailsScreen() {
           >
             <PicturePicker modalVisible={modalVisible} setModalVisible={setModalVisible} />
           </Modal>
-          <View style={styles.imageContainer}>
-            <TouchableOpacity onPress={() => setModalVisible(true)} accessibilityRole="button" accessibilityLabel="Change profile picture">
-              <View style={styles.overlay}>
-                <MaterialCommunityIcons name="pencil" size={40} color="white" />
-              </View>
-              <Image source={getProfilePic(user.image)} style={styles.image} accessibilityLabel="Profile picture" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.formContainer}>
-            <AppForm<FormValues>
-              initialValues={{ name: user.name ?? '', email: user.email }}
-              onSubmit={handleSubmit}
-              validate={validate}
-            >
-              <AppFormField<FormValues> autoComplete="name" icon="account" name="name" textContentType="name" placeholder="Name" />
-              <AppFormField<FormValues>
-                autoComplete="email"
-                icon="email"
-                keyboardType="email-address"
-                name="email"
-                textContentType="emailAddress"
-                placeholder="Email"
-              />
-              <SubmitButton<FormValues> title="Save" style={styles.saveButton} />
-            </AppForm>
-          </View>
+          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <View style={styles.imageContainer}>
+              <TouchableOpacity onPress={() => setModalVisible(true)} accessibilityRole="button" accessibilityLabel="Change profile picture">
+                <View style={styles.overlay}>
+                  <MaterialCommunityIcons name="pencil" size={40} color="white" />
+                </View>
+                <Image source={getProfilePic(user.image)} style={styles.image} accessibilityLabel="Profile picture" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.formContainer}>
+              <AppForm<FormValues>
+                initialValues={{ name: user.name ?? '', email: user.email }}
+                onSubmit={handleSubmit}
+                validate={validate}
+              >
+                <AppFormField<FormValues> autoComplete="name" icon="account" name="name" textContentType="name" placeholder="Name" />
+                <AppFormField<FormValues>
+                  autoComplete="email"
+                  icon="email"
+                  keyboardType="email-address"
+                  name="email"
+                  textContentType="emailAddress"
+                  placeholder="Email"
+                />
+                <SubmitButton<FormValues> title="Save" style={styles.saveButton} />
+              </AppForm>
+            </View>
+          </ScrollView>
         </>
       )}
     </Screen>
@@ -93,10 +95,10 @@ export default function AccountDetailsScreen() {
 
 const styles = StyleSheet.create({
   imageContainer: {
-    height: '20%',
     width: '100%',
     alignItems: 'center',
     marginTop: spacing.lg,
+    paddingBottom: spacing.sm,
   },
   image: {
     height: 150,
