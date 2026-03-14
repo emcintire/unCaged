@@ -1,3 +1,3 @@
 export * from './axiosInstance';
-export * from './generated/api';
+export * from './generated';
 export * from './queryClient';

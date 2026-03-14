@@ -18,239 +18,47 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import type {
+  AddQuoteBody,
+  AddToFavoritesBody,
+  AddToSeenBody,
+  AddToWatchlistBody,
+  AdminReviewsPage,
+  AuthTokenData,
+  ChangePasswordBody,
+  CheckCodeBody,
+  CreateMovieBody,
+  CreateReviewBody,
+  CreateUserBody,
+  DeleteRatingBody,
+  DeleteUserBody,
+  ForgotPasswordBody,
+  GetAdminReviewsParams,
+  GetIssues200,
+  GetIssuesParams,
+  GetReviewsByMovieParams,
+  Issue,
+  LoginBody,
+  LogoutBody,
+  Movie,
+  Quote,
+  RateMovieBody,
+  RefreshBody,
+  RemoveFromFavoritesBody,
+  RemoveFromSeenBody,
+  RemoveFromWatchlistBody,
+  ResetPasswordBody,
+  Review,
+  ReviewsPage,
+  SubmitIssueBody,
+  ToggleReviewLike200,
+  UpdateReviewBody,
+  UpdateUserBody,
+  User,
+  UserReview
+} from './api.schemas';
+
 import { axiosInstance } from '../axiosInstance';
-export interface AuthTokenData {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface Movie {
-  _id: string;
-  title: string;
-  avgRating?: number;
-  date: string;
-  description?: string;
-  director: string;
-  genres: string[];
-  image: string;
-  rating: string;
-  runtime: string;
-}
-
-export interface Quote {
-  quote: string;
-  subquote: string;
-}
-
-export interface Review {
-  _id: string;
-  userId: string;
-  movieId: string;
-  text: string;
-  rating?: number;
-  isSpoiler?: boolean;
-  likes: string[];
-  likeCount: number;
-  isFlagged?: boolean;
-  isLikedByUser?: boolean;
-  createdOn: string;
-  userName: string;
-  userImage: number;
-}
-
-export interface ReviewsPage {
-  reviews: Review[];
-  total: number;
-  hasMore: boolean;
-}
-
-export type AdminReview = Review & {
-  userEmail: string;
-  flaggedBy: string[];
-  movieTitle: string;
-  movieImage: string;
-};
-
-export interface AdminReviewsPage {
-  reviews: AdminReview[];
-  total: number;
-  hasMore: boolean;
-}
-
-export interface UserRating {
-  _id: string;
-  movie: string;
-  rating: number;
-}
-
-export interface User {
-  _id: string;
-  email: string;
-  favorites: string[];
-  /**
-   * Profile picture index (1-6), references a local asset in the client
-   * @minimum 1
-   * @maximum 6
-   */
-  image: number;
-  /** Legacy Imgur profile picture URL (kept for old iOS client compatibility) */
-  img: string;
-  isAdmin: boolean;
-  name?: string;
-  ratings: UserRating[];
-  seen: string[];
-  watchlist: string[];
-}
-
-export type UserReview = Review & {
-  movieTitle: string;
-  movieImage: string;
-};
-
-export type LoginBody = {
-  email: string;
-  password: string;
-};
-
-export type LogoutBody = {
-  refreshToken: string;
-};
-
-export type RefreshBody = {
-  refreshToken: string;
-};
-
-export type ForgotPasswordBody = {
-  email: string;
-};
-
-export type CheckCodeBody = {
-  code: string;
-  email: string;
-};
-
-export type ResetPasswordBody = {
-  code: string;
-  email: string;
-  newPassword: string;
-};
-
-export type CreateMovieBody = {
-  title: string;
-  director: string;
-  description?: string;
-  genres?: string[];
-  runtime: string;
-  rating: string;
-  date: string;
-  img?: string;
-};
-
-export type AddQuoteBody = {
-  quote: string;
-  subquote: string;
-};
-
-export type GetReviewsByMovieParams = {
-movieId: string;
-page?: number;
-limit?: number;
-sort?: GetReviewsByMovieSort;
-};
-
-export type GetReviewsByMovieSort = typeof GetReviewsByMovieSort[keyof typeof GetReviewsByMovieSort];
-
-
-export const GetReviewsByMovieSort = {
-  recent: 'recent',
-  popular: 'popular',
-} as const;
-
-export type CreateReviewBody = {
-  movieId: string;
-  text: string;
-  rating?: number;
-  isSpoiler?: boolean;
-};
-
-export type GetAdminReviewsParams = {
-page?: number;
-limit?: number;
-flaggedOnly?: boolean;
-userEmail?: string;
-movieTitle?: string;
-};
-
-export type UpdateReviewBody = {
-  text?: string;
-  rating?: number;
-  isSpoiler?: boolean;
-};
-
-export type ToggleReviewLike200 = {
-  liked?: boolean;
-};
-
-export type CreateUserBody = {
-  name?: string;
-  email: string;
-  password: string;
-};
-
-export type UpdateUserBody = {
-  name?: string;
-  email?: string;
-  /**
-   * Profile picture index (1-6)
-   * @minimum 1
-   * @maximum 6
-   */
-  image?: number;
-  /** Legacy Imgur URL (old iOS client only) */
-  img?: string;
-};
-
-export type DeleteUserBody = {
-  id: string;
-};
-
-export type ChangePasswordBody = {
-  currentPassword: string;
-  password: string;
-};
-
-export type AddToFavoritesBody = {
-  id: string;
-};
-
-export type RemoveFromFavoritesBody = {
-  id: string;
-};
-
-export type AddToSeenBody = {
-  id: string;
-};
-
-export type RemoveFromSeenBody = {
-  id: string;
-};
-
-export type AddToWatchlistBody = {
-  id: string;
-};
-
-export type RemoveFromWatchlistBody = {
-  id: string;
-};
-
-export type RateMovieBody = {
-  id: string;
-  rating: number;
-};
-
-export type DeleteRatingBody = {
-  id: string;
-};
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -688,6 +496,299 @@ export const useResetPassword = <TError = unknown,
     }
     
 /**
+ * @summary Submit an issue report
+ */
+export const getSubmitIssueUrl = () => {
+
+
+  
+
+  return `/api/issues`
+}
+
+export const submitIssue = async (submitIssueBody: SubmitIssueBody, options?: RequestInit): Promise<void> => {
+  
+  return axiosInstance<void>(getSubmitIssueUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      submitIssueBody,)
+  }
+);}
+
+
+
+
+export const getSubmitIssueMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitIssue>>, TError,{data: SubmitIssueBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitIssue>>, TError,{data: SubmitIssueBody}, TContext> => {
+
+const mutationKey = ['submitIssue'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitIssue>>, {data: SubmitIssueBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitIssue(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitIssueMutationResult = NonNullable<Awaited<ReturnType<typeof submitIssue>>>
+    export type SubmitIssueMutationBody = SubmitIssueBody
+    export type SubmitIssueMutationError = unknown
+
+    /**
+ * @summary Submit an issue report
+ */
+export const useSubmitIssue = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitIssue>>, TError,{data: SubmitIssueBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitIssue>>,
+        TError,
+        {data: SubmitIssueBody},
+        TContext
+      > => {
+      return useMutation(getSubmitIssueMutationOptions(options));
+    }
+    
+/**
+ * @summary Get all issues (admin only)
+ */
+export const getGetIssuesUrl = (params?: GetIssuesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/issues?${stringifiedParams}` : `/api/issues`
+}
+
+export const getIssues = async (params?: GetIssuesParams, options?: RequestInit): Promise<GetIssues200> => {
+  
+  return axiosInstance<GetIssues200>(getGetIssuesUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetIssuesQueryKey = (params?: GetIssuesParams,) => {
+    return [
+    `/api/issues`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetIssuesQueryOptions = <TData = Awaited<ReturnType<typeof getIssues>>, TError = unknown>(params?: GetIssuesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIssues>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIssuesQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIssues>>> = ({ signal }) => getIssues(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIssues>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIssuesQueryResult = NonNullable<Awaited<ReturnType<typeof getIssues>>>
+export type GetIssuesQueryError = unknown
+
+
+/**
+ * @summary Get all issues (admin only)
+ */
+
+export function useGetIssues<TData = Awaited<ReturnType<typeof getIssues>>, TError = unknown>(
+ params?: GetIssuesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIssues>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
+  
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIssuesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+/**
+ * @summary Mark an issue as resolved (admin only)
+ */
+export const getResolveIssueUrl = (id: string,) => {
+
+
+  
+
+  return `/api/issues/${id}/resolve`
+}
+
+export const resolveIssue = async (id: string, options?: RequestInit): Promise<Issue> => {
+  
+  return axiosInstance<Issue>(getResolveIssueUrl(id),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
+
+
+
+
+export const getResolveIssueMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveIssue>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveIssue>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['resolveIssue'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveIssue>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  resolveIssue(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResolveIssueMutationResult = NonNullable<Awaited<ReturnType<typeof resolveIssue>>>
+    
+    export type ResolveIssueMutationError = unknown
+
+    /**
+ * @summary Mark an issue as resolved (admin only)
+ */
+export const useResolveIssue = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveIssue>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resolveIssue>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getResolveIssueMutationOptions(options));
+    }
+    
+/**
+ * @summary Delete an issue (admin only)
+ */
+export const getDeleteIssueUrl = (id: string,) => {
+
+
+  
+
+  return `/api/issues/${id}`
+}
+
+export const deleteIssue = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return axiosInstance<void>(getDeleteIssueUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteIssueMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteIssue>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteIssue>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteIssue'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteIssue>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteIssue(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteIssueMutationResult = NonNullable<Awaited<ReturnType<typeof deleteIssue>>>
+    
+    export type DeleteIssueMutationError = unknown
+
+    /**
+ * @summary Delete an issue (admin only)
+ */
+export const useDeleteIssue = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteIssue>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteIssue>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteIssueMutationOptions(options));
+    }
+    
+/**
  * @summary Get all movies
  */
 export const getGetAllMoviesUrl = () => {
@@ -973,6 +1074,81 @@ export function useGetStaffPicks<TData = Awaited<ReturnType<typeof getStaffPicks
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetStaffPicksQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+/**
+ * @summary Get recommended movies for the authenticated user
+ */
+export const getGetRecommendationsUrl = () => {
+
+
+  
+
+  return `/api/movies/recommendations`
+}
+
+export const getRecommendations = async ( options?: RequestInit): Promise<Movie[]> => {
+  
+  return axiosInstance<Movie[]>(getGetRecommendationsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetRecommendationsQueryKey = () => {
+    return [
+    `/api/movies/recommendations`
+    ] as const;
+    }
+
+    
+export const getGetRecommendationsQueryOptions = <TData = Awaited<ReturnType<typeof getRecommendations>>, TError = unknown>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRecommendationsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecommendations>>> = ({ signal }) => getRecommendations({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRecommendationsQueryResult = NonNullable<Awaited<ReturnType<typeof getRecommendations>>>
+export type GetRecommendationsQueryError = unknown
+
+
+/**
+ * @summary Get recommended movies for the authenticated user
+ */
+
+export function useGetRecommendations<TData = Awaited<ReturnType<typeof getRecommendations>>, TError = unknown>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, TError, TData>, request?: SecondParameter<typeof axiosInstance>}
+  
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRecommendationsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -2788,3 +2964,8 @@ export function useGetMyReviews<TData = Awaited<ReturnType<typeof getMyReviews>>
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
+

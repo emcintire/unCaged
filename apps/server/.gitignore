@@ -4,6 +4,9 @@ node_modules/
 # TypeScript build output
 dist/
 
+# Generated OpenAPI spec
+openapi.json
+
 # Test coverage
 coverage/
 

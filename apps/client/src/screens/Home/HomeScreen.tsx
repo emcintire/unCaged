@@ -8,15 +8,17 @@ import MovieModal from '@/components/movieModal/MovieModal';
 import PullToRefresh from '@/components/PullToRefresh';
 import Screen from '@/components/Screen';
 import Skeleton from '@/components/Skeleton';
-import { borderRadius,fontFamily, fontSize, spacing } from '@/config';
+import { borderRadius, colors, fontFamily, fontSize, spacing } from '@/config';
 import { useAuth } from '@/hooks';
 import {
   getGetCurrentUserQueryKey,
+  getGetRecommendationsQueryKey,
   type Movie,
   useGetAllMovies,
   useGetCurrentUser,
   useGetPopularMovies,
   useGetQuote,
+  useGetRecommendations,
   useGetStaffPicks,
 } from '@/services';
 
@@ -36,7 +38,7 @@ const genres = [
   'War',
 ];
 
-const ROWS = Array.from({ length: 4 }, (_, i) => i);
+const ROWS = Array.from({ length: 5 }, (_, i) => i);
 const CARDS_PER_ROW = Array.from({ length: 6 }, (_, i) => i);
 const CARD_WIDTH = 135;
 const CARD_HEIGHT = 200;
@@ -45,14 +47,14 @@ function HomeScreenSkeleton() {
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
       <View style={styles.quoteBlock}>
-        <Skeleton width="80%" height={22} />
+        <Skeleton width="20%" height={10} />
+        <Skeleton width="80%" height={22} style={styles.quoteLine} />
         <Skeleton width="60%" height={22} style={styles.quoteLine} />
-        <Skeleton width="40%" height={14} style={styles.subquote} />
-        <Skeleton width="30%" height={10} style={styles.subsubquote} />
+        <Skeleton width="40%" height={14} style={styles.quoteLine} />
       </View>
       {ROWS.map((row) => (
         <View key={row} style={styles.row}>
-          <Skeleton width="30%" height={22} style={styles.header} />
+          <Skeleton width="30%" height={18} style={styles.quoteLine} />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -87,11 +89,14 @@ export default function HomeScreen() {
   const { data: movies = [], isLoading: moviesLoading, refetch: refetchMovies } = useGetAllMovies();
   const { data: popularMovies = [], isLoading: popularLoading, refetch: refetchPopular } = useGetPopularMovies();
   const { data: staffPicks = [], isLoading: staffPicksLoading, refetch: refetchStaffPicks } = useGetStaffPicks();
+  const { data: recommendations = [], refetch: refetchRecommendations } = useGetRecommendations({
+    query: { enabled: isAuthenticated, queryKey: getGetRecommendationsQueryKey() },
+  });
   const { data: quote, isLoading: quoteLoading, refetch: refetchQuote } = useGetQuote();
 
   const refetchAll = useCallback(
-    () => Promise.all([refetchMovies(), refetchPopular(), refetchStaffPicks(), refetchQuote()]),
-    [refetchMovies, refetchPopular, refetchStaffPicks, refetchQuote],
+    () => Promise.all([refetchMovies(), refetchPopular(), refetchStaffPicks(), refetchRecommendations(), refetchQuote()]),
+    [refetchMovies, refetchPopular, refetchStaffPicks, refetchRecommendations, refetchQuote],
   );
 
   const isLoading = moviesLoading || popularLoading || staffPicksLoading || quoteLoading;
@@ -104,12 +109,21 @@ export default function HomeScreen() {
     return [...arr].sort(() => { s = (s * 1664525 + 1013904223) & 0xffffffff; return s / 0x100000000 - 0.5; });
   }, []);
 
-  const customRows = useMemo(
+  const newReleases = useMemo(
+    () => [...movies].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10),
+    [movies],
+  );
+
+  const customRows = useMemo<Array<{ label: string; data: Array<Movie> }>>(
     () => [
       { label: 'Popular', data: seededShuffle(popularMovies, 'Popular') },
+      { label: 'New Releases', data: newReleases },
       { label: 'Staff Picks', data: seededShuffle(staffPicks, 'Staff Picks') },
+      ...(isAuthenticated && recommendations.length > 0
+        ? [{ label: 'You Might Like', data: recommendations }]
+        : []),
     ],
-    [popularMovies, staffPicks, seededShuffle],
+    [popularMovies, newReleases, staffPicks, recommendations, isAuthenticated, seededShuffle],
   );
 
   const genreRows = useMemo(
@@ -132,12 +146,17 @@ export default function HomeScreen() {
         decelerationRate="fast"
         refreshControl={<PullToRefresh onRefresh={refetchAll} />}
       >
-        <Text style={styles.quote}>{quote?.quote}</Text>
-        <Text style={styles.subquote}>{quote?.subquote}</Text>
-        <Text style={styles.subsubquote}>Verse of the Week</Text>
+        <View style={styles.quoteContainer}>
+          <Text style={styles.verseLabel}>Verse of the Week</Text>
+          <Text style={styles.quote}>{quote?.quote}</Text>
+          <Text style={styles.subquote}>{quote?.subquote}</Text>
+        </View>
         {customRows.map(({ label, data }) => (
           <View key={label}>
-            <Text style={styles.header}>{label}</Text>
+            <View style={styles.headerRow}>
+              <View style={styles.headerAccent} />
+              <Text style={styles.header}>{label}</Text>
+            </View>
             <GHScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
@@ -161,7 +180,10 @@ export default function HomeScreen() {
         ))}
         {genreRows.map(({ label, data }) => (
           <View key={label}>
-            <Text style={styles.header}>{label}</Text>
+            <View style={styles.headerRow}>
+              <View style={styles.headerAccent} />
+              <Text style={styles.header}>{label}</Text>
+            </View>
             <GHScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}
@@ -190,36 +212,53 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  quoteContainer: {
+    marginTop: spacing.xxl,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.orange,
+  },
+  verseLabel: {
+    fontFamily: fontFamily.extraLight,
+    fontSize: fontSize.xs,
+    color: colors.orange,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: spacing.xs,
+  },
   quote: {
     fontFamily: fontFamily.extraLight,
-    fontSize: fontSize.xxl,
+    fontSize: fontSize.xl,
     color: 'white',
-    textAlign: 'center',
-    marginTop: spacing.xxl,
-    paddingHorizontal: spacing.sm,
   },
   subquote: {
-    marginTop: spacing.sm,
-    fontFamily: fontFamily.regular,
-    fontSize: fontSize.base,
-    color: 'white',
-    textAlign: 'center',
-  },
-  subsubquote: {
     marginTop: spacing.xs,
-    marginBottom: spacing.sm,
-    fontFamily: fontFamily.extraLight,
+    fontFamily: fontFamily.regular,
     fontSize: fontSize.sm,
-    color: 'white',
-    textAlign: 'center',
+    color: colors.placeholder,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xl,
+    marginBottom: spacing.xs,
+    marginLeft: spacing.md,
+  },
+  headerAccent: {
+    width: 3,
+    height: 18,
+    backgroundColor: colors.orange,
+    borderRadius: 2,
+    marginRight: spacing.sm,
   },
   header: {
-    fontFamily: fontFamily.extraBold,
-    fontSize: fontSize.xxl,
+    fontFamily: fontFamily.bold,
+    fontSize: fontSize.lg,
     color: 'white',
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-    marginLeft: spacing.md,
+    letterSpacing: 0.3,
   },
   button: {
     marginRight: spacing.sm,
@@ -227,11 +266,11 @@ const styles = StyleSheet.create({
     width: 135,
   },
   scrollContent: {
-    marginLeft: 15,
-    paddingVertical: 8,
+    marginLeft: spacing.md,
+    paddingVertical: spacing.xs,
   },
   listSpacer: {
-    width: 20,
+    width: spacing.lg,
   },
   container: {
     flex: 1,

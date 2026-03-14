@@ -23,6 +23,7 @@
     "baseUrl": "./src",
     "paths": {
       "@/auth": ["auth"],
+      "@/issues": ["issues"],
       "@/middleware": ["middleware"],
       "@/movies": ["movies"],
       "@/quotes": ["quotes"],

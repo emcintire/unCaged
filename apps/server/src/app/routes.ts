@@ -1,6 +1,7 @@
 import type { Express } from 'express';
 
 import { authRouter } from '@/auth';
+import { issueRouter } from '@/issues';
 import { movieRouter } from '@/movies';
 import { quoteRouter } from '@/quotes';
 import { reviewRouter } from '@/reviews';
@@ -16,4 +17,5 @@ export const setupRoutes = (app: Express) => {
   app.use('/api/reviews', reviewRouter);
   app.use('/api/quotes', quoteRouter);
   app.use('/api/movies', movieRouter);
+  app.use('/api/issues', issueRouter);
 };

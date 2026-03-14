@@ -95,6 +95,19 @@ describe('Movies API', () => {
     expect(response.text).toBe('4.6');
   });
 
+  it('GET /api/movies/recommendations returns movies for authenticated user', async () => {
+    const response = await request(app)
+      .get('/api/movies/recommendations')
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(200);
+
+    expect(Array.isArray(response.body)).toBe(true);
+  });
+
+  it('GET /api/movies/recommendations requires authentication', async () => {
+    await request(app).get('/api/movies/recommendations').expect(401);
+  });
+
   it('POST /api/movies allows admin and blocks non-admin', async () => {
     const payload = {
       title: 'New Movie',

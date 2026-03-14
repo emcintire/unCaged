@@ -1,6 +1,7 @@
 import type { NextFunction, Request,Response } from 'express';
 
 import type { AuthenticatedRequest } from '@/types';
+import { getUserIdFromRequest } from '@/utils';
 
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './schemas';
@@ -42,6 +43,21 @@ export class MovieController {
   getStaffPicks = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const movies = await this.movieService.getStaffPicks();
+      res.status(200).send(movies);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getRecommendations = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = getUserIdFromRequest(req, res);
+      if (!userId) return;
+      const movies = await this.movieService.getRecommendations(userId);
       res.status(200).send(movies);
     } catch (error) {
       next(error);

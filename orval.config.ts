@@ -3,11 +3,12 @@ import { defineConfig } from 'orval';
 export default defineConfig({
   uncaged: {
     input: {
-      target: `http://localhost:${process.env.PORT ?? 3000}/api-docs.json`,
+      target: './apps/server/openapi.json',
     },
     output: {
-      target: './apps/client/src/services/generated/api.ts',
       client: 'react-query',
+      mode: 'split',
+      target: './apps/client/src/services/generated/api.ts',
       override: {
         fetch: {
           includeHttpResponseReturnType: false,

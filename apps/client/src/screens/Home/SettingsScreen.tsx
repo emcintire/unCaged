@@ -89,11 +89,16 @@ export default function SettingsScreen() {
     onPress: () => navigate('Privacy Policy'),
     title: 'Privacy Policy',
   }, {
-    children: <View style={styles.spacer} />,
     iconColor: colors.white,
     iconName: 'help',
     onPress: () => navigate('About'),
     title: 'About',
+  }, {
+    children: <View style={styles.spacer} />,
+    iconColor: colors.white,
+    iconName: 'flag-outline',
+    onPress: () => navigate('Report Issue'),
+    title: 'Report an Issue',
   }, {
     children: <View style={styles.spacer} />,
     disabled: !user?.isAdmin,

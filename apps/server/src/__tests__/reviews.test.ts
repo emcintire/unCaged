@@ -175,6 +175,29 @@ describe('Reviews API', () => {
     expect(updated?.flaggedBy).toEqual([]);
   });
 
+  it('PATCH /api/reviews/:reviewId updates review text and spoiler flag', async () => {
+    const review = await Review.create({ userId, movieId, text: 'Original text', rating: 3 });
+
+    const response = await request(app)
+      .patch(`/api/reviews/${review._id.toString()}`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ text: 'Updated text', isSpoiler: true })
+      .expect(200);
+
+    expect(response.body.text).toBe('Updated text');
+    expect(response.body.isSpoiler).toBe(true);
+  });
+
+  it('PATCH /api/reviews/:reviewId blocks non-owner', async () => {
+    const review = await Review.create({ userId, movieId, text: 'Owners only' });
+
+    await request(app)
+      .patch(`/api/reviews/${review._id.toString()}`)
+      .set('Authorization', `Bearer ${otherUserToken}`)
+      .send({ text: 'Hacked' })
+      .expect(403);
+  });
+
   it('DELETE /api/reviews/:reviewId returns 404 for unknown review', async () => {
     await request(app)
       .delete('/api/reviews/507f1f77bcf86cd799439011')

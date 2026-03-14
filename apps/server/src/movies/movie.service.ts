@@ -67,6 +67,42 @@ export class MovieService {
     return await Movie.find({ _id: { $in: admin.favorites } }).sort({ title: 1 });
   }
 
+  async getRecommendations(userId: string) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new HttpError(404, 'User not found.', 'USER_NOT_FOUND');
+    }
+
+    const highlyRatedIds = user.ratings.filter((r) => r.rating >= 4).map((r) => r.movie);
+    const likedIds = [...new Set([...user.favorites, ...highlyRatedIds])];
+
+    if (likedIds.length === 0) {
+      return await Movie.find({ _id: { $nin: user.seen } }).sort({ avgRating: -1 }).limit(20);
+    }
+
+    const likedMovies = await Movie.find({ _id: { $in: likedIds } }, { genres: 1 });
+    const genreCount: Record<string, number> = {};
+    for (const movie of likedMovies) {
+      for (const genre of movie.genres) {
+        genreCount[genre] = (genreCount[genre] ?? 0) + 1;
+      }
+    }
+
+    const excludedIds = [...new Set([...user.seen, ...likedIds])];
+    const candidates = await Movie.find({
+      _id: { $nin: excludedIds },
+      genres: { $in: Object.keys(genreCount) },
+    });
+
+    candidates.sort((a, b) => {
+      const scoreA = a.genres.reduce((sum, g) => sum + (genreCount[g] ?? 0), 0);
+      const scoreB = b.genres.reduce((sum, g) => sum + (genreCount[g] ?? 0), 0);
+      return scoreB - scoreA;
+    });
+
+    return candidates.slice(0, 20);
+  }
+
   async getAverageRating(id: string) {
     const movie = await this.findMovieById(id);
     return movie.avgRating ?? 0;

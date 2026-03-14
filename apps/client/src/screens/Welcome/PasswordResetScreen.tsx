@@ -38,7 +38,6 @@ export default function PasswordResetScreen() {
     }
 
     const { accessToken, refreshToken } = await resetPasswordMutation.mutateAsync({ data: { code, email, newPassword: values.newPassword } });
-    console.log(accessToken, refreshToken);
     await signIn(accessToken, refreshToken);
     showSuccessToast('Password reset successful!');
   };

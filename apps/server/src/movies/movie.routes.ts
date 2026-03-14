@@ -98,6 +98,27 @@ movieRouter.get('/staffpicks', controller.getStaffPicks);
 
 /**
  * @swagger
+ * /api/movies/recommendations:
+ *   get:
+ *     summary: Get recommended movies for the authenticated user
+ *     operationId: getRecommendations
+ *     tags: [Movies]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Recommended movies based on user favorites and ratings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Movie'
+ */
+movieRouter.get('/recommendations', auth, controller.getRecommendations);
+
+/**
+ * @swagger
  * /api/movies/avgRating/{id}:
  *   get:
  *     summary: Get average rating for a movie

@@ -5,11 +5,15 @@ import AppLogo from '@/components/AppLogo';
 import { screenOptions } from '@/navigation/stacks/screenOptions';
 import AboutScreen from '@/screens/Home/AboutScreen';
 import AccountDetailsScreen from '@/screens/Home/AccountDetailsScreen';
+import AdminIssuesScreen from '@/screens/Home/AdminIssuesScreen';
+import AdminMovieScreen from '@/screens/Home/AdminMovieScreen';
+import AdminQuoteScreen from '@/screens/Home/AdminQuoteScreen';
 import AdminReviewsScreen from '@/screens/Home/AdminReviewsScreen';
 import AdminScreen from '@/screens/Home/AdminScreen';
 import MyCollectionScreen from '@/screens/Home/MyCollectionScreen';
 import MyReviewsScreen from '@/screens/Home/MyReviewsScreen';
 import PrivacyPolicyScreen from '@/screens/Home/PrivacyPolicyScreen';
+import ReportIssueScreen from '@/screens/Home/ReportIssueScreen';
 import SecurityScreen from '@/screens/Home/SecurityScreen';
 import SettingsScreen from '@/screens/Home/SettingsScreen';
 import type { Screen, SettingsTabParamList } from '@/types';
@@ -41,12 +45,28 @@ const screens: Array<Screen<SettingsTabParamList>> = [{
   name: 'About',
   component: AboutScreen,
 }, {
+  name: 'Report Issue',
+  component: ReportIssueScreen,
+  options: ({ title: 'Report an Issue' }),
+}, {
   name: 'Admin',
   component: AdminScreen,
 }, {
   name: 'Admin Reviews',
   component: AdminReviewsScreen,
   options: ({ title: 'Manage Reviews' }),
+}, {
+  name: 'Admin Issues',
+  component: AdminIssuesScreen,
+  options: ({ title: 'Reported Issues' }),
+}, {
+  name: 'Admin Quote',
+  component: AdminQuoteScreen,
+  options: ({ title: 'Submit Quote' }),
+}, {
+  name: 'Admin Movie',
+  component: AdminMovieScreen,
+  options: ({ title: 'Create Movie' }),
 }, {
   name: 'Privacy Policy',
   component: PrivacyPolicyScreen,

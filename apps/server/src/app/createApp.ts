@@ -1,39 +1,15 @@
 import type { Express } from 'express';
 import express from 'express';
+import { writeFileSync } from 'fs';
 import helmet from 'helmet';
+import { resolve } from 'path';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { error, requestId, requestLogger } from '@/middleware';
 
 import { setupRoutes } from './routes';
-
-const swaggerOptions: swaggerJSDoc.Options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'unCaged API',
-      version: '1.0.0',
-    },
-    servers: [{ url: `http://localhost:${Number(process.env.PORT) || 3000}` }],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-        },
-      },
-    },
-  },
-  apis: [
-    './src/auth/auth.routes.ts',
-    './src/movies/movie.routes.ts',
-    './src/quotes/quote.routes.ts',
-    './src/reviews/review.routes.ts',
-    './src/users/user.routes.ts',
-  ],
-};
+import { swaggerOptions } from './swaggerOptions';
 
 export const createApp = (): Express => {
   const app = express();
@@ -49,9 +25,10 @@ export const createApp = (): Express => {
   setupRoutes(app);
 
   const swaggerDocs = swaggerJSDoc(swaggerOptions);
-  app.get('/api-docs.json', (_req, res) => res.json(swaggerDocs));
+  if (isDevelopment) {
+    writeFileSync(resolve(__dirname, '../../openapi.json'), JSON.stringify(swaggerDocs, null, 2));
+  }
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
   app.use(error);
 
   return app;
